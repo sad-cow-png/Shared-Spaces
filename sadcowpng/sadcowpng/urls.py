@@ -16,7 +16,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
-#path names are debatable
+# path names can be discussed in more detail
 urlpatterns = [
     path('', include('sharedspaces.urls')),
     path('admin/', admin.site.urls),
