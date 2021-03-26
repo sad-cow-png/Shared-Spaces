@@ -1,3 +1,6 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'signup.css' %}">
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,56 +8,11 @@
     <title>Sign up</title>
 </head>
 
-<style>
-
-
-    .container-fluid {
-        background-color: antiquewhite;
-        text-align: center;
-        padding: 15px;
-        margin: auto;
-        width: 50%;
-        height: 400px;
-    }
-
-    .float-c{
-        background-color: darksalmon;
-        text-align: center;
-        float: left;
-        margin-left: 5%;
-        padding: 10px;
-        width: 40%;
-        height: 65%;
-
-    }
-
-    .float-p{
-        background-color: burlywood;
-        text-align: center;
-        float: left;
-        margin-left: 5%;
-        padding: 10px;
-        width: 40%;
-        height: 65%;
-    }
-
-    .btn{
-
-        background-color: springgreen;
-        margin-top: 50px;
-        color: grey;
-        padding: 10px 16px;
-    }
-
-    .btn:hover{
-        background-color: limegreen;
-    }
-</style>
 
 <body>
     <p>Sign up to create an account for shared spaces.</p>
 
-    <div class="container-fluid">
+    <div class="container">
         <h1> Sign Up </h1>
         <div class="float-c">
             <h5>Client Account</h5>
