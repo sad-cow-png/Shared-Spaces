@@ -10,3 +10,12 @@ spaces to explore. The platform will offer user-friendly maps and geolocation se
 users to locate their intended space intuitively.
 
 Shared Spaces services the needs of a post-pandemic world, available on desktop and mobile devices. 
+
+
+For Developers:
+
+Create Space Background:
+    Creating a space for each proprietor involves entering data to a form that will save entries into a separate spaces 
+database so that each shared spaces listed space will exist as it's own entry that can be associated to individual 
+accounts. The data fields for the spaces database is handled in views.py and saved from there. The database must be 
+individually migrated.
