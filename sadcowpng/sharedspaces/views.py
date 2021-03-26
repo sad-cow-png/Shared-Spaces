@@ -1,6 +1,10 @@
 from django.shortcuts import render
 from django.template import loader
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.views.generic import CreateView
+
+from .models import User
+from .forms import ProprietorSignUpForm
 
 # Shared Spaces Home Page
 def index(request):
@@ -14,6 +18,29 @@ def account(request):
 
 def login(request):
     return render(request, 'sharedspaces/login.html')
+
+
+# Proprietor sign up view
+class ProprietorSignUpView(CreateView):
+    model = User
+    form_class = ProprietorSignUpForm
+    template_name = 'sharedspaces/proprietor.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs['user_type'] = 'proprietor'
+        return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        user = form.save()
+        user.save()
+        return HttpResponseRedirect('index.html')
+
+
+# Proprietor login view
+#class ProprietorLoginView(CreateView):
+    # client
+    # proprietor
+
 
 
 def sign_up(request):
