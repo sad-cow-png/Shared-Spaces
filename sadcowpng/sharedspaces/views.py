@@ -22,3 +22,6 @@ def sign_up(request):
 
 def create_space(request):
     return render(request, 'sharedspaces/create_space.html')
+
+def client_sign_up(request):
+    return render(request, 'sharedspaces/client_sign_up.html')
