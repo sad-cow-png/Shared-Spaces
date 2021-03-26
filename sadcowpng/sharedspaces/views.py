@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.template import loader
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
+from .models import User
 # Shared Spaces Home Page
 def index(request):
     return render(request, 'sharedspaces/index.html')
@@ -25,3 +26,9 @@ def create_space(request):
 
 def client_sign_up(request):
     return render(request, 'sharedspaces/client_sign_up.html')
+def client_signup_redirect(request):
+    uname = request.POST['username']
+    password = request.POST['password']
+    newUser = User(username=uname, password=password, is_client=True)
+    newUser.save()
+    return HttpResponse('sharedspaces/index.html')
