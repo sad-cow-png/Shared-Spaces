@@ -1,3 +1,6 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'signup.css' %}">
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +8,26 @@
     <title>Login</title>
 </head>
 <body>
-    <p>Log in to your shared spaces account.</p>
+
+<div class="container">
+        <h1> Login </h1>
+        <div class="float-c">
+            <h3>Client Login</h3>
+
+            <a href="#">
+            <button class="btn success">Login as a client </button>
+            </a>
+        </div>
+
+        <div class="float-p">
+            <h3>Proprietor Login</h3>
+
+            <a href="{% url 'proprietor_login' %}">
+            <button class="btn success">Login as a proprietor</button>
+            </a>
+        </div>
+    </div>
+
+
 </body>
 </html>
