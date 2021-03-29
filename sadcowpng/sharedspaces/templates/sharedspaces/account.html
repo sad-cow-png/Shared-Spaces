@@ -9,12 +9,13 @@
 
     <!-- Layout may differ depending on user type  -->
     {% if user.is_client and user.is_authenticated %}
-        Hello, client!
+        <p>Hello, client user: {{ user.get_username }} !</p>
     {% endif %}
 
     {% if user.is_proprietor and user.is_authenticated %}
-       Hello, proprietor!
+       <p>Hello, proprietor: {{ user.get_username }} !</p>
     {% endif %}
+
 
 </body>
 </html>
