@@ -19,25 +19,15 @@
         {% endif %}
     {% endif %}
 
-<form method="post" action="{% url 'account' %}">
+    <form method="post">
     {% csrf_token %}
-
-    <table>
         <p>Proprietor Login</p>
-
-    <tr>
-        <td>{{ form.username.label_tag }}</td>
-        <td>{{ form.username }}</td>
-    </tr>
-        <tr>
-        <td>{{ form.password.label_tag }}</td>
-        <td>{{ form.password }}</td>
-    </tr>
-    </table>
+        {{ form.as_p }}
 
     <input type="submit" value="Login">
     <input type="hidden" name="next" value="{{ next }}">
-</form>
+
+    </form>
 
 </body>
 </html>

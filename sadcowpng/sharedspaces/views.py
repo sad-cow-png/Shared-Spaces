@@ -3,10 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, reverse
-from django.template import loader
 from django.http import HttpResponseRedirect
-from django.views.generic import CreateView
-from django.contrib.auth import authenticate,login, logout
+from django.contrib.auth import authenticate, login, logout
 
 from .models import User
 from .forms import ProprietorSignUpForm
@@ -20,37 +18,13 @@ def index(request):
 # account page renders based on user input role
 @login_required
 def account(request):
-     return render(request, 'sharedspaces/account.html')
+    return render(request, 'sharedspaces/account.html')
 
 
 def login(request):
     return render(request, 'sharedspaces/login.html')
 
 
-# Proprietor login view
-def proprietor_login_view(request):
-
-    if(request.method == 'POST'):
-        form = AuthenticationForm(request.POST)
-        if form.is_valid():
-            uname = request.POST.get('username')
-            pw = request.POST.get('password')
-            user = authenticate(username=uname, password=pw)
-
-            if user is not None:
-                login(request, user)
-                return HttpResponseRedirect(reverse('account'))
-
-            else:
-                messages.error(request, 'Invalid username or password')
-
-    else:
-        form = AuthenticationForm()
-
-    return render(request, 'sharedspaces/proprietor_login.html', {'form': form})
-
-
-# Needs more testing
 # Proprietor login view
 class ProprietorLoginView(LoginView):
     model = User
@@ -62,6 +36,7 @@ def sign_up(request):
     return render(request, 'sharedspaces/signup.html')
 
 
+# Logs user out
 def sign_out(request):
     logout(request)
     return render(request, 'sharedspaces/logout.html')
@@ -78,9 +53,6 @@ def proprietor_sign_up_view(request):
             user = form.save(commit=False)
             user.is_proprietor = True
             user.save()
-            #uname = form.cleaned_data.get('username')
-            #pwd = form.cleaned_data.get('password')
-            #user = authenticate(username=user.username, password=pwd)
 
             return HttpResponseRedirect(reverse('index'))
 
