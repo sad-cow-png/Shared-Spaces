@@ -10,13 +10,11 @@
     <h1> This is the client signup page</h1>
     <p>Here is where you can create an account to
         start finding your perfect new hangout spot!</p>
-    <form action = "{%url 'client_sign_up' %}" method="post" >
-
-        Enter your username! <br/>
-        <input type="text" name = "username"><br/>
-        Enter your password! <br/>
-        <input type="text" name="password">
-        <input type="submit">
+    <h2>Sign Up Now!</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit">Sign Up</button>
     </form>
     </body>
 </html>

@@ -14,3 +14,15 @@ class ProprietorSignUpForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+# save user as client
+class ClientSignUpForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.is_client = True
+        if commit:
+            user.save()
+        return user
