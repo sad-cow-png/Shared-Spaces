@@ -1,7 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import CreateView
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, authenticate
 
 from .models import User
 from .forms import ProprietorSignUpForm, ClientSignUpForm
@@ -40,6 +42,21 @@ class ProprietorSignUpView(CreateView):
         return HttpResponseRedirect('index.html')
 
 
+def client_sign_up(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            uname = form.cleaned_data.get('username')
+            raw_pw = form.cleaned_data.get('password1')
+            user = authenticate(username=uname, password=raw_pw)
+            login(request , user)
+            return redirect('index')
+    else:
+        form = UserCreationForm()
+    return render(request, "sharedspaces/client_sign_up.html", {'form': form})
+
+'''
 class ClientSignUpView(CreateView):
     model = User
     form_class = ClientSignUpForm
@@ -53,8 +70,7 @@ class ClientSignUpView(CreateView):
         user = form.save()
         user.save()
         return HttpResponseRedirect('index.html')
-
-
+'''
 # Proprietor login view
 #class ProprietorLoginView(CreateView):
     # client
