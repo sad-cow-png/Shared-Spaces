@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import CreateView
@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
 
 from .models import User
-from .forms import ProprietorSignUpForm, ClientSignUpForm
+from .forms import ClientSignUpForm
 
 # Shared Spaces Home Page
 
@@ -27,33 +27,21 @@ def login(request):
 # Proprietor sign up view
 
 
-class ProprietorSignUpView(CreateView):
-    model = User
-    form_class = ProprietorSignUpForm
-    template_name = 'sharedspaces/proprietor.html'
-
-    def get_context_data(self, **kwargs):
-        kwargs['user_type'] = 'proprietor'
-        return super().get_context_data(**kwargs)
-
-    def form_valid(self, form):
-        user = form.save()
-        user.save()
-        return HttpResponseRedirect('index.html')
-
-
 def client_sign_up(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = ClientSignUpForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
             uname = form.cleaned_data.get('username')
             raw_pw = form.cleaned_data.get('password1')
+            #user = form.save()
+            user.is_client = True
             user = authenticate(username=uname, password=raw_pw)
-            login(request , user)
-            return redirect('index')
+            user.save()
+            #login(request, user)
+            return HttpResponseRedirect(reverse('index'))
     else:
-        form = UserCreationForm()
+        form = ClientSignUpForm()
     return render(request, "sharedspaces/client_sign_up.html", {'form': form})
 
 '''
