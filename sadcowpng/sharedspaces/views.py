@@ -134,7 +134,7 @@ def proprietor_sign_up_view(request):
 
         form = ProprietorSignUpForm(request.POST)
 
-        # Check if form is valid, saves user, and sets user as a proprietor
+        # Check if form is valid, creates user, sets user as a proprietor, and saves
         if form.is_valid():
             user = form.save(commit=False)
             user.is_proprietor = True
