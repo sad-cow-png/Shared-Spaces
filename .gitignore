@@ -128,5 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# important/cached data non required on github
 /sadcowpng/sadcowpng/settings.py
 .idea/
