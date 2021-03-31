@@ -2,12 +2,6 @@ from django.test import TestCase
 from .forms import CreateSpaceForm, Noise_Level_Choices
 from .models import Space
 
-# used for the webdriver that test the program
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from webdriver_manager.chrome import ChromeDriverManager
-import time
-
 
 # Tests will cover both newly entered form data and associated Create Spaces database
 class CreateSpaceTests(TestCase):
@@ -258,9 +252,9 @@ class CreateSpaceTests(TestCase):
         # Tests to see if all the information from the string return is accurate
 
         # noise test string
-        self.assertEqual(test_space.noise_str(), "This location has a noise level {} ".format(
-            Noise_Level_Choices[noise_level - 1][1])
-                         , 'The location noise level was stored in the database incorrectly.')
+        self.assertEqual(test_space.noise_str(),
+                         "This location has a noise level {} ".format(Noise_Level_Choices[noise_level - 1][1]),
+                         'The location noise level was stored in the database incorrectly.')
 
         # Deleting this entry from the database with it's unique ID number
         test_space.delete()
@@ -392,78 +386,4 @@ class CreateSpaceTests(TestCase):
         self.assertEqual(test_space.pk, None,
                          'The location was not deleted properly from the database.')
 
-    # def test_space_modification(self):
-    #     # using selenium to test the website will added later with better integration
-    #     # print("Need to make sure the website is running locally!")
-    #
-    #     # first save the data in to the database
-    #     # start by extracting the data from the form
-    #     name = TestCase.test_form.cleaned_data['space_name']
-    #     description = TestCase.test_form.cleaned_data['space_description']
-    #     max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
-    #     noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
-    #     noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
-    #     wifi = TestCase.test_form.cleaned_data['space_wifi']
-    #     restroom = TestCase.test_form.cleaned_data['space_restrooms']
-    #     food_drink = TestCase.test_form.cleaned_data['space_food_drink']
-    #
-    #     # put the data into the space mode and create a new space model
-    #     test_space = Space(space_name=name,
-    #                        space_description=description,
-    #                        space_max_capacity=max_capacity,
-    #                        space_noise_level_allowed=noise_level_allowed,
-    #                        space_noise_level=noise_level,
-    #                        space_wifi=wifi,
-    #                        space_restrooms=restroom,
-    #                        space_food_drink=food_drink)
-    #
-    #     # Submitting test form data to the create space database
-    #     test_space.save()
-    #
-    #     # get the primary key of the test space to access it on the website
-    #     primary_key = test_space.pk
-    #
-    #     # new name that will set
-    #     new_name = "New Name"
-    #
-    #     # open a new webdriver and try to edit the website
-    #     # setting up the driver
-    #     driver = webdriver.Chrome(ChromeDriverManager().install())
-    #
-    #     time.sleep(4)
-    #     driver.get("http://127.0.0.1:8000/update_space/{}".format(primary_key))
-    #
-    #     # find the input field for the name
-    #     time.sleep(4)
-    #     elem = driver.find_element_by_xpath("/html/body/div/form/table/tbody/tr[1]/td/input")
-    #
-    #     # send the new name
-    #     elem.send_keys(Keys.CONTROL + "a")
-    #     elem.send_keys(new_name)
-    #
-    #     # sleep for a bit
-    #     time.sleep(4)
-    #
-    #     # find the button and submit
-    #     elem = driver.find_element_by_xpath("/html/body/div/form/input[2]")
-    #     elem.send_keys(Keys.RETURN)
-    #
-    #     # has a few bugs
-    #     # closing driver at the end
-    #     time.sleep(4)
-    #     driver.get("http://127.0.0.1:8000/update_space/{}".format(primary_key))
-    #
-    #     # get the space again
-    #     # test_space = Space.objects.get(pk=1)
-    #     # print(test_space.space_name)
-    #     # test_space = Space.objects.get(space_name=new_name)
-    #
-    #     # Test name
-    #     # self.assertEqual(test_space.name_str(), new_name, 'The location name was stored in the database incorrectly.')
-    #
-    #     # Deleting this entry from the database with it's unique ID number
-    #     test_space.delete()
-    #
-    #     # now check if it was deleted properly
-    #     self.assertEqual(test_space.pk, None,
-    #                      'The location was not deleted properly from the database.')
+    # Selenium testing will be added later for testing front end to database

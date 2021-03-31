@@ -57,7 +57,7 @@ def create_space(request):
             sp.save()
 
             # redirecting to account page once complete for now
-            return HttpResponseRedirect('/account/')
+            return HttpResponseRedirect('/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -98,7 +98,7 @@ def update_space(request, space_id):
             old_space.save()
 
             # redirecting to account page once complete for now
-            return HttpResponseRedirect('/account/')
+            return HttpResponseRedirect('/')
 
     # if a GET (or any other method) we'll use the data from the database to
     # create a form with the data from the database
@@ -122,4 +122,5 @@ def update_space(request, space_id):
         # creating a form with the old data
         space_form = CreateSpaceForm(old_data)
 
-    return render(request, 'sharedspaces/update_space.html', {'form': space_form, "space_id": space_id})
+    return render(request, 'sharedspaces/update_space.html', {'form': space_form, "space_id": space_id,
+                                                              "name": old_space.space_name})

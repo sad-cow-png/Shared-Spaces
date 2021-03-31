@@ -10,12 +10,14 @@ Noise_Level_Choices = (
 )
 
 
+# For for creating the specific space and also to modify it.
 class CreateSpaceForm(forms.Form):
     space_name = forms.CharField(label='Name of the Shared Space:', max_length=500, strip=True)
     space_description = forms.CharField(label='Description:', max_length=1000, strip=True)
     space_max_capacity = forms.IntegerField(label='Maximum Occupancy:', min_value=0)
-    space_noise_level_allowed = forms.MultipleChoiceField(label='Noise level allowed:', choices=Noise_Level_Choices, required=False)
-    space_noise_level = forms.MultipleChoiceField(label='Noise level:', choices=Noise_Level_Choices,required=False)
+    space_noise_level_allowed = forms.MultipleChoiceField(label='Noise level allowed:', choices=Noise_Level_Choices,
+                                                          required=True)
+    space_noise_level = forms.MultipleChoiceField(label='Noise level:', choices=Noise_Level_Choices, required=True)
 
     # Might switch boolean fields to multiple choice for clarity
     space_wifi = forms.BooleanField(label='Wifi Availability:', required=False)

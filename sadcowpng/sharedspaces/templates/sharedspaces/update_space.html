@@ -30,7 +30,7 @@
 </head>
 <body>
 <div class = "update_space_form">
-    <h3>update your space here!</h3>
+    <h3>Update the Information for {{name}}</h3>
     <form  action="/update_space/{{space_id}}" method="post">
         {% csrf_token %}
         <table class="update_space_table" border="1">
