@@ -1,13 +1,400 @@
 from django.test import TestCase
+
+
 from django.urls import reverse
 
 from .models import User
 from .forms import ProprietorSignUpForm
 
 
-class ProprietorSignUpFormTest(TestCase):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Test proprietor signup with invalid and valid users
+class ProprietorSignUpTest(TestCase):
     def setUp(self):
-        # Used for existing user error
+        # Used for existing user test
         self.credentials = {
             'username': 'test',
             'password': '#zgsXJLY5jRb35j',
@@ -75,7 +462,6 @@ class ProprietorSignUpFormTest(TestCase):
             form = ProprietorSignUpForm(data=invalid_users['data'])
             self.failIf(form.is_valid())
 
-
     def test_valid_signup(self):
         data = {
             'username': 'testuser2',
@@ -94,6 +480,10 @@ class ProprietorSignUpFormTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(User.objects.count(), 2)
 
+        # Check is_proprietor flag is set for user
+        user = User.objects.get(username='testuser2')
+        self.assertEqual(user.is_proprietor, True)
+
         self.assertRedirects(response, '/')
 
 
@@ -107,6 +497,7 @@ class ProprietorLoginTest(TestCase):
         User.objects.create_user(**self.credentials)
         user = User.objects.all()
         self.assertTrue(user.count(), 1)
+
 
     def test_login_view(self):
         response = self.client.get('/login/proprietor/')
@@ -127,3 +518,10 @@ class ProprietorLoginTest(TestCase):
         self.assertTrue(response.context['user'].is_active)
 
         self.assertRedirects(response, '/account/')
+
+    # Should redirect to login if accessing account page
+    # while not logged in
+    def test_not_logged_in(self):
+        response = self.client.get('/account/')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/account/')

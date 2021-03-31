@@ -10,3 +10,60 @@ spaces to explore. The platform will offer user-friendly maps and geolocation se
 users to locate their intended space intuitively.
 
 Shared Spaces services the needs of a post-pandemic world, available on desktop and mobile devices. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+### Proprietor Login Background:
+
+When a user uses a signup form, it sets the flags ```is_client``` or ```is_proprietor```
+to true depending on which account type they are signing up for. The signup and login forms built off of django contains 
+username and password validation. The main signup page allows users to select which account type
+they are and takes them to the client/proprietor signup pages.
+
+URLs:
+<br>
+http://127.0.0.1:8000/sign_up/
+http://127.0.0.1:8000/sign_up/proprietor/
+http://127.0.0.1:8000/login/
+
+After successfully logging in as a proprietor, the page redirects to account. Account page displays account type
+and username, with logout and home links below. Accessing the account page while not logged in will redirect to main login page.
+<br>
+http://127.0.0.1:8000/login/proprietor/
+http://127.0.0.1:8000/account/
+http://127.0.0.1:8000/logout/
+<br>
+
+##### Testing proprietor signup:
+```
+python manage.py test sharedspaces.tests.ProprietorSignUpTest
+```
+##### Testing proprietor login:
+```
+python manage.py test sharedspaces.tests.ProprietorLoginTest
+```
+<br>

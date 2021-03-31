@@ -1,21 +1,16 @@
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import LoginView
+
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, reverse
-from django.http import HttpResponseRedirect
-from django.contrib.auth import logout
-
-from .models import User
-from .forms import ProprietorSignUpForm
 
 
+from django.contrib.auth.decorators import login_required; from django.contrib.auth.forms import AuthenticationForm; from django.contrib.auth.views import LoginView
+from django.contrib.auth import logout; from .models import User; from .forms import ProprietorSignUpForm
 # Shared Spaces Home Page
 def index(request):
     return render(request, 'sharedspaces/index.html')
 
-
-# account page renders based on user input role
 @login_required
+# account page renders based on user input role
 def account(request):
     return render(request, 'sharedspaces/account.html')
 
@@ -24,15 +19,107 @@ def login(request):
     return render(request, 'sharedspaces/login.html')
 
 
-# Proprietor login view
-class ProprietorLoginView(LoginView):
-    model = User
-    form_class = AuthenticationForm
-    template_name = 'sharedspaces/proprietor_login.html'
-
-
 def sign_up(request):
     return render(request, 'sharedspaces/signup.html')
+
+
+
+
+
+def create_space(request):
+    return render(request, 'sharedspaces/create_space.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Logs user out
@@ -61,5 +148,8 @@ def proprietor_sign_up_view(request):
     return render(request, 'sharedspaces/proprietor_signup.html', {'form': form})
 
 
-def create_space(request):
-    return render(request, 'sharedspaces/create_space.html')
+# Proprietor login view
+class ProprietorLoginView(LoginView):
+    model = User
+    form_class = AuthenticationForm
+    template_name = 'sharedspaces/proprietor_login.html'
