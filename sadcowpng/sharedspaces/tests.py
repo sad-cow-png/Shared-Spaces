@@ -58,9 +58,13 @@ class CreateSpaceTests(TestCase):
                          'space food/drink availability not submitted correctly and in accurate location')
 
     # Tests that cover database accuracy once form is submitted
+    # The following steps describe the order of steps for the rest of the data base accuracy tests.
+    #   first save the data in to the database
+    #   start by extracting the data from the form
+    # Running tests to see accurate data made it's way to the database
+    # while doing so check the string output as well
+    # Tests to see if all the information from the string return is accurate
     def test_form_to_database_accuracy_name(self):
-        # first save the data in to the database
-        # start by extracting the data from the form
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
@@ -82,10 +86,6 @@ class CreateSpaceTests(TestCase):
 
         # Submitting test form data to the create space database
         test_space.save()
-
-        # Running tests to see accurate data made it's way to the database
-        # while doing so check the string output as well
-        # Tests to see if all the information from the string return is accurate
 
         # Test name
         self.assertEqual(test_space.name_str(), name, 'The location name was stored in the database incorrectly.')
@@ -97,10 +97,8 @@ class CreateSpaceTests(TestCase):
         self.assertEqual(test_space.pk, None,
                          'The location was not deleted properly from the database.')
 
-    # Tests that cover database accuracy once form is submitted
+    # Tests that cover database accuracy for space description
     def test_form_to_database_accuracy_description(self):
-        # first save the data in to the database
-        # start by extracting the data from the form
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
@@ -110,7 +108,6 @@ class CreateSpaceTests(TestCase):
         restroom = TestCase.test_form.cleaned_data['space_restrooms']
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
-        # put the data into the space mode and create a new space model
         test_space = Space(space_name=name,
                            space_description=description,
                            space_max_capacity=max_capacity,
@@ -122,10 +119,6 @@ class CreateSpaceTests(TestCase):
 
         # Submitting test form data to the create space database
         test_space.save()
-
-        # Running tests to see accurate data made it's way to the database
-        # while doing so check the string output as well
-        # Tests to see if all the information from the string return is accurate
 
         # test space description
         self.assertEqual(test_space.description_str(), description,
@@ -138,10 +131,8 @@ class CreateSpaceTests(TestCase):
         self.assertEqual(test_space.pk, None,
                          'The location was not deleted properly from the database.')
 
-    # Tests that cover database accuracy once form is submitted
+    # Tests that cover database accuracy for max capacity
     def test_form_to_database_accuracy_maxcap(self):
-        # first save the data in to the database
-        # start by extracting the data from the form
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
@@ -151,7 +142,6 @@ class CreateSpaceTests(TestCase):
         restroom = TestCase.test_form.cleaned_data['space_restrooms']
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
-        # put the data into the space mode and create a new space model
         test_space = Space(space_name=name,
                            space_description=description,
                            space_max_capacity=max_capacity,
@@ -163,10 +153,6 @@ class CreateSpaceTests(TestCase):
 
         # Submitting test form data to the create space database
         test_space.save()
-
-        # Running tests to see accurate data made it's way to the database
-        # while doing so check the string output as well
-        # Tests to see if all the information from the string return is accurate
 
         # test space max cap
         self.assertEqual(test_space.max_cap_str(), "This location has {} total spots open.".format(max_capacity),
@@ -179,10 +165,8 @@ class CreateSpaceTests(TestCase):
         self.assertEqual(test_space.pk, None,
                          'The location was not deleted properly from the database.')
 
-    # Tests that cover database accuracy once form is submitted
+    # Tests that cover database accuracy for max noise allowed
     def test_form_to_database_accuracy_max_noise(self):
-        # first save the data in to the database
-        # start by extracting the data from the form
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
@@ -192,7 +176,6 @@ class CreateSpaceTests(TestCase):
         restroom = TestCase.test_form.cleaned_data['space_restrooms']
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
-        # put the data into the space mode and create a new space model
         test_space = Space(space_name=name,
                            space_description=description,
                            space_max_capacity=max_capacity,
@@ -204,10 +187,6 @@ class CreateSpaceTests(TestCase):
 
         # Submitting test form data to the create space database
         test_space.save()
-
-        # Running tests to see accurate data made it's way to the database
-        # while doing so check the string output as well
-        # Tests to see if all the information from the string return is accurate
 
         # test max noise allowed string
         self.assertEqual(test_space.noise_allowed_str(), "This location allows a max of {} noise level".format(
@@ -221,7 +200,7 @@ class CreateSpaceTests(TestCase):
         self.assertEqual(test_space.pk, None,
                          'The location was not deleted properly from the database.')
 
-    # Tests that cover database accuracy once form is submitted
+    # Tests that cover database accuracy for noise level
     def test_form_to_database_accuracy_noise(self):
         # first save the data in to the database
         # start by extracting the data from the form
@@ -247,10 +226,6 @@ class CreateSpaceTests(TestCase):
         # Submitting test form data to the create space database
         test_space.save()
 
-        # Running tests to see accurate data made it's way to the database
-        # while doing so check the string output as well
-        # Tests to see if all the information from the string return is accurate
-
         # noise test string
         self.assertEqual(test_space.noise_str(),
                          "This location has a noise level {} ".format(Noise_Level_Choices[noise_level - 1][1]),
@@ -263,7 +238,7 @@ class CreateSpaceTests(TestCase):
         self.assertEqual(test_space.pk, None,
                          'The location was not deleted properly from the database.')
 
-    # Tests that cover database accuracy once form is submitted
+    # Tests that cover database accuracy for restroom
     def test_form_to_database_accuracy_restroom(self):
         # first save the data in to the database
         # start by extracting the data from the form
@@ -289,10 +264,6 @@ class CreateSpaceTests(TestCase):
         # Submitting test form data to the create space database
         test_space.save()
 
-        # Running tests to see accurate data made it's way to the database
-        # while doing so check the string output as well
-        # Tests to see if all the information from the string return is accurate
-
         # testing restroom string
         self.assertEqual(test_space.restroom_str(), "This place does not have restrooms.",
                          'The location restroom availability was stored in the database incorrectly.')
@@ -304,10 +275,8 @@ class CreateSpaceTests(TestCase):
         self.assertEqual(test_space.pk, None,
                          'The location was not deleted properly from the database.')
 
-    # Tests that cover database accuracy once form is submitted
+    # Tests that cover database accuracy for wifi
     def test_form_to_database_accuracy_wifi(self):
-        # first save the data in to the database
-        # start by extracting the data from the form
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
@@ -317,7 +286,6 @@ class CreateSpaceTests(TestCase):
         restroom = TestCase.test_form.cleaned_data['space_restrooms']
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
-        # put the data into the space mode and create a new space model
         test_space = Space(space_name=name,
                            space_description=description,
                            space_max_capacity=max_capacity,
@@ -329,10 +297,6 @@ class CreateSpaceTests(TestCase):
 
         # Submitting test form data to the create space database
         test_space.save()
-
-        # Running tests to see accurate data made it's way to the database
-        # while doing so check the string output as well
-        # Tests to see if all the information from the string return is accurate
 
         # testing wifi string
         self.assertEqual(test_space.wifi_str(), "This place has wifi.",
@@ -345,10 +309,8 @@ class CreateSpaceTests(TestCase):
         self.assertEqual(test_space.pk, None,
                          'The location was not deleted properly from the database.')
 
-    # Tests that cover database accuracy once form is submitted
+    # Tests that cover database accuracy of food and drink
     def test_form_to_database_accuracy_food_drink(self):
-        # first save the data in to the database
-        # start by extracting the data from the form
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
@@ -370,10 +332,6 @@ class CreateSpaceTests(TestCase):
 
         # Submitting test form data to the create space database
         test_space.save()
-
-        # Running tests to see accurate data made it's way to the database
-        # while doing so check the string output as well
-        # Tests to see if all the information from the string return is accurate
 
         # testing food and drink string
         self.assertEqual(test_space.food_drink_str(), "This place has food and drink.",

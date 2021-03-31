@@ -1,9 +1,6 @@
-from django.shortcuts import render
 from django.template import loader
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-
 from .forms import CreateSpaceForm, Noise_Level_Choices
 from .models import Space
 

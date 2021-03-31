@@ -2,7 +2,7 @@ from django.db import models
 from .forms import Noise_Level_Choices
 
 
-# All information that will be sent to space
+# This table or model will hold all the data that defines each of the spaces.
 class Space(models.Model):
     space_name = models.CharField(max_length=500)
     space_description = models.CharField(max_length=1000)
@@ -12,10 +12,9 @@ class Space(models.Model):
     space_wifi = models.BooleanField()
     space_restrooms = models.BooleanField()
     space_food_drink = models.BooleanField()
-
     # space_open = models.BooleanField()
 
-    # Might want to create a string method for each data type
+    # string methods for each of the different model fields
     def name_str(self):
         return self.space_name
 

@@ -1,6 +1,6 @@
 from django import forms
 
-# Tuple list used for Multiple Choice Field
+# This represents the multiple choice options for the noise level multiple choice fields.
 Noise_Level_Choices = (
     ("1", "None"),
     ("2", "Faint"),
@@ -18,8 +18,6 @@ class CreateSpaceForm(forms.Form):
     space_noise_level_allowed = forms.MultipleChoiceField(label='Noise level allowed:', choices=Noise_Level_Choices,
                                                           required=True)
     space_noise_level = forms.MultipleChoiceField(label='Noise level:', choices=Noise_Level_Choices, required=True)
-
-    # Might switch boolean fields to multiple choice for clarity
     space_wifi = forms.BooleanField(label='Wifi Availability:', required=False)
     space_restrooms = forms.BooleanField(label='Restroom Availability:', required=False)
     space_food_drink = forms.BooleanField(label='Food or Drink Availability:', required=False)

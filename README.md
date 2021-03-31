@@ -13,7 +13,7 @@ Shared Spaces services the needs of a post-pandemic world, available on desktop 
 
 ### **For Developers**:
 
-####Create Space Background:
+#### Create Space Background:
 
 Creating a space for each proprietor involves entering data to a form that will save entries into a Space 
 model or table so that each shared spaces listed space will exist as its own entry that can be associated to individual 
@@ -24,9 +24,8 @@ key of the space in the database. The link is as follows: http://127.0.0.1:8000/
 account pages for the proprietor is completed, these pages will be accessible through buttons on the account page.
 
 ##### Testing Creation and modification of spaces:
-The command to run the tests are as follows. There are still a few issues with selenium testing. So, if the
-selenium test fails then it is most likely due to selenium and less due to the webapp. For now the test is commented out
-until a better solution is found.
+The command to run the tests are as follows. There are still a few issues with selenium testing. For now the test is
+commented out and not included in the repo until a better solution is found.
 ```
 ./manage.py test sharedspaces.tests.CreateSpaceTests
 ```
