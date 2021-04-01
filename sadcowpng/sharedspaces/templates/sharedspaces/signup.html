@@ -7,16 +7,14 @@
     <meta charset="UTF-8">
     <title>Sign up</title>
 </head>
-
 <body>
-
+    <p>Sign up to create an account for shared spaces.</p>
     <div class="container">
         <h1> Sign Up </h1>
         <div class="float-c">
             <h5>Client Account</h5>
             <p>Create an account to be able to view and save spaces.</p>
-
-            <a href="#">
+            <a href="{% url 'client_sign_up' %}">
             <button class="btn success">Sign up as a client </button>
             </a>
         </div>
@@ -30,6 +28,5 @@
             </a>
         </div>
     </div>
-
 </body>
 </html>

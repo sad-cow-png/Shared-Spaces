@@ -1,14 +1,13 @@
-
+from django.shortcuts import render, redirect, reverse
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, reverse
-from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm
-from .models import Space, User
-
-from django.contrib.auth.decorators import login_required; 
-from django.contrib.auth.forms import AuthenticationForm; 
+from django.views.generic import CreateView
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from django.contrib.auth import logout
+from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm
+from .models import Space, User
 
 
 # Shared Spaces Home Page
@@ -23,6 +22,20 @@ def account(request):
 
 def login(request):
     return render(request, 'sharedspaces/login.html')
+
+
+# Client sign up view
+def client_sign_up(request):
+    if request.method == 'POST':
+        form = ClientSignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_client = True
+            user.save()
+            return HttpResponseRedirect(reverse('/'))
+    else:
+        form = ClientSignUpForm()
+    return render(request, "sharedspaces/client_sign_up.html", {'form': form})
 
 
 def sign_up(request):
