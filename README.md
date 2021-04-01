@@ -11,29 +11,29 @@ users to locate their intended space intuitively.
 
 Shared Spaces services the needs of a post-pandemic world, available on desktop and mobile devices. 
 
+### **For Developers**:
 
+#### Create Space Background:
 
+Creating a space for each proprietor involves entering data to a form that will save entries into a Space 
+model or table so that each shared spaces listed space will exist as its own entry that can be associated to individual 
+accounts. The spaces can be both created and modified once created. As of now, the only way to get to the creation page
+is to use the direct link to the page. The link is as follows: http://127.0.0.1:8000/create_space/. Similarly, in order
+to modify the spaces, you would use a similar link along with the id of the space to edit it. The id is just the primary
+key of the space in the database. The link is as follows: http://127.0.0.1:8000/update_space/<id>. Later on as the 
+account pages for the proprietor is completed, these pages will be accessible through buttons on the account page.
 
+##### Testing Creation and modification of spaces:
+The command to run the tests are as follows. There are still a few issues with selenium testing. For now the test is
+commented out and not included in the repo until a better solution is found.
+```
+./manage.py test sharedspaces.tests.CreateSpaceTests
+```
 
+<br>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#### User Login Background:
+##### Testing user login
 
 <br>
 
@@ -67,3 +67,7 @@ python manage.py test sharedspaces.tests.ProprietorSignUpTest
 python manage.py test sharedspaces.tests.ProprietorLoginTest
 ```
 <br>
+
+
+#### Interactive Map Background:
+##### Testing the interactive map

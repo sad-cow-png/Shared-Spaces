@@ -498,7 +498,6 @@ class ProprietorLoginTest(TestCase):
         user = User.objects.all()
         self.assertTrue(user.count(), 1)
 
-
     def test_login_view(self):
         response = self.client.get('/login/proprietor/')
         self.assertEqual(response.status_code, 200)
