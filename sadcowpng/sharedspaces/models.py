@@ -1,7 +1,15 @@
 from django.db import models
-from .forms import Noise_Level_Choices
 from django.contrib.auth.models import AbstractUser
 
+# TODO: make a directory to hold static data.
+# This represents the multiple choice options for the noise level multiple choice fields.
+Noise_Level_Choices = (
+    ("1", "None"),
+    ("2", "Faint"),
+    ("3", "Moderate"),
+    ("4", "Loud"),
+    ("5", "Very Loud")
+)
 
 # Create user as a client or proprietor
 class User(AbstractUser):
