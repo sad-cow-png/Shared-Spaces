@@ -1,5 +1,12 @@
 from django.db import models
 from .forms import Noise_Level_Choices
+from django.contrib.auth.models import AbstractUser
+
+
+# Create user as a client or proprietor
+class User(AbstractUser):
+    is_client = models.BooleanField(default=False)
+    is_proprietor = models.BooleanField(default=False)
 
 
 # This table or model will hold all the data that defines each of the spaces.
@@ -49,3 +56,4 @@ class Space(models.Model):
             return "This place has food and drink."
         else:
             return "This place does not have food and drink."
+

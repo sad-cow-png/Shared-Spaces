@@ -37,17 +37,38 @@ commented out and not included in the repo until a better solution is found.
 
 <br>
 
-#### Proprietor Login Background:
-##### Testing proprietor login
 
+### Proprietor Login Background:
+
+When a user uses a signup form, it sets the flags ```is_client``` or ```is_proprietor```
+to true depending on which account type they are signing up for. The signup and login forms built off of django contains 
+username and password validation. The main signup/login page allows users to select which account type
+they are and takes them to the client/proprietor signup/login pages.
+
+URLs:
+<br>
+http://127.0.0.1:8000/sign_up/ <br>
+http://127.0.0.1:8000/sign_up/proprietor/ <br>
+http://127.0.0.1:8000/login/ <br>
+
+After successfully logging in as a proprietor, the page redirects to account. Account page displays account type
+and username, with logout and home links below. Accessing the account page while not logged in will redirect to main login page.
+<br>
+http://127.0.0.1:8000/login/proprietor/ <br>
+http://127.0.0.1:8000/account/ <br>
+http://127.0.0.1:8000/logout/  <br>
+<br>
+
+##### Testing proprietor signup:
+```
+python manage.py test sharedspaces.tests.ProprietorSignUpTest
+```
+##### Testing proprietor login:
+```
+python manage.py test sharedspaces.tests.ProprietorLoginTest
+```
 <br>
 
 
 #### Interactive Map Background:
 ##### Testing the interactive map
-
-
-
-
-
-

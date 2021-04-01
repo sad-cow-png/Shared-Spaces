@@ -1,4 +1,8 @@
+
+from django.contrib.auth.forms import UserCreationForm
+from .models import User
 from django import forms
+
 
 # This represents the multiple choice options for the noise level multiple choice fields.
 Noise_Level_Choices = (
@@ -22,3 +26,10 @@ class CreateSpaceForm(forms.Form):
     space_restrooms = forms.BooleanField(label='Restroom Availability:', required=False)
     space_food_drink = forms.BooleanField(label='Food or Drink Availability:', required=False)
     # space_open = forms.BooleanField(label='Is the Location Open?')
+
+    
+# Used for proprietor sign up view
+class ProprietorSignUpForm(UserCreationForm):
+
+    class Meta(UserCreationForm.Meta):
+        model = User

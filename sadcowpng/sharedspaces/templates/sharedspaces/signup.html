@@ -1,10 +1,35 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'signup.css' %}">
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Sign up</title>
 </head>
+
 <body>
-    <p>Sign up to create an account for shared spaces.</p>
+
+    <div class="container">
+        <h1> Sign Up </h1>
+        <div class="float-c">
+            <h5>Client Account</h5>
+            <p>Create an account to be able to view and save spaces.</p>
+
+            <a href="#">
+            <button class="btn success">Sign up as a client </button>
+            </a>
+        </div>
+
+        <div class="float-p">
+            <h5>Proprietor Account</h5>
+            <p>Create an account to be able to list your own spaces for people to reserve.</p>
+
+            <a href="{% url 'proprietor_sign_up' %}">
+            <button class="btn success">Sign up as a proprietor</button>
+            </a>
+        </div>
+    </div>
+
 </body>
 </html>

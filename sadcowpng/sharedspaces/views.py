@@ -1,15 +1,21 @@
+
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
-from .forms import CreateSpaceForm, Noise_Level_Choices
-from .models import Space
+from django.shortcuts import render, reverse
+from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm
+from .models import Space, User
+
+from django.contrib.auth.decorators import login_required; 
+from django.contrib.auth.forms import AuthenticationForm; 
+from django.contrib.auth.views import LoginView
+from django.contrib.auth import logout
 
 
 # Shared Spaces Home Page
 def index(request):
     return render(request, 'sharedspaces/index.html')
 
-
+@login_required
 # account page renders based on user input role
 def account(request):
     return render(request, 'sharedspaces/account.html')
@@ -22,7 +28,44 @@ def login(request):
 def sign_up(request):
     return render(request, 'sharedspaces/signup.html')
 
+  
+def create_space(request):
+    return render(request, 'sharedspaces/create_space.html')
+  
+  
+# Logs user out
+def sign_out(request):
+    logout(request)
+    return render(request, 'sharedspaces/logout.html')
 
+
+# Proprietor signup view
+def proprietor_sign_up_view(request):
+    if request.method == 'POST':
+
+        form = ProprietorSignUpForm(request.POST)
+
+        # Check if form is valid, creates user, sets user as a proprietor, and saves
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_proprietor = True
+            user.save()
+
+            return HttpResponseRedirect(reverse('index'))
+
+    else:
+        form = ProprietorSignUpForm()
+
+    return render(request, 'sharedspaces/proprietor_signup.html', {'form': form})
+
+
+# Proprietor login view
+class ProprietorLoginView(LoginView):
+    model = User
+    form_class = AuthenticationForm
+    template_name = 'sharedspaces/proprietor_login.html'
+
+    
 # Need to add data fields that auto populate using authentication - will be done in models
 # This is to pull location data and account data to be able to associate them to each other within the spaces table
 # Spaces would have a "proprietor ID" field to ease having it pop up on account pages

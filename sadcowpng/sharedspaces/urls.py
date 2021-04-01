@@ -11,4 +11,8 @@ urlpatterns = [
     path('update_space/<space_id>', views.update_space, name='update-space'),
 
 
+
+    path('login/proprietor/', views.ProprietorLoginView.as_view(), name='proprietor_login'),
+    path('sign_up/proprietor/', views.proprietor_sign_up_view, name='proprietor_sign_up'),
+    path('logout/', views.sign_out, name='logout'),
 ]
