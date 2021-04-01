@@ -1,28 +1,15 @@
+from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
 from .models import User
 
+
 # Saves user as a proprietor
-class ProprietorSignUpForm(UserCreationForm):
-
-    class Meta(UserCreationForm.Meta):
-        model = User
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.is_proprietor = True
-        if commit:
-            user.save()
-        return user
-
-# save user as client
+# Right now the client/props seem similiar, but later
+# we may want different forms for different types of users
+# (maybe we want the prop form to ask optionally for expected number of spaces)
 class ClientSignUpForm(UserCreationForm):
+
     class Meta(UserCreationForm.Meta):
         model = User
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.is_client = True
-        if commit:
-            user.save()
-        return user
