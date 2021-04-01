@@ -1,5 +1,5 @@
 # Shared-Spaces
-CMSC 447 Web development project.
+## CMSC 447 Web development project.
 
 As restrictions related to the COVID-19 pandemic begin to relax, the demand for publicly accessible,
 socially-distant spaces will increase for individuals with various needs. The Shared Spaces web 
@@ -36,6 +36,7 @@ commented out and not included in the repo until a better solution is found.
 ##### Testing user login
 
 <br>
+
 
 ### Proprietor Login Background:
 
