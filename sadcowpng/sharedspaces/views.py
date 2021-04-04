@@ -14,6 +14,7 @@ from .models import Space, User
 def index(request):
     return render(request, 'sharedspaces/index.html')
 
+
 @login_required
 # account page renders based on user input role
 def account(request):
@@ -41,11 +42,11 @@ def client_sign_up(request):
 def sign_up(request):
     return render(request, 'sharedspaces/signup.html')
 
-  
+
 def create_space(request):
     return render(request, 'sharedspaces/create_space.html')
-  
-  
+
+
 # Logs user out
 def sign_out(request):
     logout(request)
@@ -78,7 +79,7 @@ class ProprietorLoginView(LoginView):
     form_class = AuthenticationForm
     template_name = 'sharedspaces/proprietor_login.html'
 
-    
+
 # Need to add data fields that auto populate using authentication - will be done in models
 # This is to pull location data and account data to be able to associate them to each other within the spaces table
 # Spaces would have a "proprietor ID" field to ease having it pop up on account pages
