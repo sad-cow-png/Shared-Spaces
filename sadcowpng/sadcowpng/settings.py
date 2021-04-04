@@ -115,10 +115,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+# Redirect to account page after successful login
+LOGIN_REDIRECT_URL = '/account/'
+
+# If user is not authenticated go to login page
+LOGIN_URL = '/login/'
+
 # Edits for deploying the webapp on heroku
 # changing the static root so heroku can recognize it
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
+# Comment out the following lines to allow the website to be run
+# locally
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 django_heroku.settings(locals())
-
