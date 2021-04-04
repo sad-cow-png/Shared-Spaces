@@ -35,7 +35,7 @@ class ProprietorSignUpForm(UserCreationForm):
         
         
 # Saves user as a proprietor
-# Right now the client/props seem similiar, but later
+# Right now the client/props seem similar, but later
 # we may want different forms for different types of users
 # (maybe we want the prop form to ask optionally for expected number of spaces)
 class ClientSignUpForm(UserCreationForm):
