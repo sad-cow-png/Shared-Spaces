@@ -1,14 +1,86 @@
-<!DOCTYPE html>
+{% load static %}
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Logout</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'logo2-linked.png' %}"/>
+
+    <!-- Bootstrap CSS -->
+        <link crossorigin="anonymous"
+              href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+              integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+              rel="stylesheet">
 </head>
+
+<style>
+    .container-fluid {
+        background-color: #D2FDFF;
+        width: 100%;
+        height: 100%;
+    }
+
+    .shadow {
+        font-size: large;
+        background-color: #B4DFE5;
+        width: 60%;
+        height: 60%;
+    }
+
+    #home {
+        background-color: #303C6C;
+        color: white;
+    }
+
+    #login {
+        background-color: #F4976C;
+        color: white;
+    }
+
+    .navbar {
+        background-color: #D2FDFF;
+    }
+
+    .navbar-brand {
+        padding: 10px;
+        width: 100%;
+        background-color: #D2FDFF;
+        color: #F4976C;
+        font-size: 30px;
+    }
+
+    .navbar-brand:hover {
+        color: #303C6C;
+    }
+
+    li {
+        font-size: 30px;
+    }
+
+    ul {
+        list-style-type: none;
+    }
+
+</style>
+
 <body>
 
-  <p>You have successfully logged out!</p>
-  <a href="{% url 'login' %}">Click here to login again</a><br/><br/>
-  <a href="{% url 'index' %}">Home</a>
+    <div class="navbar">
+        <a class="navbar-brand" href="{% url 'index' %}">
+        Shared Spaces
+        <img src="{% static 'logo2-linked.png' %}" width="40" height="40">
+        </a>
+    </div>
+
+    <div class="container-fluid d-flex justify-content-center">
+        <div class="shadow d-flex align-items-center justify-content-center p-2 ">
+            <ul>
+                <li>You have successfully logged out!</li>
+                <a type="button" class="btn" id="login" href="{% url 'login' %}">Click here to login again</a>
+                <a type="button" class="btn" id="home" href="{% url 'index' %}">Home</a>
+            </ul>
+        </div>
+    </div>
 
 </body>
 </html>

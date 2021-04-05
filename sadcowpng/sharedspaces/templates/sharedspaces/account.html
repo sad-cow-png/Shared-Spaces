@@ -1,10 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Account</title>
-</head>
+{% extends 'sharedspaces/account_header.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    p, a{
+        margin-left: 20px;
+
+    }
+
+    body {
+        background-color: #D2FDFF;
+    }
+
+
+</style>
+
+<title>Account</title>
+
 <body>
+
     <p>Page will appear depending if user is a client or proprietor.</p>
 
     <!-- Layout may differ depending on user type  -->
@@ -16,7 +31,6 @@
        <p>Hello, proprietor: {{ user.get_username }} !</p>
     {% endif %}
 
-    <a href="{% url 'logout' %}">Logout</a><br/><br/>
 
 </body>
-</html>
+{% endblock %}
