@@ -1,33 +1,48 @@
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'signup.css' %}">
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Login</title>
 
-<div class="container">
-        <h1> Login </h1>
-        <div class="float-c">
-            <h3>Client Login</h3>
+        <!-- Bootstrap CSS -->
+        <link crossorigin="anonymous"
+              href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+              integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+              rel="stylesheet">
 
-            <a href="#">
-            <button class="btn success">Login as a client </button>
-            </a>
+        <link rel="stylesheet" type="text/css" href="{% static 'main_pages.css' %}">
+
+        <!-- favicon -->
+        <link rel="shortcut icon" type="image/png" href="{% static 'logo2-dark.png' %}"/>
+
+    </head>
+    <body>
+
+        <a class='navbar-brand' href="{% url 'index' %}">
+            Shared Spaces
+            <img src="{% static 'logo2-dark.png' %}" width="40" height="40" alt="">
+        </a>
+
+        <div class="shadow p-3">
+            <h1> Login </h1>
+            <div class="float-c">
+                <h3>Client Login</h3>
+
+                <a href="#">
+                <button class="btn">Login as a client </button>
+                </a>
+            </div>
+
+            <div class="float-p">
+                <h3>Proprietor Login</h3>
+
+                <a href="{% url 'proprietor_login' %}">
+                <button class="btn">Login as a proprietor</button>
+                </a>
+            </div>
         </div>
 
-        <div class="float-p">
-            <h3>Proprietor Login</h3>
-
-            <a href="{% url 'proprietor_login' %}">
-            <button class="btn success">Login as a proprietor</button>
-            </a>
-        </div>
-    </div>
-
-
-</body>
+    </body>
 </html>

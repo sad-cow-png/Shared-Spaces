@@ -15,7 +15,7 @@
         <link rel="stylesheet" type="text/css" href="{% static 'header.css' %}">
 
         <!-- favicon -->
-        <link rel="shortcut icon" type="image/png" href="{% static 'logo2-linked.png' %}"/>
+        <link rel="shortcut icon" type="image/png" href="{% static 'logo2-dark.png' %}"/>
 
     </head>
 
@@ -25,7 +25,7 @@
         <nav class="navbar navbar-expand-sm navbar-dark">
             <a class="navbar-brand" href="{% url 'index' %}">
                 Shared Spaces
-                <img src="{% static 'logo2-linked.png' %}" width="30" height="30" alt="">
+                <img src="{% static 'logo2-dark.png' %}" width="30" height="30" alt="">
             </a>
 
             {% if user.is_authenticated and user.is_proprietor %}
