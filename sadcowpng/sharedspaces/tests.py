@@ -196,8 +196,8 @@ class ProprietorSignUpTest(TestCase):
         self.assertRedirects(response, '/')
 
 
-# Test proprietor login form and view
-class ProprietorLoginTest(TestCase):
+# Test login form and view
+class LoginTest(TestCase):
     def setUp(self):
         self.credentials = {
             'username': 'testuser',
@@ -208,17 +208,17 @@ class ProprietorLoginTest(TestCase):
         self.assertTrue(user.count(), 1)
 
     def test_login_view(self):
-        response = self.client.get('/login/proprietor/')
+        response = self.client.get('/login/')
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, template_name='sharedspaces/proprietor_login.html')
+        self.assertTemplateUsed(response, template_name='sharedspaces/login.html')
 
     def test_login_fields(self):
-        response = self.client.get('/login/proprietor/')
+        response = self.client.get('/login/')
         self.assertContains(response, 'username')
         self.assertContains(response, 'password')
 
     def test_login(self):
-        response = self.client.post('/login/proprietor/', self.credentials, follow=True)
+        response = self.client.post('/login/', self.credentials, follow=True)
         self.assertEqual(response.status_code, 200)
 
         # Check if user is logged in

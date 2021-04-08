@@ -21,10 +21,6 @@ def account(request):
     return render(request, 'sharedspaces/account.html')
 
 
-def login(request):
-    return render(request, 'sharedspaces/login.html')
-
-
 # Client sign up view
 def client_sign_up(request):
     if request.method == 'POST':
@@ -33,7 +29,7 @@ def client_sign_up(request):
             user = form.save(commit=False)
             user.is_client = True
             user.save()
-            return HttpResponseRedirect(reverse('/'))
+            return HttpResponseRedirect(reverse('index'))
     else:
         form = ClientSignUpForm()
     return render(request, "sharedspaces/client_sign_up.html", {'form': form})
@@ -73,11 +69,11 @@ def proprietor_sign_up_view(request):
     return render(request, 'sharedspaces/proprietor_signup.html', {'form': form})
 
 
-# Proprietor login view
-class ProprietorLoginView(LoginView):
+# Client and Proprietor Login view
+class UserLoginView(LoginView):
     model = User
     form_class = AuthenticationForm
-    template_name = 'sharedspaces/proprietor_login.html'
+    template_name = 'sharedspaces/login.html'
 
 
 # Need to add data fields that auto populate using authentication - will be done in models

@@ -25,22 +25,19 @@
             <img src="{% static 'logo2-dark.png' %}" width="40" height="40" alt="">
         </a>
 
-        <div class="shadow p-3">
-            <h1> Login </h1>
-            <div class="float-c">
-                <h3>Client Login</h3>
+        <div class="container-fluid d-flex justify-content-center">
+            <div id="pr_login" class="shadow d-flex align-items-center justify-content-center rounded">
 
-                <a href="#">
-                <button class="btn">Login as a client </button>
-                </a>
-            </div>
-
-            <div class="float-p">
-                <h3>Proprietor Login</h3>
-
-                <a href="{% url 'proprietor_login' %}">
-                <button class="btn">Login as a proprietor</button>
-                </a>
+                <form method="post">
+                    {% csrf_token %}
+                    <h1>Login</h1>
+                    {{ form.as_p }}
+                    {% if form.errors %}
+                        <p>Your username and password didn't match. Please try again.</p>
+                    {% endif %}
+                    <input class="btn" id="pr_login_btn" type="submit" value="Login">
+                    <input type="hidden" name="next" value="{{ next }}">
+                </form>
             </div>
         </div>
 
