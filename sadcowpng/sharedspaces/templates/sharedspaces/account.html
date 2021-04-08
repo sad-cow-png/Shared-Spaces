@@ -3,34 +3,39 @@
 
 {% block content %}
 
-<style>
-    p, a{
-        margin-left: 20px;
 
+<style>
+
+    p, a, h1{
+        margin-left: 20px;
+        color: #B4DFE5;
     }
 
     body {
         background-color: #D2FDFF;
     }
 
+    .container-fluid{
+        background-color: #303C6C;
+        width: 1000px;
+        height: 800px;
+    }
 
 </style>
 
-<title>Account</title>
+    <body>
+      <div class="container-fluid">
 
-<body>
+        <!-- Layout may differ depending on user type  -->
+        {% if user.is_client and user.is_authenticated %}
+            <h1>Welcome, {{ user.get_username }}!</h1>
+        {% endif %}
 
-    <p>Page will appear depending if user is a client or proprietor.</p>
+        {% if user.is_proprietor and user.is_authenticated %}
+            <h1>Welcome, {{ user.get_username }}!</h1>
+        {% endif %}
 
-    <!-- Layout may differ depending on user type  -->
-    {% if user.is_client and user.is_authenticated %}
-        <p>Hello, client user: {{ user.get_username }} !</p>
-    {% endif %}
+      </div>
 
-    {% if user.is_proprietor and user.is_authenticated %}
-       <p>Hello, proprietor: {{ user.get_username }} !</p>
-    {% endif %}
-
-
-</body>
+    </body>
 {% endblock %}

@@ -4,7 +4,9 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
+        {% block title %}
         <title>Account</title>
+        {% endblock %}
 
         <!-- Bootstrap CSS -->
         <link crossorigin="anonymous"
@@ -13,6 +15,9 @@
               rel="stylesheet">
 
         <link rel="stylesheet" type="text/css" href="{% static 'header.css' %}">
+
+        <!-- add css in child html -->
+        {% block css %} {% endblock %}
 
         <!-- favicon -->
         <link rel="shortcut icon" type="image/png" href="{% static 'logo2-dark.png' %}"/>
@@ -44,9 +49,9 @@
                         <a class="nav-link" href="#">Add Listing</a>
                     </li>
                 </ul>
-            {% endif %}
+                <span id="user" class="navbar-brand">Hi,  {{ user.get_username }}</span>
 
-            {% if user.is_authenticated and user.is_client %}
+            {% elif user.is_authenticated and user.is_client %}
                 <nav class="navbar-text">
                     Client Account
                 </nav>
@@ -62,12 +67,31 @@
                         <a class="nav-link" href="#">Saved Spaces</a>
                     </li>
                 </ul>
-            {% endif %}
+                <span id="user" class="navbar-brand">Hi,  {{ user.get_username }}</span>
 
-            <span id="user" class="navbar-brand">Hi,  {{ user.get_username }}</span>
+
+                <!-- header can be used in homepage, whether logged in or not -->
+            {% else %}
+                 <nav class="navbar-text">
+                    Reserve your spaces now!
+                </nav>
+
+                <ul class="navbar-nav ms-auto my-2">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'sign_up' %}">Create Account</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"></a>
+                    </li>
+                </ul>
+
+            {% endif %}
         </nav>
 
-        <!-- where rest of account page goes -->
+        <!-- where rest of page goes -->
         {% block content %}  {% endblock %}
 
     </body>
