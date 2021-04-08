@@ -1,0 +1,31 @@
+  body {
+      text-align: center;
+  }
+
+  .create_space_form{
+      display: inline-block;
+      width: 800px;
+  }
+
+  .create_space_table{
+      width: 800px;
+  }
+
+  .space_submit_button{
+      margin-top: 10px;
+      width: 400px;
+  }
+
+   .update_space_form{
+       display: inline-block;
+       width: 800px;
+   }
+
+  .update_space_table{
+      width: 800px;
+  }
+
+  .space_submit_button{
+      margin-top: 10px;
+      width: 400px;
+  }
