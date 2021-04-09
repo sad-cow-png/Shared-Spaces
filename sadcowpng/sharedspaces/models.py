@@ -66,3 +66,32 @@ class Space(models.Model):
             return "This place has food and drink."
         else:
             return "This place does not have food and drink."
+
+
+class SpaceDateTime(models.Model):
+    # Switch to char if this does not work
+    space_dt_full = models.DateTimeField()
+    # This should auto-close after the date listed or if the proprietor decides to manually close a space
+    space_dt_closed = models.BooleanField()
+    space_dt_reserved = models.BooleanField()
+    # Value needs to only be non-empty if reserved = true -> covered in a later story maybe 2 forms to cover this model
+    space_dt_reserved_by = models.CharField()
+
+    def s_dt_full_str(self):
+        return self.space_dt_full
+
+    # A time/date slot for a space can be 'open' and reserved simultaneously. Open only means that it is active in use.
+    def s_dt_closed_str(self):
+        if self.space_dt_closed:
+            return "The listed date/time has passed and this space opening is now closed."
+        else:
+            return "The listed date/time has not yet passed for this space opening, still open/active in use."
+
+    def s_dt_reserved_str(self):
+        if self.space_dt_reserved:
+            return "This space is reserved!"
+        else:
+            return "This space has not been reserved yet."
+
+    def s_dt_reserved_by_str(self):
+        return self.space_dt_reserved_by

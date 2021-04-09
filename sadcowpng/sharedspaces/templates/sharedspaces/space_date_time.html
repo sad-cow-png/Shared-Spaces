@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create availabilities for your Shared Space!</title>
+</head>
+<body>
+        <div class = "space_date_time_form">
+            <h3>Enter the Date and Time for your Shared Space!</h3>
+            # Insert URL once created
+            <form  action="//" method="post">
+                {% csrf_token %}
+                <table class="space_time_date_table" border="1">
+                    # Try just form or form.as_p if this does not work
+                    {{ form.date }}
+                </table>
+                <input class="space_submit_button" type="submit" value="Submit">
+                <input class="space_submit_button" type="reset" value="Clear">
+            </form>
+        </div>
+</body>
+</html>
