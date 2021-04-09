@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
-from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm
-from .models import Space, User
+from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
+from .models import Space, User, SpaceDateTime
 
 
 # Testing for the client signup
@@ -252,42 +252,42 @@ class CreateSpaceTests(TestCase):
     def test_form_accuracy_name(self):
         # Creating a Test to check if the name is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_name'], 'TestName',
-                         'space name not submitted correctly and in accurate location')
+                         'space name submitted correctly and in accurate location')
 
     def test_form_accuracy_description(self):
         # Creating a Test to check if the description is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_description'], 'Rand Description',
-                         'space description not submitted correctly and in accurate location')
+                         'space description submitted correctly and in accurate location')
 
     def test_form_accuracy_capacity(self):
         # Creating a Test to check if the max capacity is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_max_capacity'], 5,
-                         'space max capacity not submitted correctly and in accurate location')
+                         'space max capacity submitted correctly and in accurate location')
 
     def test_form_accuracy_noise_allowed(self):
         # Creating a Test to check if the allowed noise level is saved same as the input from browser
         self.assertEqual(TestCase.test_form.cleaned_data.get('space_noise_level_allowed'), ['1'],
-                         'space noise level allowed not submitted correctly and in accurate location')
+                         'space noise level allowed submitted correctly and in accurate location')
 
     def test_form_accuracy_noise_level(self):
         # Creating a Test to check if the noise level is saved same as the input from browser
         self.assertEqual(TestCase.test_form.cleaned_data.get('space_noise_level'), ['2'],
-                         'space noise level not submitted correctly and in accurate location')
+                         'space noise level submitted correctly and in accurate location')
 
     def test_form_accuracy_wifi(self):
         # Creating a Test to check if the wifi availability is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_wifi'], True,
-                         'space wifi availability not submitted correctly and in accurate location')
+                         'space wifi availability submitted correctly and in accurate location')
 
     def test_form_accuracy_restroom(self):
         # Creating a Test to check if the restroom availability is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_restrooms'], False,
-                         'space restroom availability not submitted correctly and in accurate location')
+                         'space restroom availability submitted correctly and in accurate location')
 
     def test_form_accuracy_fd(self):
         # Creating a Test to check if the food and drink availability is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_food_drink'], True,
-                         'space food/drink availability not submitted correctly and in accurate location')
+                         'space food/drink availability submitted correctly and in accurate location')
 
     # Tests that cover database accuracy once form is submitted
     # The following steps describe the order of steps for the rest of the data base accuracy tests.
@@ -577,3 +577,18 @@ class CreateSpaceTests(TestCase):
                          'The location was not deleted properly from the database.')
 
     # Selenium testing will be added later for testing front end to database
+
+
+class TestSpaceDateTime(TestCase):
+    # Following date / time format specified in forms.py
+    TestCase.default_data = {'space_date_time': '09/04/2021 2:30'}
+
+    # First test just checks form accuracy
+    TestCase.test_form= SpaceTimes(data= TestCase.default_data)
+    TestCase.test_form.is_valid()
+
+    def test_form_accuracy_date_time(self):
+        self.assertEqual(TestCase.test_form.cleaned_data['space_date_time'],'09/04/2021 2:30',
+                         'space date and time was submitted correctly and stored accurately.')
+
+    # Tests for model accuracy for all data types in model - would happen after a model object is saved.
