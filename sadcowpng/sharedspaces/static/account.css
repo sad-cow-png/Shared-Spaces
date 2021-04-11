@@ -1,4 +1,9 @@
- p, a, h1{
+    p {
+        color: grey;
+        margin-left: 20px;
+    }
+
+    a, h1{
         margin-left: 20px;
         color: #B4DFE5;
     }
