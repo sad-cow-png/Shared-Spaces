@@ -46,7 +46,7 @@
                         <a class="nav-link" href="#">My Listings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Add Listing</a>
+                        <a class="nav-link" href="{% url 'create_space' %}">Add Listing</a>
                     </li>
                 </ul>
                 <span id="user" class="navbar-brand">Hi,  {{ user.get_username }}</span>

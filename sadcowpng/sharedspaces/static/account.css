@@ -1,0 +1,14 @@
+ p, a, h1{
+        margin-left: 20px;
+        color: #B4DFE5;
+    }
+
+    body {
+        background-color: #D2FDFF;
+    }
+
+    .container-fluid{
+        background-color: #303C6C;
+        width: 1000px;
+        height: 800px;
+    }
