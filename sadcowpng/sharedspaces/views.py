@@ -5,7 +5,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 
-#from .decorators import proprietor_required
+from .decorators import proprietor_required, user_is_space_owner
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm
 from .models import Space, User
 
@@ -18,6 +18,15 @@ def index(request):
 @login_required
 # account page renders based on user input role
 def account(request):
+    if request.user.is_proprietor:
+        user = request.user
+        space = Space.objects.filter(space_owner=user)
+        context = {
+            'space': space
+        }
+    else:
+        return render(request, 'sharedspaces/account.html')
+
     return render(request, 'sharedspaces/account.html', context=context)
 
 
@@ -76,8 +85,8 @@ class UserLoginView(LoginView):
     template_name = 'sharedspaces/login.html'
 
 
-#@login_required
-#@proprietor_required
+@login_required
+@proprietor_required
 # Need to add data fields that auto populate using authentication - will be done in models
 # This is to pull location data and account data to be able to associate them to each other within the spaces table
 # Spaces would have a "proprietor ID" field to ease having it pop up on account pages
@@ -119,6 +128,7 @@ def create_space(request):
     return render(request, 'sharedspaces/create_space.html', {'form': space_form})
 
 
+@user_is_space_owner
 def update_space(request, space_id):
     """
     Renders the page for updating the spaces stored in the database
