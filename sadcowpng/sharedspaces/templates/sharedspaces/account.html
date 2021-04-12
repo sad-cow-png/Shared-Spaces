@@ -18,23 +18,23 @@
 
         {% if user.is_proprietor and user.is_authenticated %}
             <h1>Welcome, {{ user.get_username }}!</h1>
+
+            <h2>My Listings</h2>
+            <div class="row">
+                {% for spaces in space %}
+                    <div class="col-sm-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ spaces.space_name }}</h5>
+                                <p class="card-text">{{ spaces.space_description }}</p>
+                                <a href="{% url 'update_space' spaces.id %}" class="btn btn-primary">Update Space</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% endif %}
 
-
-      <h2>My Listings</h2>
-      <div class="row">
-      {% for spaces in space %}
-          <div class="col-sm-5">
-            <div class="card">
-                <div class="card-body">
-                <h5 class="card-title">{{ spaces.space_name }}</h5>
-                <p class="card-text">{{ spaces.space_description }}</p>
-                <a href="{% url 'update_space' spaces.id %}" class="btn btn-primary">Update Space</a>
-                </div>
-            </div>
-          </div>
-      {% endfor %}
-      </div>
 
       </div>
 
