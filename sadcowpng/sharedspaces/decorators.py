@@ -1,19 +1,15 @@
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.auth.decorators import user_passes_test, login_required
-
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 # Protects views only proprietors can access
-def proprietor_required(function, redirect_field_name=REDIRECT_FIELD_NAME, login_url='/login/'):
-    def is_proprietor(u):
-        if login_required and u.is_authenticated and u.is_proprietor:
-            return True
+# Displays message if client account tries to access protected view
+def proprietor_required(function):
 
-    actual_decorator = user_passes_test(
-        is_proprietor,
-        login_url=login_url,
-        redirect_field_name=redirect_field_name,
-    )
-    if function:
-        return actual_decorator(function)
-    return actual_decorator
+    def is_client(request):
+        if request.user.is_client:
+            messages.info(request, 'Please login as a proprietor to access page.')
+            return HttpResponseRedirect(reverse('login'))
 
+        return function(request)
+    return is_client
