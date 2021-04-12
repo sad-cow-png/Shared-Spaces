@@ -1,27 +1,11 @@
 {% extends 'sharedspaces/account_header.html' %}
 {% load static %}
 
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'account.css' %}">
+{% endblock %}
+
 {% block content %}
-
-
-<style>
-
-    p, a, h1{
-        margin-left: 20px;
-        color: #B4DFE5;
-    }
-
-    body {
-        background-color: #D2FDFF;
-    }
-
-    .container-fluid{
-        background-color: #303C6C;
-        width: 1000px;
-        height: 800px;
-    }
-
-</style>
 
     <body>
       <div class="container-fluid">
@@ -33,6 +17,21 @@
 
         {% if user.is_proprietor and user.is_authenticated %}
             <h1>Welcome, {{ user.get_username }}!</h1>
+
+            <h2>My Listings</h2>
+            <div class="row">
+                {% for spaces in space %}
+                    <div class="col-sm-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ spaces.space_name }}</h5>
+                                <p class="card-text">{{ spaces.space_description }}</p>
+                                <a href="{% url 'update_space' spaces.id %}" class="btn btn-primary">Update Space</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% endif %}
 
       </div>
