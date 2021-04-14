@@ -82,23 +82,23 @@ on each test. User and space variables are adjustable depending on every develop
 python manage.py runserver
 ```
 
-### Creating new users for tests
+#### Creating new users for tests
 ```
 python manage.py test sharedspaces.tests.CreateUsers
 ```
-### Creating new spaces for tests
+#### Creating new spaces for tests
 ```
 python manage.py test sharedspaces.tests.CreateSpaces
 ```
 **Note:** If creating new users somehow breaks, change username and password in
 setUp for tests below using users you have created already. 
 
-### Tests for proprietor_required decorated views
+#### Tests for proprietor_required decorated views
 Protect views only accessible to proprietors.
 ```
 python manage.py test sharedspaces.tests.ProprietorRequiredTests
 ```
-### Tests for user_is_space_owner decorated views
+#### Tests for user_is_space_owner decorated views
 Prevents miscellaneous users from editing spaces they did not create.
 ```
 python manage.py test sharedspaces.tests.SpaceOwnerTests
