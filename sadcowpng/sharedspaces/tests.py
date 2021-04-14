@@ -581,14 +581,22 @@ class CreateSpaceTests(TestCase):
 
 class TestSpaceDateTime(TestCase):
     # Following date / time format specified in forms.py
-    TestCase.default_data = {'space_date_time': '09/04/2021 2:30'}
+    TestCase.default_data = {'space_date': '09/04/2021', 'space_start_time': '04:15', 'space_end_time': '05:15' }
 
     # First test just checks form accuracy
     TestCase.test_form= SpaceTimes(data= TestCase.default_data)
     TestCase.test_form.is_valid()
 
-    def test_form_accuracy_date_time(self):
-        self.assertEqual(TestCase.test_form.cleaned_data['space_date_time'],'09/04/2021 2:30',
-                         'space date and time was submitted correctly and stored accurately.')
+    def test_form_accuracy_date(self):
+        self.assertEqual(TestCase.test_form.cleaned_data['space_date'],'09/04/2021',
+                         'space date was submitted correctly and stored accurately.')
+
+    def test_form_accuracy_s_time(self):
+        self.assertEqual(TestCase.test_form.cleaned_data['space_date'],'04:15',
+                         'space start time was submitted correctly and stored accurately.')
+
+    def test_form_accuracy_date(self):
+        self.assertEqual(TestCase.test_form.cleaned_data['space_date'], '05:15',
+                         'space end time was submitted correctly and stored accurately.')
 
     # Tests for model accuracy for all data types in model - would happen after a model object is saved.

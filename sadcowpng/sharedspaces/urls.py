@@ -14,4 +14,5 @@ urlpatterns = [
     path('login/proprietor/', views.ProprietorLoginView.as_view(), name='proprietor_login'),
     path('sign_up/proprietor/', views.proprietor_sign_up_view, name='proprietor_sign_up'),
     path('logout/', views.sign_out, name='logout'),
+    path('space_times/', views.space_date_time, name='space_date_time'),
 ]

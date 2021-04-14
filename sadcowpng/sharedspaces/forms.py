@@ -1,8 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
-from .widgets import DateTimePickerInput
-
 
 # This represents the multiple choice options for the noise level multiple choice fields.
 Noise_Level_Choices = (
@@ -45,8 +43,9 @@ class ClientSignUpForm(UserCreationForm):
         model = User
 
 
+# User will enter the date the space will be available and the start and end time
 class SpaceTimes(forms.Form):
-    space_date_time = forms.DateTimeField(
-        input_formats=['%d/%m/%Y %H:%M'],
-        widget=DateTimePickerInput()
-    )
+    date = forms.DateField(widget=forms.DateInput(format='%m/%d/%Y'))
+    time_start = forms.TimeField(widget=forms.TimeInput(format='%H:%M'))
+    time_end = forms.TimeField(widget=forms.TimeInput(format='%H:%M'))
+

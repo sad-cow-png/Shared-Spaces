@@ -6,8 +6,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm
-from .models import Space, User
+from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
+from .models import Space, User,SpaceDateTime
 
 
 # Shared Spaces Home Page
@@ -178,3 +178,21 @@ def update_space(request, space_id):
 
     return render(request, 'sharedspaces/update_space.html', {'form': space_form, "space_id": space_id,
                                                               "name": old_space.space_name})
+def space_date_time(request):
+    if request.method == 'POST':
+        sdt = SpaceTimes(request.POST)
+        if sdt.is_valid():
+            spacedate = sdt.cleaned_data['date']
+            spacestart = sdt.cleaned_data['time_start']
+            spaceend = sdt.cleaned_data['time_end']
+
+            # These are default values - toggling for closing spaces and client side reservations need separate implementation
+            sp = SpaceDateTime(space_date = spacedate, space_start_time = spacestart, space_end_time = spaceend, space_dt_closed = False,
+                               space_dt_reserved = False )
+            sp.save()
+
+            return HttpResponseRedirect('/')
+    else:
+        sdt = SpaceTimes()
+
+    return render(request, 'sharedspaces/space_date_time.html', {'form': sdt})

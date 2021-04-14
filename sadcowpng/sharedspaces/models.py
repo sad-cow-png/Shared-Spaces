@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -70,15 +72,23 @@ class Space(models.Model):
 
 class SpaceDateTime(models.Model):
     # Switch to char if this does not work
-    space_dt_full = models.DateTimeField()
+    space_date = models.CharField(max_length=100, default= 'EMPTY')
+    space_start_time = models.CharField(max_length=100, default="EMPTY")
+    space_end_time = models.CharField(max_length=100, default='EMPTY')
     # This should auto-close after the date listed or if the proprietor decides to manually close a space
     space_dt_closed = models.BooleanField()
     space_dt_reserved = models.BooleanField()
-    # Value needs to only be non-empty if reserved = true -> covered in a later story maybe 2 forms to cover this model
-    space_dt_reserved_by = models.CharField()
+    # Value needs to only be non-empty if reserved = true -> covered in a later story for client side reservation
+    space_dt_reserved_by = models.CharField(max_length=1000)
 
-    def s_dt_full_str(self):
-        return self.space_dt_full
+    def s_date_str(self):
+        return self.space_date
+
+    def s_start_str(self):
+        return self.space_start_time
+
+    def s_end_str(self):
+        return self.space_end_time
 
     # A time/date slot for a space can be 'open' and reserved simultaneously. Open only means that it is active in use.
     def s_dt_closed_str(self):
