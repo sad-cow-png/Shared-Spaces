@@ -1,7 +1,15 @@
+from selenium import webdriver
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
+from webdriver_manager.chrome import ChromeDriver, ChromeDriverManager
 from django.test import TestCase
 from django.urls import reverse
+
+from .decorators import proprietor_required
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm
 from .models import Space, User
+from django.contrib.auth.models import AnonymousUser
+from .views import create_space, update_space
 
 
 # Testing for the client signup
@@ -20,7 +28,7 @@ class ClientSignUpTest(TestCase):
         # therefore my count should be 1 (0 before, 1 now)
 
     def test_client_signup_page(self):
-        response = self.client.get('/sign_up/client/') # move to client sign up page
+        response = self.client.get('/sign_up/client/')  # move to client sign up page
         self.assertEqual(response.status_code, 200)
         # 200 means good for some reason
         # below, we check if we got the correct html file from this page
@@ -35,7 +43,7 @@ class ClientSignUpTest(TestCase):
         invalid_data = [
             # username already exists bad
             {
-                'data' : {
+                'data': {
                     'username': 'test',
                     'password1': 'SomeReallyGoodPassword1#',
                     'password2': 'SomeReallyGoodPassword1#',
@@ -93,13 +101,13 @@ class ClientSignUpTest(TestCase):
         self.assertEqual(User.objects.count(), self.precount + 2)
 
         # find that user and check if he/she has is_client
-        user = User.objects.get(username= 'JobiBenKenobi')
+        user = User.objects.get(username='JobiBenKenobi')
         self.assertEqual(user.is_client, True)
         # we may also want to check the user has is_prop false
         self.assertEqual(user.is_proprietor, False)
         self.assertRedirects(response, 'index')
 
-        
+
 # Test proprietor signup with invalid and valid users
 class ProprietorSignUpTest(TestCase):
     def setUp(self):
@@ -234,7 +242,7 @@ class LoginTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/login/?next=/account/')
 
-        
+
 # Tests will cover both newly entered form data and associated Create Spaces database
 class CreateSpaceTests(TestCase):
     TestCase.default_data = {"space_name": 'TestName',
@@ -577,3 +585,217 @@ class CreateSpaceTests(TestCase):
                          'The location was not deleted properly from the database.')
 
     # Selenium testing will be added later for testing front end to database
+
+
+class DecoratorTests(TestCase):
+    def setUp(self):
+        self.clientuser = {
+            'username': 'spaceuser6',
+            'password': '#Ijustwantspace38',
+
+        }
+
+        self.proprietoruser = {
+            'username': 'propOwner',
+            'password': 'Re$ervehere792',
+
+        }
+        # Create client and proprietor users
+        User.objects.create_user(**self.clientuser)
+        client = User.objects.get(username='spaceuser6')
+        client.is_client = True
+
+        User.objects.create_user(**self.proprietoruser)
+        proprietor = User.objects.get(username='propOwner')
+        proprietor.is_proprietor = True
+
+        self.assertEqual(client.is_client, True)
+        self.assertEqual(proprietor.is_proprietor, True)
+
+    def test_proprietor_required_not_logged_in(self):
+        response = self.client.get('/create_space/')
+        self.failUnless(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/create_space/')
+
+    def test_proprietor_required_client(self):
+        created_users = User.objects.count()
+        self.assertEqual(2, created_users)
+
+        # Go to create page, should redirect to login
+        response = self.client.get('/create_space/')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/create_space/')
+
+        # Login as client
+        response = self.client.post('/login/?next=/create_space/', self.clientuser, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        # In client account page
+        response = self.client.get('/account/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/create_space/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_is_space_owner_not_logged_in(self):
+        # Get proprietor user object
+        user = User.objects.get(username=self.proprietoruser.get('username'))
+
+        test_space = Space(space_name='Space',
+                           space_description='This is a space',
+                           space_max_capacity=54,
+                           space_noise_level_allowed=2,
+                           space_noise_level=4,
+                           space_wifi=1,
+                           space_restrooms=1,
+                           space_food_drink=0,
+                           space_owner=user,
+                           )
+
+        test_space.save()
+        self.assertEqual(1, Space.objects.count())
+
+        # response = self.client.get('/update_space/1')
+    # self.assertEqual(response.status_code, 200)
+
+
+class ProprietorRequiredTest(TestCase):
+    def setUp(self):
+        self.clientuser = User.objects.create_user(username='spaceplease3', password='akjdhDAOIW542')
+        self.clientuser.is_client = True
+
+        self.proprietoruser = User.objects.create_user(username='proprietor5', password='ajkDUI3#f')
+        self.clientuser.is_client = True
+
+    def test_proprietor_required_decorator(self):
+        response = self.client.get('/create_space/')
+        self.assertEqual(response.status_code, 302)
+
+        self.client.force_login(self.clientuser)
+        response.user = self.clientuser
+        response = self.client.get('/create_space/')
+
+        #response.user = self.proprietoruser
+        self.assertEqual(response.status_code, 302)
+
+        #request.user = self.clientuser
+
+        #response._messages = messages.storage.default_storage(request)
+
+class DriverTest(TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+        self.index_url = "http://127.0.0.1:8000"
+
+        self.clientuser = 'spaceplease6'
+        self.clientpw = 'jedwi5hak2'
+
+        self.proprietoruser = 'proprietor5'
+        self.proprietorpw = 'ajkDUI3#f'
+
+       # self.proprietoruser = User.objects.create_user(username='proprietor5', password='ajkDUI3#f')
+       # self.proprietoruser.is_proprietor = True
+       # self.proprietoruser.save()
+
+    def client_sign_up(self):
+        driver = self.driver
+
+        driver.get(self.index_url + '/sign_up/client/')
+
+        nameFieldelem = driver.find_element_by_name("username")
+        passFieldElem = driver.find_element_by_name("password1")
+        confirmPassElem = driver.find_element_by_name("password2")
+        submitButtonElem = driver.find_element_by_xpath("//button[contains(@type, 'submit')]")
+
+        nameFieldelem.send_keys(self.clientuser)
+        passFieldElem.send_keys(self.clientpw)
+        confirmPassElem.send_keys(self.clientpw)
+        ActionChains(driver).move_to_element(submitButtonElem).click(submitButtonElem).perform()
+        submitButtonElem.send_keys(Keys.RETURN)
+
+    def test_client_login(self):
+        driver = self.driver
+
+        # Not logged in
+        expected_url = self.index_url + '/login/?next=/create_space/'
+        driver.get(self.index_url + '/create_space/')
+        redirect_url = driver.current_url
+        self.assertEqual(redirect_url, expected_url)
+
+        # This redirected login will try to redirect to create_space
+        # expecting user to be logged in as proprietor, however it will
+        # not redirect as it is logging in as client
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.clientuser)
+        password.send_keys(self.clientpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        # After logging in, page reloads
+        self.assertEqual(self.index_url + '/login/', driver.current_url)
+
+        # Display message when user logging in is a client
+        message = driver.find_element_by_xpath("//*[contains (@class, 'messages')]")
+        self.assertTrue(message)
+
+        # Login again
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.clientuser)
+        password.send_keys(self.clientpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        self.assertEqual(self.index_url + '/account/', driver.current_url)
+
+        # Accessing create_space from client account page
+        driver.get(self.index_url + '/create_space/')
+
+        # Takes you back to login page, account is still active
+        # User could potentially switch user types
+        self.assertEqual(self.index_url + '/login/', driver.current_url)
+
+    def test_proprietor_sign_up(self):
+        driver = self.driver
+
+        driver.get(self.index_url + '/sign_up/proprietor/')
+
+        nameFieldelem = driver.find_element_by_name("username")
+        passFieldElem = driver.find_element_by_name("password1")
+        confirmPassElem = driver.find_element_by_name("password2")
+        submitButtonElem = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        nameFieldelem.send_keys(self.proprietoruser)
+        passFieldElem.send_keys(self.proprietorpw)
+        confirmPassElem.send_keys(self.proprietorpw)
+        ActionChains(driver).move_to_element(submitButtonElem).click(submitButtonElem).perform()
+        submitButtonElem.send_keys(Keys.RETURN)
+
+        print('prop signed up')
+
+    def test_proprietor_login(self):
+        driver = self.driver
+
+        # Not logged in
+        expected_url = self.index_url + '/login/?next=/create_space/'
+        driver.get(self.index_url + '/create_space/')
+        redirect_url = driver.current_url
+        self.assertEqual(redirect_url, expected_url)
+
+        # Login as proprietor
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys('proprietor5')
+        password.send_keys('ajkDUI3#f')
+        loginbutton.send_keys(Keys.RETURN)
+
+        print(driver.current_url)
+
+
+   # def tearDown(self):
+     #   self.driver.close()
