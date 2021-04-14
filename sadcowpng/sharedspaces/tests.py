@@ -585,13 +585,17 @@ class CreateSpaceTests(TestCase):
     # Selenium testing will be added later for testing front end to database
 
 
-# Creates client/proprietor user and spaces
+# Creates client/proprietor users
 # Can be used to create new users, reusable
-class CreateUsersandSpaces(TestCase):
+# Run this before running decorator tests, if test users in
+# ProprietorRequiredTest and SpaceOwnerTests are unchanged
+class CreateUsers(TestCase):
     def setUp(self):
         self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+
         self.index_url = "http://127.0.0.1:8000"
 
+        # Can be changed to create new users
         self.clientuser = 'spaceplease6'
         self.clientpw = 'jedwi5hak2'
 
@@ -633,6 +637,24 @@ class CreateUsersandSpaces(TestCase):
         ActionChains(driver).move_to_element(submitButtonElem).click(submitButtonElem).perform()
         submitButtonElem.send_keys(Keys.RETURN)
 
+    def tearDown(self):
+        self.driver.close()
+
+
+# Create new spaces for proprietor users
+class CreateSpaces(TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+
+        self.index_url = "http://127.0.0.1:8000"
+
+        # Can be changed to create new users
+        self.proprietoruser = 'proprietor5'
+        self.proprietorpw = 'ajkDUI3#f'
+
+        self.sp_name = "Space space"
+        self.sp_desc = "This is a space for use."
+
     def test_create_spaces(self):
         driver = self.driver
 
@@ -656,7 +678,7 @@ class CreateUsersandSpaces(TestCase):
         noise_level = Select(driver.find_element_by_name("space_noise_level"))
         wifi = driver.find_element_by_name("space_wifi")
         restroom = driver.find_element_by_name("space_restrooms")
-        submitButton= driver.find_element_by_xpath("//*[contains(@type, 'submit')]")
+        submitButton = driver.find_element_by_xpath("//*[contains(@type, 'submit')]")
 
         sp_name.send_keys(self.sp_name)
         desc.send_keys(self.sp_desc)
@@ -675,8 +697,10 @@ class CreateUsersandSpaces(TestCase):
 class ProprietorRequiredTests(TestCase):
     def setUp(self):
         self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+
         self.index_url = "http://127.0.0.1:8000"
 
+        # Can be replaced with users based on your local database
         self.clientuser = 'spaceplease6'
         self.clientpw = 'jedwi5hak2'
 
@@ -753,13 +777,15 @@ class ProprietorRequiredTests(TestCase):
         self.driver.close()
 
 
-# Tests @user_is_space_owner decorator
+# Tests @user_is_space_owner decorator and protected view update_space()
 # Spaces are based on id created on local database, may be different
-class SpaceOwnerTest(TestCase):
+class SpaceOwnerTests(TestCase):
     def setUp(self):
         self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+
         self.index_url = "http://127.0.0.1:8000"
 
+        # Can be replaced with users based on your local database
         self.clientuser = 'spaceplease6'
         self.clientpw = 'jedwi5hak2'
 
@@ -826,3 +852,4 @@ class SpaceOwnerTest(TestCase):
 
     def tearDown(self):
         self.driver.close()
+
