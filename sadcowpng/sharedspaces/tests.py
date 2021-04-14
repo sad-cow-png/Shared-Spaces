@@ -1,15 +1,13 @@
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.select import Select
 from webdriver_manager.chrome import ChromeDriver, ChromeDriverManager
 from django.test import TestCase
 from django.urls import reverse
 
-from .decorators import proprietor_required
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm
 from .models import Space, User
-from django.contrib.auth.models import AnonymousUser
-from .views import create_space, update_space
 
 
 # Testing for the client signup
@@ -587,102 +585,9 @@ class CreateSpaceTests(TestCase):
     # Selenium testing will be added later for testing front end to database
 
 
-class DecoratorTests(TestCase):
-    def setUp(self):
-        self.clientuser = {
-            'username': 'spaceuser6',
-            'password': '#Ijustwantspace38',
-
-        }
-
-        self.proprietoruser = {
-            'username': 'propOwner',
-            'password': 'Re$ervehere792',
-
-        }
-        # Create client and proprietor users
-        User.objects.create_user(**self.clientuser)
-        client = User.objects.get(username='spaceuser6')
-        client.is_client = True
-
-        User.objects.create_user(**self.proprietoruser)
-        proprietor = User.objects.get(username='propOwner')
-        proprietor.is_proprietor = True
-
-        self.assertEqual(client.is_client, True)
-        self.assertEqual(proprietor.is_proprietor, True)
-
-    def test_proprietor_required_not_logged_in(self):
-        response = self.client.get('/create_space/')
-        self.failUnless(response.status_code, 302)
-        self.assertRedirects(response, '/login/?next=/create_space/')
-
-    def test_proprietor_required_client(self):
-        created_users = User.objects.count()
-        self.assertEqual(2, created_users)
-
-        # Go to create page, should redirect to login
-        response = self.client.get('/create_space/')
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/login/?next=/create_space/')
-
-        # Login as client
-        response = self.client.post('/login/?next=/create_space/', self.clientuser, follow=True)
-        self.assertEqual(response.status_code, 200)
-
-        # In client account page
-        response = self.client.get('/account/')
-        self.assertEqual(response.status_code, 200)
-
-        response = self.client.get('/create_space/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_user_is_space_owner_not_logged_in(self):
-        # Get proprietor user object
-        user = User.objects.get(username=self.proprietoruser.get('username'))
-
-        test_space = Space(space_name='Space',
-                           space_description='This is a space',
-                           space_max_capacity=54,
-                           space_noise_level_allowed=2,
-                           space_noise_level=4,
-                           space_wifi=1,
-                           space_restrooms=1,
-                           space_food_drink=0,
-                           space_owner=user,
-                           )
-
-        test_space.save()
-        self.assertEqual(1, Space.objects.count())
-
-        # response = self.client.get('/update_space/1')
-    # self.assertEqual(response.status_code, 200)
-
-
-class ProprietorRequiredTest(TestCase):
-    def setUp(self):
-        self.clientuser = User.objects.create_user(username='spaceplease3', password='akjdhDAOIW542')
-        self.clientuser.is_client = True
-
-        self.proprietoruser = User.objects.create_user(username='proprietor5', password='ajkDUI3#f')
-        self.clientuser.is_client = True
-
-    def test_proprietor_required_decorator(self):
-        response = self.client.get('/create_space/')
-        self.assertEqual(response.status_code, 302)
-
-        self.client.force_login(self.clientuser)
-        response.user = self.clientuser
-        response = self.client.get('/create_space/')
-
-        #response.user = self.proprietoruser
-        self.assertEqual(response.status_code, 302)
-
-        #request.user = self.clientuser
-
-        #response._messages = messages.storage.default_storage(request)
-
-class DriverTest(TestCase):
+# Creates client/proprietor user and spaces
+# Can be used to create new users, reusable
+class CreateUsersandSpaces(TestCase):
     def setUp(self):
         self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
         self.index_url = "http://127.0.0.1:8000"
@@ -693,11 +598,26 @@ class DriverTest(TestCase):
         self.proprietoruser = 'proprietor5'
         self.proprietorpw = 'ajkDUI3#f'
 
-       # self.proprietoruser = User.objects.create_user(username='proprietor5', password='ajkDUI3#f')
-       # self.proprietoruser.is_proprietor = True
-       # self.proprietoruser.save()
+        self.sp_name = "Space space"
+        self.sp_desc = "This is a space for use."
 
-    def client_sign_up(self):
+    def test_proprietor_sign_up(self):
+        driver = self.driver
+
+        driver.get(self.index_url + '/sign_up/proprietor/')
+
+        nameFieldelem = driver.find_element_by_name("username")
+        passFieldElem = driver.find_element_by_name("password1")
+        confirmPassElem = driver.find_element_by_name("password2")
+        submitButtonElem = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        nameFieldelem.send_keys(self.proprietoruser)
+        passFieldElem.send_keys(self.proprietorpw)
+        confirmPassElem.send_keys(self.proprietorpw)
+        ActionChains(driver).move_to_element(submitButtonElem).click(submitButtonElem).perform()
+        submitButtonElem.send_keys(Keys.RETURN)
+
+    def test_client_sign_up(self):
         driver = self.driver
 
         driver.get(self.index_url + '/sign_up/client/')
@@ -713,7 +633,57 @@ class DriverTest(TestCase):
         ActionChains(driver).move_to_element(submitButtonElem).click(submitButtonElem).perform()
         submitButtonElem.send_keys(Keys.RETURN)
 
-    def test_client_login(self):
+    def test_create_spaces(self):
+        driver = self.driver
+
+        # Redirect to login
+        driver.get(self.index_url + '/create_space/')
+
+        # Login as proprietor
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.proprietoruser)
+        password.send_keys(self.proprietorpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        # Create space
+        sp_name = driver.find_element_by_name("space_name")
+        desc = driver.find_element_by_name("space_description")
+        capacity = driver.find_element_by_name("space_max_capacity")
+        noise_allowed = Select(driver.find_element_by_name("space_noise_level_allowed"))
+        noise_level = Select(driver.find_element_by_name("space_noise_level"))
+        wifi = driver.find_element_by_name("space_wifi")
+        restroom = driver.find_element_by_name("space_restrooms")
+        submitButton= driver.find_element_by_xpath("//*[contains(@type, 'submit')]")
+
+        sp_name.send_keys(self.sp_name)
+        desc.send_keys(self.sp_desc)
+        capacity.send_keys(62)
+        noise_allowed.select_by_index(2)
+        noise_level.select_by_index(3)
+        wifi.click()
+        restroom.click()
+        submitButton.send_keys(Keys.RETURN)
+
+    def tearDown(self):
+        self.driver.close()
+
+
+# Tests @proprietor_required decorator and protected view create_space()
+class ProprietorRequiredTests(TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+        self.index_url = "http://127.0.0.1:8000"
+
+        self.clientuser = 'spaceplease6'
+        self.clientpw = 'jedwi5hak2'
+
+        self.proprietoruser = 'proprietor5'
+        self.proprietorpw = 'ajkDUI3#f'
+
+    def test_client_create_space(self):
         driver = self.driver
 
         # Not logged in
@@ -758,25 +728,7 @@ class DriverTest(TestCase):
         # User could potentially switch user types
         self.assertEqual(self.index_url + '/login/', driver.current_url)
 
-    def test_proprietor_sign_up(self):
-        driver = self.driver
-
-        driver.get(self.index_url + '/sign_up/proprietor/')
-
-        nameFieldelem = driver.find_element_by_name("username")
-        passFieldElem = driver.find_element_by_name("password1")
-        confirmPassElem = driver.find_element_by_name("password2")
-        submitButtonElem = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
-
-        nameFieldelem.send_keys(self.proprietoruser)
-        passFieldElem.send_keys(self.proprietorpw)
-        confirmPassElem.send_keys(self.proprietorpw)
-        ActionChains(driver).move_to_element(submitButtonElem).click(submitButtonElem).perform()
-        submitButtonElem.send_keys(Keys.RETURN)
-
-        print('prop signed up')
-
-    def test_proprietor_login(self):
+    def test_proprietor_create_space(self):
         driver = self.driver
 
         # Not logged in
@@ -790,12 +742,87 @@ class DriverTest(TestCase):
         password = driver.find_element_by_name("password")
         loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
 
-        name.send_keys('proprietor5')
-        password.send_keys('ajkDUI3#f')
+        name.send_keys(self.proprietoruser)
+        password.send_keys(self.proprietorpw)
         loginbutton.send_keys(Keys.RETURN)
 
-        print(driver.current_url)
+        # Redirect to create_space page
+        self.assertEqual(self.index_url + '/create_space/', driver.current_url)
+
+    def tearDown(self):
+        self.driver.close()
 
 
-   # def tearDown(self):
-     #   self.driver.close()
+# Tests @user_is_space_owner decorator
+# Spaces are based on id created on local database, may be different
+class SpaceOwnerTest(TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+        self.index_url = "http://127.0.0.1:8000"
+
+        self.clientuser = 'spaceplease6'
+        self.clientpw = 'jedwi5hak2'
+
+        self.proprietoruser = 'proprietor5'
+        self.proprietorpw = 'ajkDUI3#f'
+
+    def test_client_access_spaces(self):
+        driver = self.driver
+
+        # Access update_space not logged in
+        driver.get(self.index_url + '/update_space/1')
+        self.assertEqual(self.index_url + '/update_space/1', driver.current_url)
+
+        # Display error message
+        message = driver.find_element_by_css_selector("body").text
+        self.assertEqual(message, 'Permission Denied.')
+
+        driver.get(self.index_url + '/login/')
+
+        # Access space as a client denied
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.clientuser)
+        password.send_keys(self.clientpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        driver.get(self.index_url + '/update_space/1')
+        self.assertEqual(self.index_url + '/update_space/1', driver.current_url)
+
+        # Display error message
+        message = driver.find_element_by_css_selector("body").text
+        self.assertEqual(message, 'Permission Denied.')
+
+    def test_proprietor_access_spaces(self):
+        driver = self.driver
+
+        driver.get(self.index_url + '/login/')
+
+        # Login as proprietor
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.proprietoruser)
+        password.send_keys(self.proprietorpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        # Access own space on database
+        driver.get(self.index_url + '/update_space/7')
+        self.assertEqual(self.index_url + '/update_space/7', driver.current_url)
+
+        message = driver.find_element_by_css_selector("body").text
+        self.assertNotEqual(message, 'Permission Denied.')
+
+        # Access other user's space
+        driver.get(self.index_url + '/update_space/2')
+        self.assertEqual(self.index_url + '/update_space/2', driver.current_url)
+
+        # Display error message
+        message = driver.find_element_by_css_selector("body").text
+        self.assertEqual(message, 'Permission Denied.')
+
+    def tearDown(self):
+        self.driver.close()
