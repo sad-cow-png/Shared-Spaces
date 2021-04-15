@@ -42,7 +42,7 @@ class ClientSignUpTest(TestCase):
             # username already exists bad
             {
                 'data': {
-                    'username': 'test',
+                    'username': 'testyBoy',
                     'password1': 'SomeReallyGoodPassword1#',
                     'password2': 'SomeReallyGoodPassword1#',
                 }
@@ -93,7 +93,7 @@ class ClientSignUpTest(TestCase):
             'password2': 'DisneyInfringementIsMyRight1@',
         }
 
-        response = self.client.post('sign_up/client_sign_up', data=good_data)
+        response = self.client.post('/sign_up/client/', data=good_data)
         self.assertEqual(response.status_code, 302)
         # right now, we should have 2 more objects from start
         self.assertEqual(User.objects.count(), self.precount + 2)
@@ -103,7 +103,7 @@ class ClientSignUpTest(TestCase):
         self.assertEqual(user.is_client, True)
         # we may also want to check the user has is_prop false
         self.assertEqual(user.is_proprietor, False)
-        self.assertRedirects(response, 'index')
+        self.assertRedirects(response, '/')
 
 
 # Test proprietor signup with invalid and valid users
@@ -605,7 +605,7 @@ class CreateUsers(TestCase):
         self.sp_name = "Space space"
         self.sp_desc = "This is a space for use."
 
-    def test_proprietor_sign_up(self):
+    def proprietor_sign_up(self):
         driver = self.driver
 
         driver.get(self.index_url + '/sign_up/proprietor/')
@@ -621,7 +621,7 @@ class CreateUsers(TestCase):
         ActionChains(driver).move_to_element(submitButtonElem).click(submitButtonElem).perform()
         submitButtonElem.send_keys(Keys.RETURN)
 
-    def test_client_sign_up(self):
+    def client_sign_up(self):
         driver = self.driver
 
         driver.get(self.index_url + '/sign_up/client/')
@@ -655,7 +655,7 @@ class CreateSpaces(TestCase):
         self.sp_name = "Space space"
         self.sp_desc = "This is a space for use."
 
-    def test_create_spaces(self):
+    def create_spaces(self):
         driver = self.driver
 
         # Redirect to login
