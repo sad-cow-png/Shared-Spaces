@@ -1,17 +1,48 @@
 {% extends 'sharedspaces/account_header.html' %}
-{%  load static %}
-
-<!-- overrides base template title -->
-{% block title %}
- <title>Shared Spaces</title>
-{% endblock %}
+{% load static %}
 
 {% block content %}
 
-    <body>
-        <p> This is the main page </p>
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Shared Spaces</title>
+            <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+            <style type="text/css">
+                #map {
+                    height: 75%;
+                }
+                html,
+                body {
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;
+                }
+            </style>
+            <script>
+                let map;
+                const umbcLatLng = {lat: 39.254, lng: -76.711};
+                const mapOptions = {
+                    center: umbcLatLng,
+                    mapTypeId: 'roadmap',
+                    zoom: 15,
+                };
+                function initMap() {
+                    map = new google.maps.Map(document.getElementById("map"), mapOptions);
+                }
+            </script>
+        </head>
+        <body>
+            <p> This is the main page </p>
+            <body>
+            <div id="map"></div>
+            <script
+                src="https://maps.googleapis.com/maps/api/js?key=GOOGLE_MAPS_API_KEY&callback=initMap&libraries=&v=weekly"
+                async
+            ></script>
+            </body>
+        </body>
+    </html>
 
-
-    </body>
 {% endblock %}
-
