@@ -853,3 +853,76 @@ class SpaceOwnerTests(TestCase):
     def tearDown(self):
         self.driver.close()
 
+
+# Test if the pages use the correct template
+# Does not test specific details, therefore client and
+# proprietor test results would be the same, since they use same template
+# Only using a proprietor account is sufficient for this kind of test
+class PageTemplateTests(TestCase):
+    def setUp(self):
+        self.user = {
+            'username': 'testuser',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**self.user)
+        self.proprietor = User.objects.get(username='testuser')
+        self.proprietor.is_proprietor = True
+        self.assertEqual(1, User.objects.count())
+
+        response = self.client.post('/login/', self.user, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(response.context['user'].is_authenticated)
+        self.assertTrue(response.context['user'].is_active)
+
+    def test_proprietor_account_view(self):
+        self.assertTrue(self.proprietor.is_proprietor)
+
+        response = self.client.get('/account/')
+        self.assertEqual(response.status_code, 200)
+
+        # Test that it is using the right templates
+        self.assertTemplateUsed(response, 'sharedspaces/account.html')
+        self.assertTemplateUsed(response, 'sharedspaces/account_header.html')
+
+    def test_index_view(self):
+        response = self.client.get('')
+        self.assertEqual(response.status_code, 200)
+
+        # Test that it is using the right templates
+        self.assertTemplateUsed(response, 'sharedspaces/index.html')
+        self.assertTemplateUsed(response, 'sharedspaces/account_header.html')
+
+    def test_index_view_logged_in(self):
+        response = self.client.get('')
+        self.assertEqual(response.status_code, 200)
+
+        # Test that it is using the right templates
+        self.assertTemplateUsed(response, 'sharedspaces/index.html')
+        self.assertTemplateUsed(response, 'sharedspaces/account_header.html')
+
+    def test_logout_view(self):
+        response = self.client.get('/logout/')
+        self.assertEqual(response.status_code, 200)
+
+        # Test that it is using the right template
+        self.assertTemplateUsed(response, 'sharedspaces/logout.html')
+
+    def test_logo_is_on_page(self):
+        response = self.client.get('')
+        self.assertContains(response, 'navbar-brand')
+
+        response = self.client.get('/account/')
+        self.assertContains(response, 'navbar-brand')
+
+        response = self.client.get('/sign_up/client/')
+        self.assertContains(response, 'navbar-brand')
+
+        response = self.client.get('/sign_up/proprietor/')
+        self.assertContains(response, 'navbar-brand')
+
+        response = self.client.get('/login/')
+        self.assertContains(response, 'navbar-brand')
+
+        response = self.client.get('/logout/')
+        self.assertContains(response, 'navbar-brand')
