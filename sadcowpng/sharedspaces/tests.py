@@ -926,3 +926,4 @@ class PageTemplateTests(TestCase):
 
         response = self.client.get('/logout/')
         self.assertContains(response, 'navbar-brand')
+
