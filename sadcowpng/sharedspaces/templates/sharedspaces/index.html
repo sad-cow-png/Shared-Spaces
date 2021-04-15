@@ -13,6 +13,7 @@
             <title>Shared Spaces</title>
             <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
             <script>
+            
                 let map;
                 const umbcLatLng = {lat: 39.254, lng: -76.711};
                 const mapOptions = {
@@ -23,7 +24,15 @@
 
                 function initMap() {
                     map = new google.maps.Map(document.getElementById("map"), mapOptions);
+                    map.addListener('click', (event) => {
+                        createMarker(event.latLng.lat(), event.latLng.lng());
+                    });
                 }
+
+                function createMarker(latitude, longitude) {
+                    const marker = new google.maps.Marker({position: {lat: latitude, lng: longitude}, map: map});
+                }
+
             </script>
         </head>
         <body>
