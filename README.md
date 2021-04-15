@@ -64,6 +64,13 @@ python manage.py test sharedspaces.tests.LoginTest
 
 
 #### Interactive Map Background:
+The Google Maps JavaScript API embeds an interactive map centered over UMBC within a
+Django HTML template. As of current, the Spaces model does not yet have a location
+field, so the JavaScript functionality is not yet integrated with the SQL database.
+
+Current map functionality includes the ability to navigate and adjust the positioning
+of the map as well as the placement of markers.
+
 ##### Testing the interactive map
 
 <br>

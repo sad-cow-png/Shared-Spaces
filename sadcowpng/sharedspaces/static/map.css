@@ -1,0 +1,15 @@
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#map {
+    border: solid black 1px;
+    height: 500px;
+    margin-right: 5px;
+    margin-left: 10px;
+    margin-top: 10px;
+    padding: 2px;
+    width: 800px;
+}

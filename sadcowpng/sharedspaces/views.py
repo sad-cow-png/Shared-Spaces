@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse, HttpResponseRedirect
+from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -12,7 +13,7 @@ from .models import Space, User
 
 # Shared Spaces Home Page
 def index(request):
-    return render(request, 'sharedspaces/index.html')
+    return render(request, 'sharedspaces/index.html', {'maps_api_key': settings.GOOGLE_MAPS_API_KEY})
 
 
 @login_required
