@@ -1,22 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Account</title>
-</head>
-<body>
-    <p>Page will appear depending if user is a client or proprietor.</p>
+{% extends 'sharedspaces/account_header.html' %}
+{% load static %}
 
-    <!-- Layout may differ depending on user type  -->
-    {% if user.is_client and user.is_authenticated %}
-        <p>Hello, client user: {{ user.get_username }} !</p>
-    {% endif %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'account.css' %}">
+{% endblock %}
 
-    {% if user.is_proprietor and user.is_authenticated %}
-       <p>Hello, proprietor: {{ user.get_username }} !</p>
-    {% endif %}
+{% block content %}
 
-    <a href="{% url 'logout' %}">Logout</a><br/><br/>
+    <body>
+      <div class="container-fluid">
 
-</body>
-</html>
+        <!-- Layout may differ depending on user type  -->
+        {% if user.is_client and user.is_authenticated %}
+            <h1>Welcome, {{ user.get_username }}!</h1>
+        {% endif %}
+
+        {% if user.is_proprietor and user.is_authenticated %}
+            <h1>Welcome, {{ user.get_username }}!</h1>
+
+            <h2>My Listings</h2>
+            <div class="row">
+                {% for spaces in space %}
+                    <div class="col-sm-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ spaces.space_name }}</h5>
+                                <p class="card-text">{{ spaces.space_description }}</p>
+                                <a href="{% url 'update_space' spaces.id %}" class="btn btn-primary">Update Space</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+
+      </div>
+
+    </body>
+{% endblock %}
+

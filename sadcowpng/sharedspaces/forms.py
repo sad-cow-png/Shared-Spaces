@@ -23,12 +23,11 @@ class CreateSpaceForm(forms.Form):
     space_wifi = forms.BooleanField(label='Wifi Availability:', required=False)
     space_restrooms = forms.BooleanField(label='Restroom Availability:', required=False)
     space_food_drink = forms.BooleanField(label='Food or Drink Availability:', required=False)
-    # space_open = forms.BooleanField(label='Is the Location Open?')
+    space_open = forms.BooleanField(label='Is the Location Open?', required=False)
 
     
 # Used for proprietor sign up view
 class ProprietorSignUpForm(UserCreationForm):
-
     class Meta(UserCreationForm.Meta):
         model = User
         
@@ -38,14 +37,14 @@ class ProprietorSignUpForm(UserCreationForm):
 # we may want different forms for different types of users
 # (maybe we want the prop form to ask optionally for expected number of spaces)
 class ClientSignUpForm(UserCreationForm):
-
     class Meta(UserCreationForm.Meta):
         model = User
 
 
 # User will enter the date the space will be available and the start and end time
 class SpaceTimes(forms.Form):
-    date = forms.DateField(widget=forms.DateInput(format='%m/%d/%Y'))
-    time_start = forms.TimeField(widget=forms.TimeInput(format='%H:%M'))
-    time_end = forms.TimeField(widget=forms.TimeInput(format='%H:%M'))
+    date = forms.DateField(widget=forms.DateInput(format='%m/%d/%Y'), required=True)
+    time_start = forms.TimeField(widget=forms.TimeInput(format='%H:%M'), required=True)
+    time_end = forms.TimeField(widget=forms.TimeInput(format='%H:%M'), required=True)
+    closed = forms.BooleanField(label='Is this time currently available?', required=False)
 

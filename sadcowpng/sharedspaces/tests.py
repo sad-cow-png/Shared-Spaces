@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
 from .models import Space, User, SpaceDateTime
+import datetime
 
 
 # Testing for the client signup
@@ -20,7 +21,7 @@ class ClientSignUpTest(TestCase):
         # therefore my count should be 1 (0 before, 1 now)
 
     def test_client_signup_page(self):
-        response = self.client.get('/sign_up/client/') # move to client sign up page
+        response = self.client.get('/sign_up/client/')  # move to client sign up page
         self.assertEqual(response.status_code, 200)
         # 200 means good for some reason
         # below, we check if we got the correct html file from this page
@@ -35,7 +36,7 @@ class ClientSignUpTest(TestCase):
         invalid_data = [
             # username already exists bad
             {
-                'data' : {
+                'data': {
                     'username': 'test',
                     'password1': 'SomeReallyGoodPassword1#',
                     'password2': 'SomeReallyGoodPassword1#',
@@ -93,13 +94,13 @@ class ClientSignUpTest(TestCase):
         self.assertEqual(User.objects.count(), self.precount + 2)
 
         # find that user and check if he/she has is_client
-        user = User.objects.get(username= 'JobiBenKenobi')
+        user = User.objects.get(username='JobiBenKenobi')
         self.assertEqual(user.is_client, True)
         # we may also want to check the user has is_prop false
         self.assertEqual(user.is_proprietor, False)
         self.assertRedirects(response, 'index')
 
-        
+
 # Test proprietor signup with invalid and valid users
 class ProprietorSignUpTest(TestCase):
     def setUp(self):
@@ -234,7 +235,7 @@ class ProprietorLoginTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/login/?next=/account/')
 
-        
+
 # Tests will cover both newly entered form data and associated Create Spaces database
 class CreateSpaceTests(TestCase):
     TestCase.default_data = {"space_name": 'TestName',
@@ -244,7 +245,8 @@ class CreateSpaceTests(TestCase):
                              "space_noise_level": [Noise_Level_Choices[1][0]],
                              "space_wifi": True,
                              "space_restrooms": False,
-                             "space_food_drink": True}
+                             "space_food_drink": True,
+                             "space_open": True}
     TestCase.test_form = CreateSpaceForm(data=TestCase.default_data)
     TestCase.test_form.is_valid()
 
@@ -288,6 +290,12 @@ class CreateSpaceTests(TestCase):
         # Creating a Test to check if the food and drink availability is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_food_drink'], True,
                          'space food/drink availability submitted correctly and in accurate location')
+
+    # added by Bishal ##################################################################################
+    def test_form_accuracy_open(self):
+        # Creating a Test to check if the food and drink availability is saved correctly
+        self.assertEqual(TestCase.test_form.cleaned_data['space_food_drink'], True,
+                         'Space availability submitted correctly and in accurate location')
 
     # Tests that cover database accuracy once form is submitted
     # The following steps describe the order of steps for the rest of the data base accuracy tests.
@@ -576,27 +584,132 @@ class CreateSpaceTests(TestCase):
         self.assertEqual(test_space.pk, None,
                          'The location was not deleted properly from the database.')
 
+    # added by Bishal ##################################################################################
+    # Tests that cover database accuracy of food and drink
+    def test_form_to_database_accuracy_space_open(self):
+        name = TestCase.test_form.cleaned_data['space_name']
+        description = TestCase.test_form.cleaned_data['space_description']
+        max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
+        noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
+        noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
+        wifi = TestCase.test_form.cleaned_data['space_wifi']
+        restroom = TestCase.test_form.cleaned_data['space_restrooms']
+        food_drink = TestCase.test_form.cleaned_data['space_food_drink']
+        space_open = TestCase.test_form.cleaned_data['space_open']
+
+        # put the data into the space mode and create a new space model
+        test_space = Space(space_name=name,
+                           space_description=description,
+                           space_max_capacity=max_capacity,
+                           space_noise_level_allowed=noise_level_allowed,
+                           space_noise_level=noise_level,
+                           space_wifi=wifi,
+                           space_restrooms=restroom,
+                           space_food_drink=food_drink,
+                           space_open=space_open)
+
+        # Submitting test form data to the create space database
+        test_space.save()
+
+        # testing food and drink string
+        self.assertEqual(test_space.space_open, True,
+                         'The space availability was stored in the database incorrectly.')
+
+        # Deleting this entry from the database with it's unique ID number
+        test_space.delete()
+
+        # now check if it was deleted properly
+        self.assertEqual(test_space.pk, None,
+                         'The location was not deleted properly from the database.')
+
     # Selenium testing will be added later for testing front end to database
 
 
+# added by Sharlet #################################################################################
 class TestSpaceDateTime(TestCase):
     # Following date / time format specified in forms.py
-    TestCase.default_data = {'space_date': '09/04/2021', 'space_start_time': '04:15', 'space_end_time': '05:15' }
+    TestCase.default_data_date = {'date': '09/04/2021', 'time_start': '04:15', 'time_end': '05:15'}
 
     # First test just checks form accuracy
-    TestCase.test_form= SpaceTimes(data= TestCase.default_data)
-    TestCase.test_form.is_valid()
+    TestCase.test_form_date = SpaceTimes(data=TestCase.default_data_date)
+    TestCase.test_form_date.is_valid()
 
+    TestCase.default_space_data = {"space_name": 'TestName',
+                                   "space_description": 'Rand Description',
+                                   "space_max_capacity": 5,
+                                   "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
+                                   "space_noise_level": [Noise_Level_Choices[1][0]],
+                                   "space_wifi": True,
+                                   "space_restrooms": False,
+                                   "space_food_drink": True}
+    TestCase.test_space_form = CreateSpaceForm(data=TestCase.default_space_data)
+    TestCase.test_space_form.is_valid()
+
+    # added by Sharlet #################################################################################
     def test_form_accuracy_date(self):
-        self.assertEqual(TestCase.test_form.cleaned_data['space_date'],'09/04/2021',
+        self.assertEqual(TestCase.test_form_date.cleaned_data['date'], '09/04/2021',
                          'space date was submitted correctly and stored accurately.')
 
     def test_form_accuracy_s_time(self):
-        self.assertEqual(TestCase.test_form.cleaned_data['space_date'],'04:15',
+        self.assertEqual(TestCase.test_form_date.cleaned_data['time_start'], datetime.time(4, 15),
                          'space start time was submitted correctly and stored accurately.')
 
-    def test_form_accuracy_date(self):
-        self.assertEqual(TestCase.test_form.cleaned_data['space_date'], '05:15',
+    def test_form_accuracy_e_time(self):
+        self.assertEqual(TestCase.test_form_date.cleaned_data['time_end'], datetime.time(5, 15),
                          'space end time was submitted correctly and stored accurately.')
 
+    # added by Bishal ##################################################################################
     # Tests for model accuracy for all data types in model - would happen after a model object is saved.
+    def test_date_time_model(self):
+        # first create the space to access using fk
+        name = TestCase.test_space_form.cleaned_data['space_name']
+        description = TestCase.test_space_form.cleaned_data['space_description']
+        max_capacity = TestCase.test_space_form.cleaned_data['space_max_capacity']
+        noise_level_allowed = int(TestCase.test_space_form.cleaned_data["space_noise_level_allowed"][0])
+        noise_level = int(TestCase.test_space_form.cleaned_data["space_noise_level"][0])
+        wifi = TestCase.test_space_form.cleaned_data['space_wifi']
+        restroom = TestCase.test_space_form.cleaned_data['space_restrooms']
+        food_drink = TestCase.test_space_form.cleaned_data['space_food_drink']
+
+        # put the data into the space mode and create a new space model
+        test_space = Space(space_name=name,
+                           space_description=description,
+                           space_max_capacity=max_capacity,
+                           space_noise_level_allowed=noise_level_allowed,
+                           space_noise_level=noise_level,
+                           space_wifi=wifi,
+                           space_restrooms=restroom,
+                           space_food_drink=food_drink)
+
+        # Submitting test form data to the create space database
+        test_space.save()
+
+        # now create and save the space data model
+        space_date = TestCase.test_form_date.cleaned_data['date']
+        space_start_time = TestCase.test_form_date.cleaned_data['time_start']
+        space_end_time = TestCase.test_form_date.cleaned_data['time_end']
+        space_id = test_space
+        date_time = SpaceDateTime(space_date=space_date,
+                                  space_start_time=space_start_time,
+                                  space_end_time=space_end_time,
+                                  space_id=space_id)
+        date_time.save()
+
+        # now try to access the name of the object
+        self.assertEqual(date_time.s_date_str(), datetime.date(2021, 9, 4),
+                         'Date is working properly.')
+        self.assertEqual(date_time.s_start_str(), datetime.time(4, 15),
+                         'Start time is working properly.')
+        self.assertEqual(date_time.s_end_str(), datetime.time(5, 15),
+                         'End time is working properly.')
+        self.assertEqual(date_time.s_dt_closed_str(),
+                         "The listed date/time has not yet passed for this space opening, still open/active in use.",
+                         'Closed flag is working properly.')
+        self.assertEqual(date_time.s_dt_reserved_str(),
+                         "This space has not been reserved yet.",
+                         'Reserved flag is working properly.')
+        self.assertEqual(date_time.s_dt_reserved_by_str(), "No User",
+                         'Date reserved by is working properly.')
+        self.assertEqual(date_time.s_space_id(), "This is an availability time for the following space: TestName",
+                         'Space foreign key is working properly.')
+
