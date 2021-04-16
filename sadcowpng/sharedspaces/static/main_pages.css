@@ -8,11 +8,6 @@
         max-height: 700px;
     }
 
-    #description {
-        display: inline-flex;
-        word-wrap: break-word;
-    }
-
     #client_box {
         background-color: #F4976C;
         text-align: center;
