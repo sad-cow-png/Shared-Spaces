@@ -1,6 +1,7 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
 
 # TODO: make a directory to hold static data.
 # This represents the multiple choice options for the noise level multiple choice fields.
@@ -28,7 +29,7 @@ class Space(models.Model):
     space_wifi = models.BooleanField()
     space_restrooms = models.BooleanField()
     space_food_drink = models.BooleanField()
-    # space_open = models.BooleanField()
+    space_open = models.BooleanField(default=True)
     space_owner = models.ForeignKey('User', on_delete=models.CASCADE, default=None, null=True)
 
     # string methods for each of the different model fields
@@ -68,4 +69,44 @@ class Space(models.Model):
             return "This place does not have food and drink."
 
 
+class SpaceDateTime(models.Model):
+    # Switch to char if this does not work
+    space_date = models.CharField(max_length=100, default='EMPTY')
+    space_start_time = models.CharField(max_length=100, default='EMPTY')
+    space_end_time = models.CharField(max_length=100, default='EMPTY')
+    # This should auto-close after the date listed or if the proprietor decides to manually close a space
+    space_dt_closed = models.BooleanField(default=False)
+    space_dt_reserved = models.BooleanField(default=False)
+    # Value needs to only be non-empty if reserved = true -> covered in a later story for client side reservation
+    space_dt_reserved_by = models.CharField(max_length=1000, default='No User')
+    space_id = models.ForeignKey('Space', on_delete=models.CASCADE, default=None, null=True)
 
+    # all the to string methods all the fields in the model
+    def s_date_str(self):
+        return self.space_date
+
+    def s_start_str(self):
+        return self.space_start_time
+
+    def s_end_str(self):
+        return self.space_end_time
+
+    # A time/date slot for a space can be 'open' and reserved simultaneously. Open only means that it is active in use.
+    def s_dt_closed_str(self):
+        if self.space_dt_closed:
+            return "The listed date/time has passed and this space opening is now closed."
+        else:
+            return "The listed date/time has not yet passed for this space opening, still open/active in use."
+
+    def s_dt_reserved_str(self):
+        if self.space_dt_reserved:
+            return "This space is reserved!"
+        else:
+            return "This space has not been reserved yet."
+
+    def s_dt_reserved_by_str(self):
+        return self.space_dt_reserved_by
+
+    def s_space_id(self):
+        location = self.space_id.space_name
+        return "This is an availability time for the following space: {}".format(location)
