@@ -129,5 +129,4 @@ dmypy.json
 .pyre/
 
 # important/cached data non required on github
-/sadcowpng/sadcowpng/settings.py
 .idea/

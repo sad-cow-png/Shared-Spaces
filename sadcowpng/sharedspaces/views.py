@@ -1,27 +1,34 @@
 from django.shortcuts import render, redirect, reverse
-from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import CreateView
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login, authenticate, logout
+from django.conf import settings
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm
-from .models import Space, User
+from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
+from .models import Space, User, SpaceDateTime
+from .decorators import proprietor_required, user_is_space_owner
+from datetime import datetime
 
 
 # Shared Spaces Home Page
 def index(request):
-    return render(request, 'sharedspaces/index.html')
+    return render(request, 'sharedspaces/index.html', {'maps_api_key': settings.GOOGLE_MAPS_API_KEY})
+
 
 @login_required
 # account page renders based on user input role
 def account(request):
-    return render(request, 'sharedspaces/account.html')
+    if request.user.is_proprietor:
+        user = request.user
+        space = Space.objects.filter(space_owner=user)
+        context = {
+            'space': space
+        }
+    else:
+        return render(request, 'sharedspaces/account.html')
 
-
-def login(request):
-    return render(request, 'sharedspaces/login.html')
+    return render(request, 'sharedspaces/account.html', context=context)
 
 
 # Client sign up view
@@ -32,7 +39,7 @@ def client_sign_up(request):
             user = form.save(commit=False)
             user.is_client = True
             user.save()
-            return HttpResponseRedirect(reverse('/'))
+            return HttpResponseRedirect(reverse('index'))
     else:
         form = ClientSignUpForm()
     return render(request, "sharedspaces/client_sign_up.html", {'form': form})
@@ -41,11 +48,7 @@ def client_sign_up(request):
 def sign_up(request):
     return render(request, 'sharedspaces/signup.html')
 
-  
-def create_space(request):
-    return render(request, 'sharedspaces/create_space.html')
-  
-  
+
 # Logs user out
 def sign_out(request):
     logout(request)
@@ -72,13 +75,15 @@ def proprietor_sign_up_view(request):
     return render(request, 'sharedspaces/proprietor_signup.html', {'form': form})
 
 
-# Proprietor login view
-class ProprietorLoginView(LoginView):
+# Client and Proprietor Login view
+class UserLoginView(LoginView):
     model = User
     form_class = AuthenticationForm
-    template_name = 'sharedspaces/proprietor_login.html'
+    template_name = 'sharedspaces/login.html'
 
-    
+
+@login_required
+@proprietor_required
 # Need to add data fields that auto populate using authentication - will be done in models
 # This is to pull location data and account data to be able to associate them to each other within the spaces table
 # Spaces would have a "proprietor ID" field to ease having it pop up on account pages
@@ -103,14 +108,17 @@ def create_space(request):
             wifi = space_form.cleaned_data['space_wifi']
             restroom = space_form.cleaned_data['space_restrooms']
             food_drink = space_form.cleaned_data['space_food_drink']
+            user = request.user
 
             sp = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
                        space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level, space_wifi=wifi,
-                       space_restrooms=restroom, space_food_drink=food_drink)
-            sp.save()
+                       space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
 
-            # redirecting to account page once complete for now
-            return HttpResponseRedirect('/')
+            sp.save()
+            primary_key = sp.pk
+
+            # redirecting to date and time page once complete to get at least one data and time
+            return HttpResponseRedirect(reverse('space_date_time', args=[primary_key]))
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -119,6 +127,7 @@ def create_space(request):
     return render(request, 'sharedspaces/create_space.html', {'form': space_form})
 
 
+@user_is_space_owner
 def update_space(request, space_id):
     """
     Renders the page for updating the spaces stored in the database
@@ -146,12 +155,13 @@ def update_space(request, space_id):
             old_space.space_wifi = space_form.cleaned_data['space_wifi']
             old_space.space_restrooms = space_form.cleaned_data['space_restrooms']
             old_space.space_food_drink = space_form.cleaned_data['space_food_drink']
+            old_space.space_open = space_form.cleaned_data['space_open']
 
             # save the updated object in the database
             old_space.save()
 
             # redirecting to account page once complete for now
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect('account.html')
 
     # if a GET (or any other method) we'll use the data from the database to
     # create a form with the data from the database
@@ -170,10 +180,81 @@ def update_space(request, space_id):
                     "space_noise_level": old_space_noise_level,
                     "space_wifi": old_space.space_wifi,
                     "space_restrooms": old_space.space_restrooms,
-                    "space_food_drink": old_space.space_food_drink}
+                    "space_food_drink": old_space.space_food_drink,
+                    "space_open": old_space.space_open}
 
         # creating a form with the old data
         space_form = CreateSpaceForm(old_data)
 
     return render(request, 'sharedspaces/update_space.html', {'form': space_form, "space_id": space_id,
                                                               "name": old_space.space_name})
+
+
+def space_date_time(request, space_id):
+    """
+    Used to create the data and time for a specific space
+    :param request: HTML request
+    :param space_id: The pk of the space that the date and time belongs to
+    :return: Redirects to account if POST else goes to the form page to fill it up
+    """
+    if request.method == 'POST':
+        sdt = SpaceTimes(request.POST)
+        if sdt.is_valid():
+            space_date = sdt.cleaned_data['date']
+            space_start = sdt.cleaned_data['time_start']
+            space_end = sdt.cleaned_data['time_end']
+
+            # These are default values - toggling for closing spaces and client side reservations need separate
+            # implementation
+            sp = SpaceDateTime(space_date=space_date,
+                               space_start_time=space_start,
+                               space_end_time=space_end,
+                               space_dt_closed=False,
+                               space_dt_reserved=False,
+                               space_id=Space.objects.get(pk=space_id))
+            sp.save()
+
+            return HttpResponseRedirect(reverse('account'))
+    else:
+        sdt = SpaceTimes()
+
+    return render(request, 'sharedspaces/space_date_time.html', {'form': sdt,
+                                                                 "space_id": space_id})
+
+
+def update_space_date_time(request, data_time_id):
+    """
+    To update the toggle for date and time
+    """
+    # get the space from the data base with the given space id
+    old_date_time = SpaceDateTime.objects.get(pk=data_time_id)
+
+    if request.method == 'POST':
+        sdt = SpaceTimes(request.POST)
+        # to access the cleaned data
+        sdt.is_valid()
+        # update the object from the database with the new data
+        old_date_time.space_dt_closed = sdt.cleaned_data["closed"]
+
+        # save the updated object in the database
+        old_date_time.save()
+
+        return HttpResponseRedirect(reverse('account'))
+    else:
+
+        # extracting the old data into a dictionary
+        old_data = {"date": old_date_time.space_date,
+                    "time_start": old_date_time.space_start_time,
+                    "time_end": old_date_time.space_end_time,
+                    "closed": old_date_time.space_dt_closed}
+
+        sdt = SpaceTimes(old_data)
+
+    return render(request, 'sharedspaces/update_space_date_time.html',
+                  {'form': sdt, "date": old_date_time.space_date,
+                   "start": old_date_time.space_start_time,
+                   "end": old_date_time.space_end_time,
+                   "reserved": old_date_time.space_dt_reserved,
+                   "reserved_by": old_date_time.space_dt_reserved_by,
+                   "space_name": old_date_time.space_id.space_name,
+                   "id": data_time_id})

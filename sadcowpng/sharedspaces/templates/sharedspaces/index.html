@@ -1,10 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Shared Spaces</title>
-</head>
-<body>
-    <p> This is the main page </p>
-</body>
-</html>
+{% extends 'sharedspaces/account_header.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'map.css' %}">
+{% endblock %}
+
+{% block content %}
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            {% block title %}
+                <title>Shared Spaces</title>
+            {% endblock %}
+            <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+            <script>
+
+                let map;
+                const umbcLatLng = {lat: 39.254, lng: -76.711};
+                const mapOptions = {
+                    center: umbcLatLng,
+                    mapTypeId: 'roadmap',
+                    zoom: 15,
+                };
+
+                // Map initializes centered over UMBC.
+                // Map options fields alter appearance and interactive functionality of the embedded map.
+                function initMap() {
+                    // The map is embedded in the 'map' div found in index.html.
+                    map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+                    // Enables users to place markers on the map.
+                    map.addListener('click', (event) => {
+                        createMarker(event.latLng.lat(), event.latLng.lng());
+                    });
+
+                    // TODO: When it is determined how the Space model will contain its location, you 
+                    //       can then loop over those locations in the SQL database and add them as
+                    //       markers here. 
+                    //       Using a google.maps.InfoWindow for each of these markers is likely the
+                    //       most efficient way to display the Space information when a user clicks
+                    //       on a space.
+                }
+
+                // Wrapper function to add a google.maps.Marker to the embedded map.
+                function createMarker(latitude, longitude) {
+                    const marker = new google.maps.Marker({position: {lat: latitude, lng: longitude}, map: map});
+                }
+
+                // If google.maps.InfoWindows are decided to be used to display space information, additional wrapper
+                // functions similar to the one above will need to be placed here.
+
+            </script>
+        </head>
+        <body>
+            <!-- Google Maps API makes a callback to initMap(). Moving JavaScript to an external file is ideal, but
+                 there have been issues with Google Maps being unable to find the initMap() function outside of this
+                 file due to weird JavaScript scope and closure fun. -->
+            <div id="map"></div>
+            <script src="https://maps.googleapis.com/maps/api/js?key={{maps_api_key}}&callback=initMap&libraries=&v=weekly" 
+                    async>
+            </script>
+        </body>
+    </html>
+{% endblock %}
