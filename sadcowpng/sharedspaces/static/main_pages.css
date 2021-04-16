@@ -4,10 +4,16 @@
         padding: 15px;
         margin: auto;
         width: 50%;
-        height: 400px;
+        height: 60vh;
+        max-height: 700px;
     }
 
-    .float-c {
+    #description {
+        display: inline-flex;
+        word-wrap: break-word;
+    }
+
+    #client_box {
         background-color: #F4976C;
         text-align: center;
         float: left;
@@ -15,10 +21,12 @@
         margin-top: 10px;
         padding: 10px;
         width: 40%;
-        height: 65%;
+        height: 35vh;
+        overflow: scroll;
+
     }
 
-    .float-p {
+    #proprietor_box {
         background-color: #FBE8A6;
         text-align: center;
         float: left;
@@ -26,7 +34,8 @@
         margin-top: 10px;
         padding: 10px;
         width: 40%;
-        height: 65%;
+        height: 35vh;
+        overflow: scroll;
     }
 
 
@@ -41,12 +50,10 @@
     }
 
     #btn-c {
-       /* margin-top: 35px; */
         margin-top: 15%
     }
 
     #btn-p {
-      /*  margin-top: 10px; */
         margin-top: 5%;
     }
     /* submit, signup buttons */
@@ -78,6 +85,10 @@
     #pr_signup{
         width: 60%;
         height: 550px;
+
+    #signup{
+        width: 70%;
+        height: 90%;
     }
 
     h2 {
@@ -89,7 +100,7 @@
     /* client/proprietor signup pages */
     table{
         color: #F4976C;
-        margin-top: 20px;
+        margin: auto;
         border-spacing: 15px;
         border-color: #F4976C;
     }
@@ -165,4 +176,3 @@
         list-style-type: none;
     }
     /* logout page */
-

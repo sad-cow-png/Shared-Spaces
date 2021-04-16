@@ -20,7 +20,6 @@ class User(AbstractUser):
     is_proprietor = models.BooleanField(default=False)
 
 
-# This table or model will hold all the data that defines each of the spaces.
 class Space(models.Model):
     space_name = models.CharField(max_length=500)
     space_description = models.CharField(max_length=1000)
@@ -31,6 +30,7 @@ class Space(models.Model):
     space_restrooms = models.BooleanField()
     space_food_drink = models.BooleanField()
     space_open = models.BooleanField(default=True)
+    space_owner = models.ForeignKey('User', on_delete=models.CASCADE, default=None, null=True)
 
     # string methods for each of the different model fields
     def name_str(self):

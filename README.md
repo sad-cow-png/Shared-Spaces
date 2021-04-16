@@ -34,7 +34,7 @@ commented out and not included in the repo until a better solution is found.
 
 #### User Login Background:
 When a user uses a signup form, it sets the flags ```is_client``` or ```is_proprietor```
-to true depending on which account type they are signing up for. The signup and login forms built off of django contains
+to true depending on which account type they are signing up for. The signup and login forms built off of django contains 
 username and password validation. The main signup page allows users to select which account type
 they are and takes them to the client/proprietor signup page.
 
@@ -73,11 +73,13 @@ of the map as well as the placement of markers.
 
 ##### Testing the interactive map
 There are not tests for the map due to it just being a front end and no backend has been set up yet.
+
 <br>
 
 ### Selenium tests for authentication
 Before running tests, please _**runserver**_ and _**read comments**_
 on each test. User and space variables are adjustable depending on every developer's needs.
+
 ```
 python manage.py runserver
 ```
@@ -91,7 +93,7 @@ python manage.py test sharedspaces.tests.CreateUsers
 python manage.py test sharedspaces.tests.CreateSpaces
 ```
 **Note:** If creating new users somehow breaks, change username and password in
-setUp for tests below using users you have created already.
+setUp for tests below using users you have created already. 
 
 #### Tests for proprietor_required decorated views
 Protect views only accessible to proprietors.
@@ -127,7 +129,3 @@ is completed as that is what will connect all the tables together and have a wor
 ```
 python manage.py test sharedspaces.tests.TestSpaceDateTime
 ```
-
-
-
-

@@ -1,29 +1,34 @@
 from django.shortcuts import render, redirect, reverse
-from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import CreateView
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login, authenticate, logout
+from django.conf import settings
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
 from .models import Space, User, SpaceDateTime
+from .decorators import proprietor_required, user_is_space_owner
 from datetime import datetime
 
 
 # Shared Spaces Home Page
 def index(request):
-    return render(request, 'sharedspaces/index.html')
+    return render(request, 'sharedspaces/index.html', {'maps_api_key': settings.GOOGLE_MAPS_API_KEY})
 
 
 @login_required
 # account page renders based on user input role
 def account(request):
-    return render(request, 'sharedspaces/account.html')
+    if request.user.is_proprietor:
+        user = request.user
+        space = Space.objects.filter(space_owner=user)
+        context = {
+            'space': space
+        }
+    else:
+        return render(request, 'sharedspaces/account.html')
 
-
-def login(request):
-    return render(request, 'sharedspaces/login.html')
+    return render(request, 'sharedspaces/account.html', context=context)
 
 
 # Client sign up view
@@ -34,7 +39,7 @@ def client_sign_up(request):
             user = form.save(commit=False)
             user.is_client = True
             user.save()
-            return HttpResponseRedirect(reverse('/'))
+            return HttpResponseRedirect(reverse('index'))
     else:
         form = ClientSignUpForm()
     return render(request, "sharedspaces/client_sign_up.html", {'form': form})
@@ -70,13 +75,15 @@ def proprietor_sign_up_view(request):
     return render(request, 'sharedspaces/proprietor_signup.html', {'form': form})
 
 
-# Proprietor login view
-class ProprietorLoginView(LoginView):
+# Client and Proprietor Login view
+class UserLoginView(LoginView):
     model = User
     form_class = AuthenticationForm
-    template_name = 'sharedspaces/proprietor_login.html'
+    template_name = 'sharedspaces/login.html'
 
 
+@login_required
+@proprietor_required
 # Need to add data fields that auto populate using authentication - will be done in models
 # This is to pull location data and account data to be able to associate them to each other within the spaces table
 # Spaces would have a "proprietor ID" field to ease having it pop up on account pages
@@ -101,10 +108,12 @@ def create_space(request):
             wifi = space_form.cleaned_data['space_wifi']
             restroom = space_form.cleaned_data['space_restrooms']
             food_drink = space_form.cleaned_data['space_food_drink']
+            user = request.user
 
             sp = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
                        space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level, space_wifi=wifi,
                        space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
+
             sp.save()
             primary_key = sp.pk
 
@@ -118,6 +127,7 @@ def create_space(request):
     return render(request, 'sharedspaces/create_space.html', {'form': space_form})
 
 
+@user_is_space_owner
 def update_space(request, space_id):
     """
     Renders the page for updating the spaces stored in the database
