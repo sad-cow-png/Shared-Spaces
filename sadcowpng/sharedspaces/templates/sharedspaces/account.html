@@ -17,8 +17,8 @@
 
         {% if user.is_proprietor and user.is_authenticated %}
             <h1>Welcome, {{ user.get_username }}!</h1>
-
-            <h2>My Listings</h2>
+            <br>
+            <h3>My Listings</h3>
             <div class="row">
                 {% for spaces in space %}
                     <div class="col-sm-5">
@@ -33,10 +33,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-
-
       </div>
-
     </body>
 {% endblock %}
 
