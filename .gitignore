@@ -130,3 +130,5 @@ dmypy.json
 
 # important/cached data non required on github
 .idea/
+# used for misc part of the program
+sadcowpng/sharedspaces/misc.py
