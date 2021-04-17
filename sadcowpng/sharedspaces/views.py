@@ -8,7 +8,6 @@ from django.contrib.auth.views import LoginView
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
 from .models import Space, User, SpaceDateTime
 from .decorators import proprietor_required, user_is_space_owner
-from datetime import datetime
 
 
 # Shared Spaces Home Page
@@ -112,7 +111,7 @@ def create_space(request):
 
             sp = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
                        space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level, space_wifi=wifi,
-                       space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
+                       space_restrooms=restroom, space_food_drink=food_drink, space_owner=user, space_open=True)
 
             sp.save()
             primary_key = sp.pk
@@ -161,7 +160,7 @@ def update_space(request, space_id):
             old_space.save()
 
             # redirecting to account page once complete for now
-            return HttpResponseRedirect('account.html')
+            return HttpResponseRedirect(reverse('account'))
 
     # if a GET (or any other method) we'll use the data from the database to
     # create a form with the data from the database
@@ -186,8 +185,10 @@ def update_space(request, space_id):
         # creating a form with the old data
         space_form = CreateSpaceForm(old_data)
 
-    return render(request, 'sharedspaces/update_space.html', {'form': space_form, "space_id": space_id,
-                                                              "name": old_space.space_name})
+        context = {'form': space_form, "space_id": space_id,
+                   "name": old_space.space_name}
+
+    return render(request, 'sharedspaces/update_space.html', context=context)
 
 
 def space_date_time(request, space_id):
@@ -217,9 +218,10 @@ def space_date_time(request, space_id):
             return HttpResponseRedirect(reverse('account'))
     else:
         sdt = SpaceTimes()
+        context = {'form': sdt,
+                   "space_id": space_id}
 
-    return render(request, 'sharedspaces/space_date_time.html', {'form': sdt,
-                                                                 "space_id": space_id})
+    return render(request, 'sharedspaces/space_date_time.html', context=context)
 
 
 def update_space_date_time(request, data_time_id):
@@ -248,13 +250,11 @@ def update_space_date_time(request, data_time_id):
                     "time_end": old_date_time.space_end_time,
                     "closed": old_date_time.space_dt_closed}
 
+        # setting up form to just show the closed status
         sdt = SpaceTimes(old_data)
 
-    return render(request, 'sharedspaces/update_space_date_time.html',
-                  {'form': sdt, "date": old_date_time.space_date,
-                   "start": old_date_time.space_start_time,
-                   "end": old_date_time.space_end_time,
-                   "reserved": old_date_time.space_dt_reserved,
-                   "reserved_by": old_date_time.space_dt_reserved_by,
-                   "space_name": old_date_time.space_id.space_name,
-                   "id": data_time_id})
+        context = {'form': sdt,
+                   "old_date_time": old_date_time,
+                   "id": data_time_id}
+
+    return render(request, 'sharedspaces/update_space_date_time.html', context=context)

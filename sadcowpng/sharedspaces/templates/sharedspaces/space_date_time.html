@@ -1,40 +1,27 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Create availabilities for your Shared Space!</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Create availabilities for your Shared Space!</title>
 
-    <!-- Bootstrap CSS -->
-    <link crossorigin="anonymous"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
-          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
-          rel="stylesheet">
-    <style>
-        body {
-            text-align: center;
-        }
+        <!-- Bootstrap CSS -->
+        <link crossorigin="anonymous"
+              href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+              integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+              rel="stylesheet">
 
-        .space_date_time_form{
-            display: inline-block;
-            width: 800px;
-        }
+        <link rel="stylesheet" type="text/css" href="{% static 'spaces.css' %}">
 
-        .space_date_time_table{
-            width: 800px;
-        }
+        <!-- favicon -->
+        <link rel="shortcut icon" type="image/png" href="{% static 'logo2-dark.png' %}"/>
 
-        .space_submit_button{
-            margin-top: 10px;
-            width: 400px;
-        }
-    </style>
-</head>
-<body>
+    </head>
+    <body>
         <div class = "space_date_time_form">
             <h3>Enter the Date and Time for your Shared Space!</h3>
-
-            Please enter the date in mm/dd/yyyy format and times in hh:mm format.
-
+            <h5>Please enter the date in mm/dd/yyyy format and times in hh:mm format.</h5>
             <form  action="/space_times/{{space_id}}" method="post">
                 {% csrf_token %}
                 <table class="space_date_time_table" border="1">
@@ -44,5 +31,5 @@
                 <input class="space_submit_button" type="reset" value="Clear">
             </form>
         </div>
-</body>
+    </body>
 </html>
