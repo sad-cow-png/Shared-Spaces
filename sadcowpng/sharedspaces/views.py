@@ -108,12 +108,15 @@ def create_space(request):
             restroom = space_form.cleaned_data['space_restrooms']
             food_drink = space_form.cleaned_data['space_food_drink']
             user = request.user
+            tags = space_form.cleaned_data['space_tags']
 
             sp = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
                        space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level, space_wifi=wifi,
-                       space_restrooms=restroom, space_food_drink=food_drink, space_owner=user, space_open=True)
+                       space_restrooms=restroom, space_food_drink=food_drink, space_owner=user, space_open=True,
+                       space_tags=tags)
 
             sp.save()
+
             primary_key = sp.pk
 
             # redirecting to date and time page once complete to get at least one data and time
@@ -155,7 +158,7 @@ def update_space(request, space_id):
             old_space.space_restrooms = space_form.cleaned_data['space_restrooms']
             old_space.space_food_drink = space_form.cleaned_data['space_food_drink']
             old_space.space_open = space_form.cleaned_data['space_open']
-
+            old_space.space_tags = space_form.cleaned_data['space_tags']
             # save the updated object in the database
             old_space.save()
 
@@ -171,6 +174,10 @@ def update_space(request, space_id):
         old_space_noise_level_allowed = Noise_Level_Choices[old_space.space_noise_level_allowed - 1]
         old_space_noise_level = Noise_Level_Choices[old_space.space_noise_level - 1]
 
+        tag_list = []
+        for tag in old_space.space_tags.tags.get_query_set():
+            tag_list.append(tag.name)
+
         # extracting the old data into a dictionary
         old_data = {"space_name": old_space.space_name,
                     "space_description": old_space.space_description,
@@ -180,7 +187,9 @@ def update_space(request, space_id):
                     "space_wifi": old_space.space_wifi,
                     "space_restrooms": old_space.space_restrooms,
                     "space_food_drink": old_space.space_food_drink,
-                    "space_open": old_space.space_open}
+                    "space_open": old_space.space_open,
+                    "space_tags": tag_list,
+                    }
 
         # creating a form with the old data
         space_form = CreateSpaceForm(old_data)
@@ -191,6 +200,7 @@ def update_space(request, space_id):
     return render(request, 'sharedspaces/update_space.html', context=context)
 
 
+@user_is_space_owner
 def space_date_time(request, space_id):
     """
     Used to create the data and time for a specific space
@@ -224,6 +234,7 @@ def space_date_time(request, space_id):
     return render(request, 'sharedspaces/space_date_time.html', context=context)
 
 
+@user_is_space_owner
 def update_space_date_time(request, data_time_id):
     """
     To update the toggle for date and time

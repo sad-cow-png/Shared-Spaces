@@ -2,9 +2,12 @@ import datetime
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from taggit.managers import TaggableManager
 
 # TODO: make a directory to hold static data.
 # This represents the multiple choice options for the noise level multiple choice fields.
+
+
 Noise_Level_Choices = (
     ("1", "None"),
     ("2", "Faint"),
@@ -31,6 +34,7 @@ class Space(models.Model):
     space_food_drink = models.BooleanField()
     space_open = models.BooleanField(default=True)
     space_owner = models.ForeignKey('User', on_delete=models.CASCADE, default=None, null=True)
+    space_tags = TaggableManager(blank=True)
 
     # string methods for each of the different model fields
     def name_str(self):
@@ -67,6 +71,7 @@ class Space(models.Model):
             return "This place has food and drink."
         else:
             return "This place does not have food and drink."
+
 
 
 class SpaceDateTime(models.Model):
