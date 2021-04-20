@@ -174,9 +174,9 @@ def update_space(request, space_id):
         old_space_noise_level_allowed = Noise_Level_Choices[old_space.space_noise_level_allowed - 1]
         old_space_noise_level = Noise_Level_Choices[old_space.space_noise_level - 1]
 
-        tag_list = []
-        for tag in old_space.space_tags.tags.get_query_set():
-            tag_list.append(tag.name)
+ #       tag_list = []
+  #      for tag in old_space.space_tags.tags.get_query_set():
+   #         tag_list.append(tag.name)
 
         # extracting the old data into a dictionary
         old_data = {"space_name": old_space.space_name,
@@ -188,7 +188,7 @@ def update_space(request, space_id):
                     "space_restrooms": old_space.space_restrooms,
                     "space_food_drink": old_space.space_food_drink,
                     "space_open": old_space.space_open,
-                    "space_tags": tag_list,
+                    #"space_tags": tag_list,
                     }
 
         # creating a form with the old data
@@ -269,3 +269,18 @@ def update_space_date_time(request, data_time_id):
                    "id": data_time_id}
 
     return render(request, 'sharedspaces/update_space_date_time.html', context=context)
+
+
+# client_required decorator
+def reserve_space(request, space_id):
+    """
+    Clients can reserve a time on the reserve page for each listed space
+    Page should display available times and users will be able to select
+    """
+    space = Space.objects.get(pk=space_id)
+
+    context = {
+        "space": space,
+    }
+
+    return render(request, 'sharedspaces/reserve_space.html', context=context)
