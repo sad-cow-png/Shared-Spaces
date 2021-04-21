@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from taggit.forms import TagField, TagWidget
 from taggit.managers import TaggableManager
 
-from .models import User
+from .models import User, SpaceDateTime
 
 # This represents the multiple choice options for the noise level multiple choice fields.
 Noise_Level_Choices = (
@@ -28,7 +28,8 @@ class CreateSpaceForm(forms.Form):
     space_food_drink = forms.BooleanField(label='Food or Drink Availability:', required=False)
     space_open = forms.BooleanField(label='Is the Location Open?', required=False)
     space_tags = TagField(required=False, help_text='Use a comma to separate tags.')
-    
+
+
 # Used for proprietor sign up view
 class ProprietorSignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
@@ -51,3 +52,16 @@ class SpaceTimes(forms.Form):
     time_end = forms.TimeField(widget=forms.TimeInput(format='%H:%M'), required=True)
     closed = forms.BooleanField(label='Is this time currently available?', required=False)
 
+
+class ReserveSpaceForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        space_id = kwargs.pop('space_id', None)
+        space_times = SpaceDateTime.objects.filter(space_id=space_id)
+        super(ReserveSpaceForm, self).__init__(*args, **kwargs)
+
+        self.fields['reserve_date'].queryset = space_times.values('space_date')
+        print(self.fields['reserve_date'].queryset)
+        self.fields['reserve_time_slot'].queryset = space_times.values('space_start_time')
+
+    reserve_date = forms.ModelChoiceField(label='Available dates:', queryset=None, required=True)
+    reserve_time_slot = forms.ModelChoiceField(label='Select a time slot:', queryset=None, required=True)

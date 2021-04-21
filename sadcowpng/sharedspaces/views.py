@@ -5,7 +5,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
+from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes, \
+    ReserveSpaceForm
 from .models import Space, User, SpaceDateTime
 from .decorators import proprietor_required, user_is_space_owner
 
@@ -277,10 +278,38 @@ def reserve_space(request, space_id):
     Clients can reserve a time on the reserve page for each listed space
     Page should display available times and users will be able to select
     """
-    space = Space.objects.get(pk=space_id)
 
-    context = {
-        "space": space,
-    }
+    space = Space.objects.get(pk=space_id)
+    space_times = SpaceDateTime.objects.filter(space_id=space_id)
+
+    #sp = space_times.s_space_id()
+
+    if request.method == 'POST':
+        reservation = ReserveSpaceForm(request.POST, space_id)
+       # reservation.fields['reserve_date'].queryset = SpaceDateTime.objects.order_by('space_date')
+      #  reservation.fields
+        if reservation.is_valid():
+
+            #available_dates = reservation.cleaned_data['reserve_date']
+            #time_start = reservation.cleaned_data['reserve_time_slot']
+            #time_end = reservation.cleaned_data['']
+
+            #space_times.space_dt_reserved_by = request.user
+            #space_times.save()
+            return HttpResponseRedirect(reverse('account'))
+
+    else:
+        reservation = ReserveSpaceForm(space_id=space_id)
+
+        context = {
+            "form": reservation,
+            "space": space,
+            "space_times": space_times,
+
+        }
+
+   # def get_form_kwargs(self):
+    #    kwargs = super(reserve_space, self).get_form_kwargs()
+     #   kwargs['space_id'] = self.space_id
 
     return render(request, 'sharedspaces/reserve_space.html', context=context)
