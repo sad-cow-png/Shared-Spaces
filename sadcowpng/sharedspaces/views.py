@@ -5,9 +5,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
+from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes, SearchBar
 from .models import Space, User, SpaceDateTime
 from .decorators import proprietor_required, user_is_space_owner
+from django.db.models import Q
 
 
 # Shared Spaces Home Page
@@ -258,3 +259,37 @@ def update_space_date_time(request, data_time_id):
                    "id": data_time_id}
 
     return render(request, 'sharedspaces/update_space_date_time.html', context=context)
+
+
+def search_results(request):
+    if request.method == 'POST':
+        sb = SearchBar(request.POST)
+        if sb.is_valid():
+           q = sb.cleaned_data['query']
+           ufilter = sb.cleaned_data['filters']
+
+        # The all search will comb through each model for a match case for the search query
+        # Inter model searches will have chained results
+        if ufilter == 'all':
+            return render(request, 'sharedspaces/search_results.html')
+
+        if ufilter == 'space':
+            space = Space.objects.filter()
+            context ={
+                'space':space
+            }
+            return render(request, 'sharedspaces/search_results.html', context=context)
+
+        if filter == 'date':
+            date = SpaceDateTime.objects.filter()
+            context ={
+                'date':date
+            }
+            return render(request, 'sharedspaces/search_results.html', context=context)
+
+        if filter == 'user':
+            user = User.objects.filter()
+            context = {
+                'user':user
+            }
+            return render(request, 'sharedspaces/search_results.html', context=context)

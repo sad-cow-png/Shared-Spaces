@@ -54,6 +54,15 @@
             </script>
         </head>
         <body>
+            <div class = "search_bar">
+                <form  action="/search_results/" method="post">
+                    <input placeholder="Search Space Information Here..." size="40" align = "center" >
+                    {% csrf_token %}
+                    {{ form }}
+                <input class="space_submit_button" type="submit" value="Search">
+                <input class="space_submit_button" type="reset" value="Clear">
+            </form>
+            </div>
             <!-- Google Maps API makes a callback to initMap(). Moving JavaScript to an external file is ideal, but
                  there have been issues with Google Maps being unable to find the initMap() function outside of this
                  file due to weird JavaScript scope and closure fun. -->

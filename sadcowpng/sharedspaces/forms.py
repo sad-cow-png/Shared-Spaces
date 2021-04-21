@@ -48,3 +48,13 @@ class SpaceTimes(forms.Form):
     time_end = forms.TimeField(widget=forms.TimeInput(format='%H:%M'), required=True)
     closed = forms.BooleanField(label='Is this time currently available?', required=False)
 
+
+class SearchBar(forms.Form):
+    Search_Choices = (
+        ('all', 'All'),
+        ('space','Space Details'),
+        ('user', 'User'),
+        ('date', 'Date Available'),
+    )
+    query = forms.CharField(max_length=1000, strip=True)
+    filters = forms.ChoiceField(choices=Search_Choices)
