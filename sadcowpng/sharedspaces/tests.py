@@ -8,6 +8,8 @@ from django.urls import reverse
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
 from .models import Space, User, SpaceDateTime
 import datetime
+from django.db.models import Q
+
 
 
 
@@ -1063,3 +1065,66 @@ class PageTemplateTests(TestCase):
         response = self.client.get('/logout/')
         self.assertContains(response, 'navbar-brand')
 
+# Tester: Sharlet Claros ###################################################################################
+# Tests search input validity, filter selections, and search query validity
+class SearchBarTests(TestCase):
+    # Have to set up a space and a date/time for it  - Reusing a lot of the set up in tests for date/time
+    TestCase.default_data_date = {'date': '09/04/2021', 'time_start': '04:15', 'time_end': '05:15'}
+
+    # Going through form use first
+    TestCase.test_form_date = SpaceTimes(data=TestCase.default_data_date)
+    TestCase.test_form_date.is_valid()
+
+    TestCase.default_space_data = {"space_name": 'SpaceSearch',
+                                   "space_description": 'Rand Description',
+                                   "space_max_capacity": 5,
+                                   "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
+                                   "space_noise_level": [Noise_Level_Choices[1][0]],
+                                   "space_wifi": True,
+                                   "space_restrooms": False,
+                                   "space_food_drink": True}
+    TestCase.test_space_form = CreateSpaceForm(data=TestCase.default_space_data)
+    TestCase.test_space_form.is_valid()
+    name = TestCase.test_space_form.cleaned_data['space_name']
+    description = TestCase.test_space_form.cleaned_data['space_description']
+    max_capacity = TestCase.test_space_form.cleaned_data['space_max_capacity']
+    noise_level_allowed = int(TestCase.test_space_form.cleaned_data["space_noise_level_allowed"][0])
+    noise_level = int(TestCase.test_space_form.cleaned_data["space_noise_level"][0])
+    wifi = TestCase.test_space_form.cleaned_data['space_wifi']
+    restroom = TestCase.test_space_form.cleaned_data['space_restrooms']
+    food_drink = TestCase.test_space_form.cleaned_data['space_food_drink']
+
+    # pulls data from form and fills out model fields to save space in table
+    test_space = Space(space_name=name,
+                       space_description=description,
+                       space_max_capacity=max_capacity,
+                       space_noise_level_allowed=noise_level_allowed,
+                       space_noise_level=noise_level,
+                       space_wifi=wifi,
+                       space_restrooms=restroom,
+                       space_food_drink=food_drink)
+
+    test_space.save()
+
+    # now create and save the space data model
+    space_date = TestCase.test_form_date.cleaned_data['date']
+    space_start_time = TestCase.test_form_date.cleaned_data['time_start']
+    space_end_time = TestCase.test_form_date.cleaned_data['time_end']
+    space_id = test_space
+    date_time = SpaceDateTime(space_date=space_date,
+                              space_start_time=space_start_time,
+                              space_end_time=space_end_time,
+                              space_id=space_id)
+    date_time.save()
+
+    # Testing that the query method utilized will work on data contained in tables
+    def QueryCheck(self):
+        # Will try to match the space with the search query
+        spacequery = 'Search'
+        datequery = '09'
+
+        space = Space.objects.filter(Q(space_name__contains=spacequery))
+        dt = SpaceDateTime.objects.filter(Q(space_date__contains=datequery))
+
+        TestCase.assertTrue(spacequery in space.space_name)
+        TestCase.assertContains(datequery in dt.space_date)

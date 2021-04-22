@@ -55,13 +55,17 @@
         </head>
         <body>
             <div class = "search_bar">
-                <form  action="/search_results/" method="post">
-                    <input placeholder="Search Space Information Here..." size="40" align = "center" >
+                <form  action="" method="post">
                     {% csrf_token %}
-                    {{ form }}
-                <input class="space_submit_button" type="submit" value="Search">
-                <input class="space_submit_button" type="reset" value="Clear">
-            </form>
+                    <input name="query" id= "query" type= text placeholder="Search Space Information Here..." size="35" align = "center" >
+                    <select name="filters" id="filters">
+                        <option value="all">All</option>
+                        <option value="space">Space</option>
+                        <option value="date">Date</option>
+                    </select>
+                    <input class="space_submit_button" type="submit" value="Search">
+                    <input class="space_submit_button" type="reset" value="Clear">
+                </form>
             </div>
             <!-- Google Maps API makes a callback to initMap(). Moving JavaScript to an external file is ideal, but
                  there have been issues with Google Maps being unable to find the initMap() function outside of this

@@ -4,7 +4,35 @@
     <meta charset="UTF-8">
     <title>Search Results!</title>
 </head>
+{% block content %}
+
 <body>
-    There are supposed to be some search results here.
+    <div>
+        There are supposed to be some search results here.
+        {% if val == 'all' %}
+            <h1>Displaying Search Results for an ALL search.</h1>
+            Idea for implementation is for space date time to contain the space name, description and time all in the date/time table - all features should translate over.
+        {% elif val == 'space' %}
+            <h1>Displaying Search Results for a SPACE search.</h1>
+            {% for spaces in space %}
+                    <div class="col-sm-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ spaces.space_name }}</h5>
+                                <p class="card-text">{{ spaces.space_description }}</p>
+                                <a href="" class="btn btn-primary">Reserve Space</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+        {% elif val == 'date' %}
+            <h1>Displaying Search Results for a DATE search.</h1>
+        {% else % }
+            <h1> I don't know how you got here. Don't do it again >:/</h1>
+        {% endif %}
+    </div>
 </body>
+
+{% endblock %}
+
 </html>
