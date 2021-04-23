@@ -68,7 +68,7 @@ class ReserveTimeChoiceField(forms.ModelChoiceField):
 
 class ReserveChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        return "%s: %s - %s" % (obj.space_date, obj.space_start_time, obj.space_end_time)
+        return " %s ---- %s - %s " % (obj.space_date, obj.space_start_time, obj.space_end_time)
 
 
 class ReserveSpaceForm(forms.Form):
@@ -76,10 +76,11 @@ class ReserveSpaceForm(forms.Form):
         space_id = kwargs.pop('space_id', None)
         space_times = SpaceDateTime.objects.filter(space_id=space_id, space_dt_reserved=False, space_dt_closed=False)
         super(ReserveSpaceForm, self).__init__(*args, **kwargs)
-        self.fields['reserve_date'].queryset = space_times
-        self.fields['reserve_time_slot'].queryset = space_times
+        #self.fields['reserve_date'].queryset = space_times
+        #self.fields['reserve_time_slot'].queryset = space_times
         self.fields['reservation'].queryset = space_times
 
-    reserve_date = ReserveDateChoiceField(label='Available dates:', queryset=None, required=True)
-    reserve_time_slot = ReserveTimeChoiceField(label='Select a time slot:', widget=RadioSelect(), queryset=None, required=True)
-   # reservation = ReserveChoiceField(label="Please select one.", widget=RadioSelect(), queryset=None, required=True )
+   # reserve_date = ReserveDateChoiceField(label='Available dates:', queryset=None, required=True)
+   # reserve_time_slot = ReserveTimeChoiceField(label='Select a time slot:', widget=RadioSelect(), queryset=None, required=True)
+    reservation = ReserveChoiceField(label="Select one to reserve.", widget=RadioSelect(), queryset=None, required=True )
+

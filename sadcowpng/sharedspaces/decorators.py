@@ -27,3 +27,16 @@ def user_is_space_owner(function):
             return HttpResponse('Permission Denied.')
 
     return is_owner
+
+
+# Protects views only clients can access
+# Displays message if proprietor account tries to access protected view
+def client_required(function):
+    def is_proprietor(request, space_id):
+        if request.user.is_proprietor:
+            messages.info(request, 'Please login as a client to access page.')
+            return HttpResponseRedirect(reverse('login'))
+        else:
+            return function(request, space_id)
+
+    return is_proprietor

@@ -21,26 +21,20 @@
 
     <body>
 
-        <a class='navbar-brand' href="{% url 'index' %}">
-            Shared Spaces
-            <img src="{% static 'logo2-dark.png' %}" width="40" height="40" alt="">
-        </a>
+    <div class="shadow">
+         <h2>{{ space.space_name }}</h2>
+        <div class="reserve_form">
+            <form  method="post" action="/reserve/{{space_id}}">
+                {% csrf_token %}
 
-        <div class="shadow">
-            <h1>{{ space.space_name }}</h1>
-            {% csrf_token %}
-            <div class="reserve_form">
-            {{ form.as_p }}
-            <input class="btn" id="reserve" type="submit" value="Reserve">
-            <a type="button" class="btn" href="{% url 'index' %}" >Cancel</a>
-            </div>
+                <table class="reserve_table" border="2">
+                    {{ form }}
+                </table>
 
-
-
+                <input class="btn" id="reserve" type="submit" value="Reserve">
+                <a type="button" id="reserve" class="btn" href="{% url 'index' %}" >Cancel</a>
+            </form>
         </div>
-
-
-
-
+    </div>
     </body>
 </html>
