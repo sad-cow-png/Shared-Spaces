@@ -1,5 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.db.models import Value, F
+from django.db.models.functions import Concat
+from django.forms import RadioSelect
 from taggit.forms import TagField, TagWidget
 from taggit.managers import TaggableManager
 
@@ -53,15 +56,30 @@ class SpaceTimes(forms.Form):
     closed = forms.BooleanField(label='Is this time currently available?', required=False)
 
 
+class ReserveDateChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.space_date
+
+
+class ReserveTimeChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "%s - %s" % (obj.space_start_time, obj.space_end_time)
+
+
+class ReserveChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "%s: %s - %s" % (obj.space_date, obj.space_start_time, obj.space_end_time)
+
+
 class ReserveSpaceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         space_id = kwargs.pop('space_id', None)
-        space_times = SpaceDateTime.objects.filter(space_id=space_id)
+        space_times = SpaceDateTime.objects.filter(space_id=space_id, space_dt_reserved=False, space_dt_closed=False)
         super(ReserveSpaceForm, self).__init__(*args, **kwargs)
+        self.fields['reserve_date'].queryset = space_times
+        self.fields['reserve_time_slot'].queryset = space_times
+        self.fields['reservation'].queryset = space_times
 
-        self.fields['reserve_date'].queryset = space_times.values('space_date')
-        print(self.fields['reserve_date'].queryset)
-        self.fields['reserve_time_slot'].queryset = space_times.values('space_start_time')
-
-    reserve_date = forms.ModelChoiceField(label='Available dates:', queryset=None, required=True)
-    reserve_time_slot = forms.ModelChoiceField(label='Select a time slot:', queryset=None, required=True)
+    reserve_date = ReserveDateChoiceField(label='Available dates:', queryset=None, required=True)
+    reserve_time_slot = ReserveTimeChoiceField(label='Select a time slot:', widget=RadioSelect(), queryset=None, required=True)
+   # reservation = ReserveChoiceField(label="Please select one.", widget=RadioSelect(), queryset=None, required=True )

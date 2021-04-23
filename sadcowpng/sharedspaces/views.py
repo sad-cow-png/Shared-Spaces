@@ -1,3 +1,5 @@
+from django.db.models import F, Value
+from django.db.models.functions import Concat
 from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
@@ -5,6 +7,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.views.generic import CreateView, FormView
+
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes, \
     ReserveSpaceForm
 from .models import Space, User, SpaceDateTime
@@ -272,7 +276,6 @@ def update_space_date_time(request, data_time_id):
     return render(request, 'sharedspaces/update_space_date_time.html', context=context)
 
 
-# client_required decorator
 def reserve_space(request, space_id):
     """
     Clients can reserve a time on the reserve page for each listed space
@@ -282,34 +285,43 @@ def reserve_space(request, space_id):
     space = Space.objects.get(pk=space_id)
     space_times = SpaceDateTime.objects.filter(space_id=space_id)
 
-    #sp = space_times.s_space_id()
-
     if request.method == 'POST':
-        reservation = ReserveSpaceForm(request.POST, space_id)
-       # reservation.fields['reserve_date'].queryset = SpaceDateTime.objects.order_by('space_date')
-      #  reservation.fields
-        if reservation.is_valid():
+        form = ReserveSpaceForm(request.POST, space_id=space_id)
+        print(form)
+        if form.is_valid():
 
-            #available_dates = reservation.cleaned_data['reserve_date']
-            #time_start = reservation.cleaned_data['reserve_time_slot']
-            #time_end = reservation.cleaned_data['']
+            # Compared id of date and time slot to confirm date and time are correct
+            reserve_date = form.cleaned_data['reserve_date']
+            time_slot = form.cleaned_data['reserve_time_slot']
 
-            #space_times.space_dt_reserved_by = request.user
-            #space_times.save()
-            return HttpResponseRedirect(reverse('account'))
+            if reserve_date.pk == time_slot.pk:
+                sp_slot = SpaceDateTime.objects.get(pk=time_slot.pk)
+                sp_slot.space_dt_reserved_by = request.user.username
+                sp_slot.space_dt_reserved = True
+                sp_slot.save()
+                return HttpResponseRedirect(reverse('account'))
+
+            else:
+                form = ReserveSpaceForm(space_id=space_id)
+            #date = SpaceDateTime.objects.filter(space_id=space_id, space_date=reserve_date)
+
+            #start, end = time_slot.split(' - ')
+
+            #sp_slot = SpaceDateTime.objects.get(space_id=space_id, space_date=date,
+             #                                  space_start_time=start, space_end_time=end)
+            #sp_slot.space_dt_reserved_by = request.user
+           # sp_slot.space_dt_reserved = True
+            #sp_slot.save()
 
     else:
-        reservation = ReserveSpaceForm(space_id=space_id)
+        form = ReserveSpaceForm(space_id=space_id)
 
-        context = {
-            "form": reservation,
-            "space": space,
-            "space_times": space_times,
-
-        }
-
-   # def get_form_kwargs(self):
-    #    kwargs = super(reserve_space, self).get_form_kwargs()
-     #   kwargs['space_id'] = self.space_id
+    context = {
+        "form": form,
+        "space": space,
+        "space_id": space_id,
+        "space_times": space_times,
+    }
 
     return render(request, 'sharedspaces/reserve_space.html', context=context)
+
