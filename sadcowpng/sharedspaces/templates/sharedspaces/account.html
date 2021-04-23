@@ -13,6 +13,12 @@
         <!-- Layout may differ depending on user type  -->
         {% if user.is_client and user.is_authenticated %}
             <h1>Welcome, {{ user.get_username }}!</h1>
+            <br>
+            <h3>Reserved Spaces</h3>
+            {% for space in reserved_space %}
+                <p>{{ space.space_name }}</p>
+            {% endfor %}
+
         {% endif %}
 
         {% if user.is_proprietor and user.is_authenticated %}

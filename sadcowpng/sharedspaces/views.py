@@ -1,5 +1,3 @@
-from django.db.models import F, Value
-from django.db.models.functions import Concat
 from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
@@ -7,12 +5,11 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from django.views.generic import CreateView, FormView
 
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes, \
     ReserveSpaceForm
 from .models import Space, User, SpaceDateTime
-from .decorators import proprietor_required, user_is_space_owner
+from .decorators import proprietor_required, user_is_space_owner, client_required
 
 
 # Shared Spaces Home Page
@@ -30,7 +27,19 @@ def account(request):
             'space': space
         }
     else:
-        return render(request, 'sharedspaces/account.html')
+        user = request.user
+        reserved_time = SpaceDateTime.objects.filter(space_dt_reserved_by=user)
+
+        # Find space by time slot and add to client reserved space list
+        reserved_by_user = []
+        for space in reserved_time:
+            reservation = Space.objects.get(pk=space.space_id.pk)
+            reserved_by_user.append(reservation)
+
+        context = {
+            'reserved_time': reserved_time,
+            'reserved_space': reserved_by_user,
+        }
 
     return render(request, 'sharedspaces/account.html', context=context)
 
@@ -276,42 +285,30 @@ def update_space_date_time(request, data_time_id):
     return render(request, 'sharedspaces/update_space_date_time.html', context=context)
 
 
+@client_required
 def reserve_space(request, space_id):
     """
     Clients can reserve a time on the reserve page for each listed space
-    Page should display available times and users will be able to select
+    Each space page should display available times and users will be
+    able to select one
     """
 
     space = Space.objects.get(pk=space_id)
-    space_times = SpaceDateTime.objects.filter(space_id=space_id)
 
     if request.method == 'POST':
         form = ReserveSpaceForm(request.POST, space_id=space_id)
-        print(form)
+
         if form.is_valid():
 
             # Compared id of date and time slot to confirm date and time are correct
-            reserve_date = form.cleaned_data['reserve_date']
-            time_slot = form.cleaned_data['reserve_time_slot']
+            reserve_space = form.cleaned_data['reservation']
+            #time_slot = form.cleaned_data['reserve_time_slot']
 
-            if reserve_date.pk == time_slot.pk:
-                sp_slot = SpaceDateTime.objects.get(pk=time_slot.pk)
-                sp_slot.space_dt_reserved_by = request.user.username
-                sp_slot.space_dt_reserved = True
-                sp_slot.save()
-                return HttpResponseRedirect(reverse('account'))
-
-            else:
-                form = ReserveSpaceForm(space_id=space_id)
-            #date = SpaceDateTime.objects.filter(space_id=space_id, space_date=reserve_date)
-
-            #start, end = time_slot.split(' - ')
-
-            #sp_slot = SpaceDateTime.objects.get(space_id=space_id, space_date=date,
-             #                                  space_start_time=start, space_end_time=end)
-            #sp_slot.space_dt_reserved_by = request.user
-           # sp_slot.space_dt_reserved = True
-            #sp_slot.save()
+            sp_slot = SpaceDateTime.objects.get(pk=reserve_space.pk)
+            sp_slot.space_dt_reserved_by = request.user.username
+            sp_slot.space_dt_reserved = True
+            sp_slot.save()
+            return HttpResponseRedirect(reverse('account'))
 
     else:
         form = ReserveSpaceForm(space_id=space_id)
@@ -320,7 +317,6 @@ def reserve_space(request, space_id):
         "form": form,
         "space": space,
         "space_id": space_id,
-        "space_times": space_times,
     }
 
     return render(request, 'sharedspaces/reserve_space.html', context=context)
