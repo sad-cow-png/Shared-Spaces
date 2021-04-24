@@ -20,21 +20,46 @@
     </head>
 
     <body>
+        <a class='navbar-brand' href="{% url 'index' %}">
+            Shared Spaces
+            <img src="{% static 'logo2-dark.png' %}" width="40" height="40" alt="">
+        </a>
 
-    <div class="shadow">
-         <h2>{{ space.space_name }}</h2>
-        <div class="reserve_form">
-            <form  method="post" action="/reserve/{{space_id}}">
-                {% csrf_token %}
+        <div class="shadow">
+            <h2>Reserve for {{ space.space_name }}</h2>
+            <div class="reserve_form">
+                <form id="reserve" method="post" time-url="{% url 'load_times' %}" action="/reserve/{{space_id}}">
+                    {% csrf_token %}
 
-                <table class="reserve_table" border="2">
-                    {{ form }}
-                </table>
+                    <table class="reserve_table" border="2">
+                        {{ form }}
+                    </table>
 
-                <input class="btn" id="reserve" type="submit" value="Reserve">
-                <a type="button" id="reserve" class="btn" href="{% url 'index' %}" >Cancel</a>
-            </form>
+                    <input class="btn" type="submit" value="Reserve">
+                    <a type="button" class="btn" href="{% url 'index' %}" >Cancel</a>
+                </form>
+
+            <!-- Chained select options -->
+            <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+            <script>
+                $("#id_reserve_date").change(function () {
+                    var url = $("#reserve").attr("time-url");    // time-url has to be connected to form
+                    var sp_dt_id = $(this).val();
+
+                $.ajax({
+                    url: url,
+                    data: {
+                    'sp': sp_dt_id
+                    },
+                success: function (data) {
+                    $("#id_reserve_time_slot").html(data);
+                    }
+                    });
+                });
+            </script>
+
+
+            </div>
         </div>
-    </div>
     </body>
 </html>

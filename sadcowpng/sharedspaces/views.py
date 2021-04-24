@@ -301,14 +301,20 @@ def reserve_space(request, space_id):
         if form.is_valid():
 
             # Compared id of date and time slot to confirm date and time are correct
-            reserve_space = form.cleaned_data['reservation']
-            #time_slot = form.cleaned_data['reserve_time_slot']
+            # should not fail as date/time slots are linked on front-end
+            date = form.cleaned_data['reserve_date']
+            time_slot = form.cleaned_data['reserve_time_slot']
 
-            sp_slot = SpaceDateTime.objects.get(pk=reserve_space.pk)
-            sp_slot.space_dt_reserved_by = request.user.username
-            sp_slot.space_dt_reserved = True
-            sp_slot.save()
-            return HttpResponseRedirect(reverse('account'))
+            if date.pk == time_slot.pk:
+                sp_slot = SpaceDateTime.objects.get(pk=time_slot.pk)
+                sp_slot.space_dt_reserved_by = request.user.username
+                sp_slot.space_dt_reserved = True
+                sp_slot.save()
+
+                return HttpResponseRedirect(reverse('account'))
+
+            else:
+                form = ReserveSpaceForm(space_id=space_id)
 
     else:
         form = ReserveSpaceForm(space_id=space_id)
@@ -321,3 +327,14 @@ def reserve_space(request, space_id):
 
     return render(request, 'sharedspaces/reserve_space.html', context=context)
 
+
+def load_times(request):
+    """
+    Update available time slot based on selected date
+    Gets SpaceDateTime object pk from "Available date(s)" selection box
+    Filters time slot by pk for "Available time slot" box
+    """
+    sp_dt_id = request.GET.get('sp')
+    sp_times = SpaceDateTime.objects.filter(pk=sp_dt_id)
+
+    return render(request, 'sharedspaces/time_slot_options.html', {'sp_times': sp_times})

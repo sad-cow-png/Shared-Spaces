@@ -56,31 +56,29 @@ class SpaceTimes(forms.Form):
     closed = forms.BooleanField(label='Is this time currently available?', required=False)
 
 
+# Displays space_date string in YYYY-MM-DD format
 class ReserveDateChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.space_date
 
 
+# Concatenates start/end time into a time slot string
 class ReserveTimeChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s - %s" % (obj.space_start_time, obj.space_end_time)
 
 
-class ReserveChoiceField(forms.ModelChoiceField):
-    def label_from_instance(self, obj):
-        return " %s ---- %s - %s " % (obj.space_date, obj.space_start_time, obj.space_end_time)
-
-
+# Takes in space_id from view and returns SpaceDateTime objects for selection
 class ReserveSpaceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         space_id = kwargs.pop('space_id', None)
         space_times = SpaceDateTime.objects.filter(space_id=space_id, space_dt_reserved=False, space_dt_closed=False)
         super(ReserveSpaceForm, self).__init__(*args, **kwargs)
-        #self.fields['reserve_date'].queryset = space_times
-        #self.fields['reserve_time_slot'].queryset = space_times
-        self.fields['reservation'].queryset = space_times
+        self.fields['reserve_date'].queryset = space_times
+        self.fields['reserve_time_slot'].queryset = space_times
 
-   # reserve_date = ReserveDateChoiceField(label='Available dates:', queryset=None, required=True)
-   # reserve_time_slot = ReserveTimeChoiceField(label='Select a time slot:', widget=RadioSelect(), queryset=None, required=True)
-    reservation = ReserveChoiceField(label="Select one to reserve.", widget=RadioSelect(), queryset=None, required=True )
+    reserve_date = ReserveDateChoiceField(label='Available date(s):', queryset=None, required=True)
+    reserve_time_slot = ReserveTimeChoiceField(label='Available time slot:', queryset=None, required=True,
+                                               empty_label=None)
+
 
