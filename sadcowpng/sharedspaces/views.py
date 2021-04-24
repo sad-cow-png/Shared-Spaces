@@ -122,12 +122,12 @@ def create_space(request):
             restroom = space_form.cleaned_data['space_restrooms']
             food_drink = space_form.cleaned_data['space_food_drink']
             user = request.user
-            tags = space_form.cleaned_data['space_tags']
+         #   tags = space_form.cleaned_data['space_tags']
 
             sp = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
                        space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level, space_wifi=wifi,
-                       space_restrooms=restroom, space_food_drink=food_drink, space_owner=user, space_open=True,
-                       space_tags=tags)
+                       space_restrooms=restroom, space_food_drink=food_drink, space_owner=user, space_open=True)
+                       #space_tags=tags)
 
             sp.save()
 
@@ -285,6 +285,7 @@ def update_space_date_time(request, data_time_id):
     return render(request, 'sharedspaces/update_space_date_time.html', context=context)
 
 
+@login_required
 @client_required
 def reserve_space(request, space_id):
     """
