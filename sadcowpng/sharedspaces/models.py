@@ -34,7 +34,6 @@ class Space(models.Model):
     space_food_drink = models.BooleanField()
     space_open = models.BooleanField(default=True)
     space_owner = models.ForeignKey('User', on_delete=models.CASCADE, default=None, null=True)
-    space_tags = TaggableManager(blank=True)
 
     # string methods for each of the different model fields
     def name_str(self):
@@ -71,7 +70,6 @@ class Space(models.Model):
             return "This place has food and drink."
         else:
             return "This place does not have food and drink."
-
 
 
 class SpaceDateTime(models.Model):
@@ -115,3 +113,4 @@ class SpaceDateTime(models.Model):
     def s_space_id(self):
         location = self.space_id.space_name
         return "This is an availability time for the following space: {}".format(location)
+
