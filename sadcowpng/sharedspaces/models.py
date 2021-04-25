@@ -73,7 +73,6 @@ class Space(models.Model):
             return "This place does not have food and drink."
 
 
-
 class SpaceDateTime(models.Model):
     # Switch to char if this does not work
     space_date = models.CharField(max_length=100, default='EMPTY')

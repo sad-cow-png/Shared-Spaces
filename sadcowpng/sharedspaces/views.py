@@ -5,6 +5,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from taggit.models import Tag
+
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
 from .models import Space, User, SpaceDateTime
 from .decorators import proprietor_required, user_is_space_owner
@@ -112,12 +114,16 @@ def create_space(request):
 
             sp = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
                        space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level, space_wifi=wifi,
-                       space_restrooms=restroom, space_food_drink=food_drink, space_owner=user, space_open=True,
-                       space_tags=tags)
+                       space_restrooms=restroom, space_food_drink=food_drink, space_owner=user, space_open=True)
 
             sp.save()
 
             primary_key = sp.pk
+
+            # Get created space key to manually add tags
+            space = Space.objects.get(pk=primary_key)
+            for tag in tags:
+                space.space_tags.add(tag)
 
             # redirecting to date and time page once complete to get at least one data and time
             return HttpResponseRedirect(reverse('space_date_time', args=[primary_key]))
@@ -175,8 +181,9 @@ def update_space(request, space_id):
         old_space_noise_level = Noise_Level_Choices[old_space.space_noise_level - 1]
 
         tag_list = []
-        for tag in old_space.space_tags.tags.get_query_set():
+        for tag in old_space.space_tags:
             tag_list.append(tag.name)
+       # tag_list = old_space.space_tags.all
 
         # extracting the old data into a dictionary
         old_data = {"space_name": old_space.space_name,

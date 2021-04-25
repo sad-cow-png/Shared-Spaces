@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from taggit.forms import TagField, TagWidget
-from taggit.managers import TaggableManager
 
 from .models import User
 
@@ -27,8 +26,9 @@ class CreateSpaceForm(forms.Form):
     space_restrooms = forms.BooleanField(label='Restroom Availability:', required=False)
     space_food_drink = forms.BooleanField(label='Food or Drink Availability:', required=False)
     space_open = forms.BooleanField(label='Is the Location Open?', required=False)
-    space_tags = TagField(required=False, help_text='Use a comma to separate tags.')
-    
+    space_tags = TagField(help_text='Use a comma to separate tags.', widget=TagWidget(), required=False)
+
+
 # Used for proprietor sign up view
 class ProprietorSignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
