@@ -129,3 +129,15 @@ is completed as that is what will connect all the tables together and have a wor
 ```
 python manage.py test sharedspaces.tests.TestSpaceDateTime
 ```
+<br>
+
+#### List spaces Background:
+List out the spaces in the user account was mostly already complete but what was needed to be added were a few buttons.
+So, a few buttons were added and with that the ability to edit and add time/date for the space. 
+
+##### List spaces Testing:
+The test mainly checks that the functionality required for the card is working correctly. This involves making sure
+that the space connected to the user can be retrieved easily. The testing for actual front end is not added.
+```
+python manage.py test sharedspaces.tests.ListSpacesTest
+```

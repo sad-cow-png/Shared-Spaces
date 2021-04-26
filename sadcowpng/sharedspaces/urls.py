@@ -14,4 +14,5 @@ urlpatterns = [
     path('logout/', views.sign_out, name='logout'),
     path('space_times/<space_id>', views.space_date_time, name='space_date_time'),
     path('space_update_times/<data_time_id>', views.update_space_date_time, name='update_date_time'),
+    path('date_time/<space_id>', views.date_time, name='date_time'),
 ]
