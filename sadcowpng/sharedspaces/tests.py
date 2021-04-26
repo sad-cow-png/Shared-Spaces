@@ -10,7 +10,6 @@ from .models import Space, User, SpaceDateTime
 import datetime
 
 
-
 # Testing for the client signup
 class ClientSignUpTest(TestCase):
 
@@ -107,7 +106,7 @@ class ClientSignUpTest(TestCase):
         self.assertEqual(user.is_proprietor, False)
         self.assertRedirects(response, '/')
 
-      
+
 # Test proprietor signup with invalid and valid users
 class ProprietorSignUpTest(TestCase):
     def setUp(self):
@@ -721,6 +720,7 @@ class TestSpaceDateTime(TestCase):
                          'Space foreign key is working properly.')
         # end ##########################################################################################################
 
+
 # Creates client/proprietor users
 # Can be used to create new users, reusable
 # Run this before running decorator tests, if test users in
@@ -1062,4 +1062,70 @@ class PageTemplateTests(TestCase):
 
         response = self.client.get('/logout/')
         self.assertContains(response, 'navbar-brand')
+
+
+# Test By Bishal
+# These are all the test for listing out spaces
+# This mainly checks to see that given a proprietor their spaces is added to their name
+# Then, we can all their spaces using a name
+class ListSpacesTest(TestCase):
+
+    def test_space_user(self):
+        """
+        As the functionality of getting the space by using user id is required for the
+        listing to work we will mainly just test that
+        """
+        # setting up the user
+        user = {
+            'username': 'testuser2',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**user)
+        proprietor = User.objects.get(username='testuser2')
+        proprietor.is_proprietor = True
+
+        # now we add two identical spaces for the user
+        for i in range(2):
+            default_list_data = {"space_name": 'TestName{}'.format(i),
+                                 "space_description": 'Rand Description',
+                                 "space_max_capacity": 5,
+                                 "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
+                                 "space_noise_level": [Noise_Level_Choices[1][0]],
+                                 "space_wifi": True,
+                                 "space_restrooms": False,
+                                 "space_food_drink": True,
+                                 "space_open": True}
+            test_list = CreateSpaceForm(data=default_list_data)
+            test_list.is_valid()
+
+            name = test_list.cleaned_data['space_name']
+            description = test_list.cleaned_data['space_description']
+            max_capacity = test_list.cleaned_data['space_max_capacity']
+            noise_level_allowed = int(test_list.cleaned_data["space_noise_level_allowed"][0])
+            noise_level = int(test_list.cleaned_data["space_noise_level"][0])
+            wifi = test_list.cleaned_data['space_wifi']
+            restroom = test_list.cleaned_data['space_restrooms']
+            food_drink = test_list.cleaned_data['space_food_drink']
+
+            test_space = Space(space_name=name,
+                               space_description=description,
+                               space_max_capacity=max_capacity,
+                               space_noise_level_allowed=noise_level_allowed,
+                               space_noise_level=noise_level,
+                               space_wifi=wifi,
+                               space_restrooms=restroom,
+                               space_food_drink=food_drink,
+                               space_owner=proprietor)
+
+            # Save the save data into the database
+            test_space.save()
+
+        # now the user should have two spaces to their name we we will extract it using their user id
+        spaces = Space.objects.filter(space_owner=proprietor)
+        self.assertEqual(len(spaces), 2, "The owner was not given two spaces.")
+
+        names = [space.space_name for space in spaces]
+
+        for i in range(2):
+            self.assertTrue('TestName{}'.format(i) in names, "A space is missing from the user's list")
 
