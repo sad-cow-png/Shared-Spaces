@@ -280,3 +280,4 @@ def date_time(request, space_id):
         return HttpResponseRedirect(reverse('account'))
 
     return render(request, 'sharedspaces/date_time.html', context=context)
+
