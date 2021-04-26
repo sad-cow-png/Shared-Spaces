@@ -141,3 +141,18 @@ that the space connected to the user can be retrieved easily. The testing for ac
 ```
 python manage.py test sharedspaces.tests.ListSpacesTest
 ```
+
+<br>
+
+#### Space Reuse Background:
+Reuse consisted of making sure that the space had different times that could be signed up for. This consisted of 
+connecting a lot that had already been completed. Fixing up the buttons done for the card set up in account
+to redirect to the list of dates and time was one of them. It also consisted of making sure new dates could be added
+or deactivated and much more. 
+
+##### Space Reuse Testing:
+The testing mainly consists of making sure that the spaces created can have dates linked to them and that nothing goes
+wrong in the database when they are being connected using the foreign key. 
+```
+python manage.py test sharedspaces.tests.SpaceReuseTest
+```
