@@ -126,6 +126,7 @@ def create_space(request):
     return render(request, 'sharedspaces/create_space.html', {'form': space_form})
 
 
+@login_required
 @user_is_space_owner
 def update_space(request, space_id):
     """
@@ -191,6 +192,7 @@ def update_space(request, space_id):
     return render(request, 'sharedspaces/update_space.html', context=context)
 
 
+@user_is_space_owner
 def space_date_time(request, space_id):
     """
     Used to create the data and time for a specific space
@@ -261,6 +263,7 @@ def update_space_date_time(request, data_time_id):
 
 
 @login_required
+@user_is_space_owner
 def date_time(request, space_id):
     """
     The handles the listing of date and time for each location
@@ -277,4 +280,3 @@ def date_time(request, space_id):
         return HttpResponseRedirect(reverse('account'))
 
     return render(request, 'sharedspaces/date_time.html', context=context)
-

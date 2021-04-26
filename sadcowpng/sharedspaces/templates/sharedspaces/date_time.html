@@ -28,6 +28,7 @@
             <br>
             <div class="row">
                 {% for date_time in date_times %}
+                {% if date_time.space_dt_closed == False%}
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Date: {{date_time.space_date}}
@@ -36,6 +37,7 @@
                             <a href="{% url 'update_date_time' date_time.id %}" class="btn btn-primary">Deactivate</a>
                         </div>
                     </div>
+                {% endif %}
                 {% endfor %}
             </div>
             {% endif %}

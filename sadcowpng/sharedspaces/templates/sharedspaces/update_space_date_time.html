@@ -24,7 +24,7 @@
             <form  action="/space_update_times/{{id}}" method="post">
                 {% csrf_token %}
                 <table class="space_date_time_table" border="1">
-                    Date: {{old_date_time.space_date}}<br>
+                    <h5>Date: {{old_date_time.space_date}}<br>
                     Start Time: {{old_date_time.space_start_time}}<br>
                     End Time: {{old_date_time.space_end_time}}<br>
 
@@ -34,8 +34,8 @@
                         This timeslot is not reserved by anyone. <br>
                     {% endif %}
 
-                    Is this time and currently available? <br>
-                    (check the box for yes): {{ form.closed }}
+                    Do you want to deactivate this time? <br>
+                        (check the box for yes): {{ form.closed }}</h5>>
                 </table>
                 <input class="space_submit_button" type="submit" value="Update">
                 <input class="space_submit_button" type="reset" value="Reset">
