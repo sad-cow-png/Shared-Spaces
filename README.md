@@ -129,3 +129,23 @@ is completed as that is what will connect all the tables together and have a wor
 ```
 python manage.py test sharedspaces.tests.TestSpaceDateTime
 ```
+
+<br>
+
+#### Reserve Space
+Only clients may access page to reserve a time slot for a space. Each space page
+has a reserve page with two selection boxes. Once the date is selected the time slot for
+that date will show up. Since each date and time slot are from the same object, there will be
+duplicate dates showing up in the reserve date box. Using ajax, once the date is selected, it is used to
+determine the SpaceDateTime object pk to display the time slot through ``load_times`` in views.py.
+String formatting for date and time slot displayed in selection boxes is done in forms.py <br><br>
+Once a client clicks on the reserve button, it sends them back to account page where they can see the spaces
+they have reserved.
+
+##### Reserve space testing:
+Created a simple test for making sure the reservation goes through. Will possibly add more later.
+<br>
+```
+python manage.py test sharedspaces.tests.ReserveFormSeleniumTests
+```
+<br>
