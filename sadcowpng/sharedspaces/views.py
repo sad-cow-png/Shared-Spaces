@@ -164,7 +164,15 @@ def update_space(request, space_id):
             old_space.space_restrooms = space_form.cleaned_data['space_restrooms']
             old_space.space_food_drink = space_form.cleaned_data['space_food_drink']
             old_space.space_open = space_form.cleaned_data['space_open']
-            old_space.space_tags = space_form.cleaned_data['space_tags']
+            tags = space_form.cleaned_data['space_tags']
+
+            # add tags if not existing
+            for tag in tags:
+                if tag in old_space.space_tags.get_queryset():
+                    pass
+                else:
+                    old_space.space_tags.add(tag)
+
             # save the updated object in the database
             old_space.save()
 
@@ -180,10 +188,8 @@ def update_space(request, space_id):
         old_space_noise_level_allowed = Noise_Level_Choices[old_space.space_noise_level_allowed - 1]
         old_space_noise_level = Noise_Level_Choices[old_space.space_noise_level - 1]
 
-        tag_list = []
-        for tag in old_space.space_tags:
-            tag_list.append(tag.name)
-       # tag_list = old_space.space_tags.all
+        # get tags
+        tag_list = old_space.space_tags.get_queryset()
 
         # extracting the old data into a dictionary
         old_data = {"space_name": old_space.space_name,
@@ -201,7 +207,7 @@ def update_space(request, space_id):
         # creating a form with the old data
         space_form = CreateSpaceForm(old_data)
 
-        context = {'form': space_form, "space_id": space_id,
+        context = {'form': space_form, "space_id": space_id, "space": old_space,
                    "name": old_space.space_name}
 
     return render(request, 'sharedspaces/update_space.html', context=context)

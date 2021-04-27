@@ -1,7 +1,8 @@
   body {
       text-align: center;
-      overflow: hidden;
-      background-color: #D2FDFF ;
+      height: auto;
+      overflow: scroll;
+      background-color: #D2FDFF;
   }
 
   .create_space_form, .update_space_form, .space_date_time_form{
@@ -34,6 +35,7 @@
       margin: auto;
       border-spacing: 5px;
       border-color: #F4976C;
+
   }
 
   th, td {
