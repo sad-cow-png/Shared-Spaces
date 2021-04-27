@@ -17,6 +17,12 @@ class CreateSpaceForm(forms.Form):
     space_name = forms.CharField(label='Name of the Shared Space:', max_length=500, strip=True)
     space_description = forms.CharField(label='Description:', max_length=1000, strip=True)
     space_max_capacity = forms.IntegerField(label='Maximum Occupancy:', min_value=0)
+    space_address1 = forms.CharField(label='Address 1:', max_length=1000, strip=True)
+    space_address2 = forms.CharField(label='Address 2:', max_length=1000, strip=True, required=False)
+    space_zip_code = forms.CharField(label='Zip code:', max_length=5, strip=True)
+    space_city = forms.CharField(label='City:', max_length=1000, strip=True)
+    space_state = forms.CharField(label='State:', max_length=2, strip=True)
+    space_country = forms.CharField(label='Country:', max_length=1000, strip=True)
     space_noise_level_allowed = forms.MultipleChoiceField(label='Noise level allowed:', choices=Noise_Level_Choices,
                                                           required=True)
     space_noise_level = forms.MultipleChoiceField(label='Noise level:', choices=Noise_Level_Choices, required=True)
