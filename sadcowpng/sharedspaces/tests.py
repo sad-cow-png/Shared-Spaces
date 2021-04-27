@@ -1220,4 +1220,72 @@ class SpaceReuseTest(TestCase):
         for i in range(3):
             self.assertTrue('2021-11-1{}'.format(i) in date_list, "A date is missing from the space date time list")
 
-            
+
+# Test By Bishal
+# These are all the test for activating and deactivating spaces
+# We main test that once the status of said space has been changed, if we access the said value through the connection
+# between user and space, the data is not affected.
+class SpaceCloseTest(TestCase):
+
+    def test_space_close(self):
+        """
+        We want to create a space with a closed status and then see if that comes through
+        properly when getting the object from the user that owns the spaces.
+        """
+        # setting up the user
+        user = {
+            'username': 'testuser2',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**user)
+        proprietor = User.objects.get(username='testuser2')
+        proprietor.is_proprietor = True
+
+        # now we add two identical spaces for the user but one set to false
+        for i in range(2):
+            default_list_data = {"space_name": 'TestName{}'.format(i),
+                                 "space_description": 'Rand Description',
+                                 "space_max_capacity": 5,
+                                 "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
+                                 "space_noise_level": [Noise_Level_Choices[1][0]],
+                                 "space_wifi": True,
+                                 "space_restrooms": False,
+                                 "space_food_drink": True,
+                                 "space_open": True}
+
+            if i != 1:
+                default_list_data["space_open"] = False
+
+            test_list = CreateSpaceForm(data=default_list_data)
+            test_list.is_valid()
+
+            name = test_list.cleaned_data['space_name']
+            description = test_list.cleaned_data['space_description']
+            max_capacity = test_list.cleaned_data['space_max_capacity']
+            noise_level_allowed = int(test_list.cleaned_data["space_noise_level_allowed"][0])
+            noise_level = int(test_list.cleaned_data["space_noise_level"][0])
+            wifi = test_list.cleaned_data['space_wifi']
+            restroom = test_list.cleaned_data['space_restrooms']
+            food_drink = test_list.cleaned_data['space_food_drink']
+            open_space = test_list.cleaned_data['space_open']
+
+            test_space = Space(space_name=name,
+                               space_description=description,
+                               space_max_capacity=max_capacity,
+                               space_noise_level_allowed=noise_level_allowed,
+                               space_noise_level=noise_level,
+                               space_wifi=wifi,
+                               space_restrooms=restroom,
+                               space_food_drink=food_drink,
+                               space_owner=proprietor,
+                               space_open=open_space)
+
+            # Save the save data into the database
+            test_space.save()
+
+        # now the user should have two spaces to their name we we will extract it using their user id
+        spaces = Space.objects.filter(space_owner=proprietor)
+        self.assertEqual(len(spaces), 2, "The two spaces were properly saved.")
+
+        spaces = Space.objects.filter(space_owner=proprietor, space_open=True)
+        self.assertEqual(len(spaces), 1, "The open flag ia not working.")

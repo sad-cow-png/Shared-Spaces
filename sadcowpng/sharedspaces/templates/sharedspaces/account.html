@@ -23,7 +23,13 @@
                 {% for spaces in space %}
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">{{ spaces.space_name }}</h5>
+                            <h5 class="card-title">{{ spaces.space_name }}
+                            {% if spaces.space_open %}
+                                <span class="badge badge-success">Open</span>
+                            {% else %}
+                                <span class="badge badge-danger">Closed</span>
+                            {% endif %}
+                            </h5>
                             <p class="card-text">{{ spaces.space_description }}</p>
                             <a href="{% url 'date_time' spaces.id %}" class="btn btn-primary">Edit Time</a>
                             <a href="{% url 'update_space' spaces.id %}" class="btn btn-primary">Update Space</a>
