@@ -1,8 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from taggit.managers import TaggableManager
 
 # TODO: make a directory to hold static data.
 # This represents the multiple choice options for the noise level multiple choice fields.
+
+
 Noise_Level_Choices = (
     ("1", "None"),
     ("2", "Faint"),
@@ -132,3 +135,4 @@ class SpaceDateTime(models.Model):
     def s_space_id(self):
         location = self.space_id.space_name
         return "This is an availability time for the following space: {}".format(location)
+
