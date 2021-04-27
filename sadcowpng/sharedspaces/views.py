@@ -116,6 +116,12 @@ def create_space(request):
             name = space_form.cleaned_data['space_name']
             description = space_form.cleaned_data['space_description']
             max_capacity = space_form.cleaned_data['space_max_capacity']
+            space_address1 = space_form.cleaned_data['space_address1']
+            space_address2 = space_form.cleaned_data['space_address2']
+            space_zip_code = space_form.cleaned_data['space_zip_code']
+            space_city = space_form.cleaned_data['space_city']
+            space_state = space_form.cleaned_data['space_state']
+            space_country = space_form.cleaned_data['space_country']
             noise_level_allowed = int(space_form.cleaned_data["space_noise_level_allowed"][0])
             noise_level = int(space_form.cleaned_data["space_noise_level"][0])
             wifi = space_form.cleaned_data['space_wifi']
@@ -124,6 +130,8 @@ def create_space(request):
             user = request.user
 
             sp = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                       space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                       space_city=space_city, space_state=space_state, space_country=space_country,
                        space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level, space_wifi=wifi,
                        space_restrooms=restroom, space_food_drink=food_drink, space_owner=user, space_open=True)
 
@@ -166,6 +174,12 @@ def update_space(request, space_id):
             old_space.space_name = space_form.cleaned_data['space_name']
             old_space.space_description = space_form.cleaned_data['space_description']
             old_space.space_max_capacity = space_form.cleaned_data['space_max_capacity']
+            old_space.space_address1 = space_form.cleaned_data['space_address1']
+            old_space.space_address2 = space_form.cleaned_data['space_address2']
+            old_space.space_zip_code = space_form.cleaned_data['space_zip_code']
+            old_space.space_city = space_form.cleaned_data['space_city']
+            old_space.space_state = space_form.cleaned_data['space_state']
+            old_space.space_country = space_form.cleaned_data['space_country']
             old_space.space_noise_level_allowed = int(space_form.cleaned_data["space_noise_level_allowed"][0])
             old_space.space_noise_level = int(space_form.cleaned_data["space_noise_level"][0])
             old_space.space_wifi = space_form.cleaned_data['space_wifi']
@@ -191,6 +205,12 @@ def update_space(request, space_id):
         old_data = {"space_name": old_space.space_name,
                     "space_description": old_space.space_description,
                     "space_max_capacity": old_space.space_max_capacity,
+                    "space_address1": old_space.space_address1,
+                    "space_address2": old_space.space_address2,
+                    "space_zip_code": old_space.space_zip_code,
+                    "space_city": old_space.space_city,
+                    "space_state": old_space.space_state,
+                    "space_country": old_space.space_country,
                     "space_noise_level_allowed": old_space_noise_level_allowed,
                     "space_noise_level": old_space_noise_level,
                     "space_wifi": old_space.space_wifi,
