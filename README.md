@@ -169,3 +169,24 @@ space it still hold the value that it is closed. This is the main process used t
 ```
 python manage.py test sharedspaces.tests.SpaceCloseTest
 ```
+
+<br>
+
+#### Space Address Background:
+Given that each location has to be shown on the map. We need to store their addresses. So, this feature focused on
+implementing that into the space model. This required removing all the old migrations as it would require a default.
+But we want there to be no spaces in the database without dates. So we deleted the database, reset the migrations, and
+will do the same for the Heroku Database. Overall, changed up everywhere the space model was used and fixed up all the
+test for the model, and it's uses.
+
+##### Space Address Testing:
+The main test added was to make sure the address was saved correctly into the database and that the forms were working
+correctly. So I mainly added to the create space tests. I also edited the space close tests, space reuse test, list
+space tests, and space date and time tests.
+```
+./manage.py test sharedspaces.tests.CreateSpaceTests
+./manage.py test sharedspaces.tests.TestSpaceDateTime
+./manage.py test sharedspaces.tests.ListSpacesTest
+./manage.py test sharedspaces.tests.SpaceReuseTest
+./manage.py test sharedspaces.tests.SpaceCloseTest
+```
