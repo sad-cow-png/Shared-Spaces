@@ -156,3 +156,16 @@ wrong in the database when they are being connected using the foreign key.
 ```
 python manage.py test sharedspaces.tests.SpaceReuseTest
 ```
+
+<br>
+
+#### Deactivate Space Background:
+When we deactivate a space, we change the status of the model to not open and there is a text printed on the card that
+lets the user know that the space is not active. This mainly affects the proprietors account.
+
+##### Deactivate Space Testing:
+The main testing here consisted of making sure that when the space is set to in active, and we access it from a user's
+space it still hold the value that it is closed. This is the main process used to change the status of the space.
+```
+python manage.py test sharedspaces.tests.SpaceCloseTest
+```
