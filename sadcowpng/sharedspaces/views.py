@@ -142,6 +142,7 @@ def create_space(request):
     return render(request, 'sharedspaces/create_space.html', {'form': space_form})
 
 
+@login_required
 @user_is_space_owner
 def update_space(request, space_id):
     """
@@ -332,3 +333,24 @@ def load_times(request):
     sp_times = SpaceDateTime.objects.filter(pk=sp_dt_id)
 
     return render(request, 'sharedspaces/time_slot_options.html', {'sp_times': sp_times})
+
+  
+@login_required  
+@user_is_space_owner
+def date_time(request, space_id):
+    """
+    The handles the listing of date and time for each location
+    """
+    if request.user.is_proprietor:
+        date_times = SpaceDateTime.objects.filter(space_id=space_id)
+        space = Space.objects.get(pk=space_id)
+
+        context = {
+            'date_times': date_times,
+            'space': space
+        }
+    else:
+        return HttpResponseRedirect(reverse('account'))
+
+    return render(request, 'sharedspaces/date_time.html', context=context)
+

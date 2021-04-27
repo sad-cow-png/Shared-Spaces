@@ -53,7 +53,7 @@ class SpaceTimes(forms.Form):
     date = forms.DateField(widget=forms.DateInput(format='%m/%d/%Y'), required=True)
     time_start = forms.TimeField(widget=forms.TimeInput(format='%H:%M'), required=True)
     time_end = forms.TimeField(widget=forms.TimeInput(format='%H:%M'), required=True)
-    closed = forms.BooleanField(label='Is this time currently available?', required=False)
+    closed = forms.BooleanField(label='Is this time currently close?', required=False)
 
 
 # Displays space_date string in YYYY-MM-DD format

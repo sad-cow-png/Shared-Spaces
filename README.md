@@ -148,4 +148,45 @@ Created a simple test for making sure the reservation goes through. Will possibl
 ```
 python manage.py test sharedspaces.tests.ReserveFormSeleniumTests
 ```
+
 <br>
+
+#### List spaces Background:
+List out the spaces in the user account was mostly already complete but what was needed to be added were a few buttons.
+So, a few buttons were added and with that the ability to edit and add time/date for the space. 
+
+##### List spaces Testing:
+The test mainly checks that the functionality required for the card is working correctly. This involves making sure
+that the space connected to the user can be retrieved easily. The testing for actual front end is not added.
+```
+python manage.py test sharedspaces.tests.ListSpacesTest
+```
+
+<br>
+
+#### Space Reuse Background:
+Reuse consisted of making sure that the space had different times that could be signed up for. This consisted of 
+connecting a lot that had already been completed. Fixing up the buttons done for the card set up in account
+to redirect to the list of dates and time was one of them. It also consisted of making sure new dates could be added
+or deactivated and much more. 
+
+##### Space Reuse Testing:
+The testing mainly consists of making sure that the spaces created can have dates linked to them and that nothing goes
+wrong in the database when they are being connected using the foreign key. 
+```
+python manage.py test sharedspaces.tests.SpaceReuseTest
+```
+
+<br>
+
+#### Deactivate Space Background:
+When we deactivate a space, we change the status of the model to not open and there is a text printed on the card that
+lets the user know that the space is not active. This mainly affects the proprietors account.
+
+##### Deactivate Space Testing:
+The main testing here consisted of making sure that when the space is set to in active, and we access it from a user's
+space it still hold the value that it is closed. This is the main process used to change the status of the space.
+```
+python manage.py test sharedspaces.tests.SpaceCloseTest
+```
+
