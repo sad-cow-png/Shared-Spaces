@@ -720,7 +720,8 @@ class TestSpaceDateTime(TestCase):
                          'Space foreign key is working properly.')
         # end ##########################################################################################################
 
-
+        
+# added by Binh ############################################################################################
 # Creates client/proprietor users
 # Can be used to create new users, reusable
 # Run this before running decorator tests, if test users in
@@ -1064,6 +1065,100 @@ class PageTemplateTests(TestCase):
         self.assertContains(response, 'navbar-brand')
 
 
+# Simple test for testing if client reservation goes through
+class ReserveFormSeleniumTests(TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+
+        self.index_url = "http://127.0.0.1:8000"
+
+        # Can be replaced with users based on your local database
+        self.clientuser = 'spaceplease6'
+        self.clientpw = 'jedwi5hak2'
+
+        self.proprietoruser = 'proprietor5'
+        self.proprietorpw = 'ajkDUI3#f'
+
+        # Space reservation number, change if needed
+        self.rsp = '10'
+
+    def test_proprietor_access_reserve(self):
+        driver = self.driver
+
+        # Access reserve page not logged in
+        driver.get(self.index_url + '/reserve/' + self.rsp)
+        self.assertEqual(self.index_url + '/login/?next=/reserve/' + self.rsp, driver.current_url)
+
+        # Login as proprietor, expected to stay on page
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.proprietoruser)
+        password.send_keys(self.proprietorpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        self.assertEqual(self.index_url + '/login/', driver.current_url)
+
+        # Display error message
+        message = driver.find_element_by_class_name("messages").text
+        self.assertEqual(message, 'Please login as a client to access page.')
+
+    def test_client_access_reserve(self):
+        driver = self.driver
+
+        # Login as client
+        driver.get(self.index_url + '/login/')
+
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.clientuser)
+        password.send_keys(self.clientpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        # Access reserve page
+        driver.get(self.index_url + '/reserve/' + self.rsp)
+        self.assertEqual(self.index_url + '/reserve/' + self.rsp, driver.current_url)
+
+    def test_client_reserve_space(self):
+        """
+        Test currently works for checking one space reserved on account page.
+        Go to admin page to reset reservation if no spaces are left for reservation.
+        """
+
+        driver = self.driver
+
+        # Login as client
+        driver.get(self.index_url + '/login/')
+
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.clientuser)
+        password.send_keys(self.clientpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        driver.get(self.index_url + '/reserve/' + self.rsp)
+        text = driver.find_element_by_tag_name('h2').text
+        text = text.split(' ')
+        text = text[2:5]
+        spaceName = ' '.join(text)
+
+        selectDate = Select(driver.find_element_by_name("reserve_date"))
+        selectDate.select_by_index(1)
+
+        submit = driver.find_element_by_xpath("//input[@type = 'submit']")
+        submit.send_keys(Keys.RETURN)
+
+        spaces = driver.find_element_by_tag_name('p').text
+        self.assertEqual(spaceName, spaces)
+
+#   end ############################################################################################
+
+
 # Test By Bishal
 # These are all the test for listing out spaces
 # This mainly checks to see that given a proprietor their spaces is added to their name
@@ -1289,3 +1384,4 @@ class SpaceCloseTest(TestCase):
 
         spaces = Space.objects.filter(space_owner=proprietor, space_open=True)
         self.assertEqual(len(spaces), 1, "The open flag ia not working.")
+

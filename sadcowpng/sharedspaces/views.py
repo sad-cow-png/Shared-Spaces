@@ -5,9 +5,11 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
+
+from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes, \
+    ReserveSpaceForm
 from .models import Space, User, SpaceDateTime
-from .decorators import proprietor_required, user_is_space_owner
+from .decorators import proprietor_required, user_is_space_owner, client_required
 
 
 # Shared Spaces Home Page
@@ -25,7 +27,19 @@ def account(request):
             'space': space
         }
     else:
-        return render(request, 'sharedspaces/account.html')
+        user = request.user
+        reserved_time = SpaceDateTime.objects.filter(space_dt_reserved_by=user)
+
+        # Find space by time slot and add to client reserved space list
+        reserved_by_user = []
+        for space in reserved_time:
+            reservation = Space.objects.get(pk=space.space_id.pk)
+            reserved_by_user.append(reservation)
+
+        context = {
+            'reserved_time': reserved_time,
+            'reserved_space': reserved_by_user,
+        }
 
     return render(request, 'sharedspaces/account.html', context=context)
 
@@ -113,7 +127,9 @@ def create_space(request):
                        space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level, space_wifi=wifi,
                        space_restrooms=restroom, space_food_drink=food_drink, space_owner=user, space_open=True)
 
+
             sp.save()
+
             primary_key = sp.pk
 
             # redirecting to date and time page once complete to get at least one data and time
@@ -156,7 +172,6 @@ def update_space(request, space_id):
             old_space.space_restrooms = space_form.cleaned_data['space_restrooms']
             old_space.space_food_drink = space_form.cleaned_data['space_food_drink']
             old_space.space_open = space_form.cleaned_data['space_open']
-
             # save the updated object in the database
             old_space.save()
 
@@ -181,7 +196,8 @@ def update_space(request, space_id):
                     "space_wifi": old_space.space_wifi,
                     "space_restrooms": old_space.space_restrooms,
                     "space_food_drink": old_space.space_food_drink,
-                    "space_open": old_space.space_open}
+                    "space_open": old_space.space_open,
+                    }
 
         # creating a form with the old data
         space_form = CreateSpaceForm(old_data)
@@ -226,6 +242,7 @@ def space_date_time(request, space_id):
     return render(request, 'sharedspaces/space_date_time.html', context=context)
 
 
+@user_is_space_owner
 def update_space_date_time(request, data_time_id):
     """
     To update the toggle for date and time
@@ -263,6 +280,62 @@ def update_space_date_time(request, data_time_id):
 
 
 @login_required
+@client_required
+def reserve_space(request, space_id):
+    """
+    Clients can reserve a time on the reserve page for each listed space
+    Each space page should display available times and users will be
+    able to select one
+    """
+
+    space = Space.objects.get(pk=space_id)
+
+    if request.method == 'POST':
+        form = ReserveSpaceForm(request.POST, space_id=space_id)
+
+        if form.is_valid():
+
+            # Compared id of date and time slot to confirm date and time are correct
+            # should not fail as date/time slots are linked on front-end
+            date = form.cleaned_data['reserve_date']
+            time_slot = form.cleaned_data['reserve_time_slot']
+
+            if date.pk == time_slot.pk:
+                sp_slot = SpaceDateTime.objects.get(pk=time_slot.pk)
+                sp_slot.space_dt_reserved_by = request.user.username
+                sp_slot.space_dt_reserved = True
+                sp_slot.save()
+
+                return HttpResponseRedirect(reverse('account'))
+
+            else:
+                form = ReserveSpaceForm(space_id=space_id)
+
+    else:
+        form = ReserveSpaceForm(space_id=space_id)
+
+    context = {
+        "form": form,
+        "space": space,
+        "space_id": space_id,
+    }
+
+    return render(request, 'sharedspaces/reserve_space.html', context=context)
+
+
+def load_times(request):
+    """
+    Update available time slot based on selected date
+    Gets SpaceDateTime object pk from "Available date(s)" selection box
+    Filters time slot by pk for "Available time slot" box
+    """
+    sp_dt_id = request.GET.get('sp')
+    sp_times = SpaceDateTime.objects.filter(pk=sp_dt_id)
+
+    return render(request, 'sharedspaces/time_slot_options.html', {'sp_times': sp_times})
+
+  
+@login_required  
 @user_is_space_owner
 def date_time(request, space_id):
     """
