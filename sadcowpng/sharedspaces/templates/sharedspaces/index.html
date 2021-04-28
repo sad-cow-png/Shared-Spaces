@@ -14,43 +14,10 @@
                 <title>Shared Spaces</title>
             {% endblock %}
             <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-            <script>
-
-                let map;
-                const umbcLatLng = {lat: 39.254, lng: -76.711};
-                const mapOptions = {
-                    center: umbcLatLng,
-                    mapTypeId: 'roadmap',
-                    zoom: 15,
-                };
-
-                // Map initializes centered over UMBC.
-                // Map options fields alter appearance and interactive functionality of the embedded map.
-                function initMap() {
-                    // The map is embedded in the 'map' div found in index.html.
-                    map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-                    // Enables users to place markers on the map.
-                    map.addListener('click', (event) => {
-                        createMarker(event.latLng.lat(), event.latLng.lng());
-                    });
-
-                    // TODO: When it is determined how the Space model will contain its location, you 
-                    //       can then loop over those locations in the SQL database and add them as
-                    //       markers here. 
-                    //       Using a google.maps.InfoWindow for each of these markers is likely the
-                    //       most efficient way to display the Space information when a user clicks
-                    //       on a space.
-                }
-
-                // Wrapper function to add a google.maps.Marker to the embedded map.
-                function createMarker(latitude, longitude) {
-                    const marker = new google.maps.Marker({position: {lat: latitude, lng: longitude}, map: map});
-                }
-
-                // If google.maps.InfoWindows are decided to be used to display space information, additional wrapper
-                // functions similar to the one above will need to be placed here.
-
+            <script type = "text/javascript" src= "../../static/mapsFunction.js">
+                // remeber when jimmy had some nice code here to use the map?
+                // moved it to a file called "mapsFunction.js"
+                // over in the static folder (where all the .css)
             </script>
         </head>
         <body>
