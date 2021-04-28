@@ -1065,8 +1065,9 @@ class PageTemplateTests(TestCase):
         response = self.client.get('/logout/')
         self.assertContains(response, 'navbar-brand')
 
-# Tester: Sharlet Claros ###################################################################################
+# Tester: Sharlet Claros
 # Tests search input validity, filter selections, and search query validity
+# Queries that are able to pull the correct object (only object in this case) are successful
 class SearchBarTests(TestCase):
     # Have to set up a space and a date/time for it  - Reusing a lot of the set up in tests for date/time
     TestCase.default_data_date = {'date': '09/04/2021', 'time_start': '04:15', 'time_end': '05:15'}
@@ -1127,4 +1128,12 @@ class SearchBarTests(TestCase):
         dt = SpaceDateTime.objects.filter(Q(space_date__contains=datequery))
 
         TestCase.assertTrue(spacequery in space.space_name)
-        TestCase.assertContains(datequery in dt.space_date)
+        TestCase.assertTrue(datequery in dt.space_date)
+        # Checking to see that the properties/fields for each are available
+        TestCase.assertEqual("SpaceSearch", space.space_name)
+        TestCase.assertEqual("Rand Description", space.space_description)
+        TestCase.assertEqual(5, space.space_max_capacity)
+        TestCase.assertEqual('09/04/2021', dt.space_date)
+
+
+

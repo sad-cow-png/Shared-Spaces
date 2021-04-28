@@ -1,3 +1,9 @@
+{% extends 'sharedspaces/search_header.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'account.css' %}">
+{% endblock %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,18 +14,55 @@
 
 <body>
     <div>
-        There are supposed to be some search results here.
         {% if val == 'all' %}
             <h1>Displaying Search Results for an ALL search.</h1>
-            Idea for implementation is for space date time to contain the space name, description and time all in the date/time table - all features should translate over.
+                {% for allqs in all %}
+                    <div class="col-sm-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ allqs.space_name }}</h5>
+                                <h5 class="card-title">{{ allqs.space_id.space_name }}</h5>
+                                <p class="card-text">{{ allqs.space_description }}</p>
+                                <p class="card-text">{{ allqs.space_id.space_description }}</p>
+                                Max Capacity:
+                                <p class="card-text">{{ allqs.space_max_capacity }}</p>
+                                <p class="card-text">{{ allqs.space_id.space_max_capacity }}</p>
+                                Wifi Offered?
+                                <p class="card-text">{{ allqs.space_wifi }}</p>
+                                <p class="card-text">{{ allqs.space_id.space_wifi }}</p>
+                                Restrooms Offered?
+                                <p class="card-text">{{ allqs.space_restrooms }}</p>
+                                <p class="card-text">{{ allqs.space_id.space_restrooms }}</p>
+                                Food/Drink Offered?
+                                <p class="card-text">{{ allqs.space_food_drink }}</p>
+                                <p class="card-text">{{ allqs.space_id.space_food_drink }}</p>
+                                <a href="" class="btn btn-primary">Reserve Space</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
         {% elif val == 'space' %}
             <h1>Displaying Search Results for a SPACE search.</h1>
             {% for spaces in space %}
                     <div class="col-sm-5">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">{{ spaces.space_name }}</h5>
+                                <h5 class="card-title">{{ spaces.space_name }}
+                                    {% if spaces.space_open %}
+                                        <span class="badge badge-success">Open</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Closed</span>
+                                    {% endif %}
+                                </h5>
                                 <p class="card-text">{{ spaces.space_description }}</p>
+                                Max Capacity
+                                <p class="card-text">{{ spaces.space_max_capacity }}</p>
+                                Wifi Offered?
+                                <p class="card-text">{{ spaces.space_wifi }}</p>
+                                Restrooms Offered?
+                                <p class="card-text">{{ spaces.space_restrooms }}</p>
+                                Food/Drink Offered?
+                                <p class="card-text">{{ spaces.space_food_drink }}</p>
                                 <a href="" class="btn btn-primary">Reserve Space</a>
                             </div>
                         </div>
@@ -27,8 +70,31 @@
                 {% endfor %}
         {% elif val == 'date' %}
             <h1>Displaying Search Results for a DATE search.</h1>
-        {% else % }
-            <h1> I don't know how you got here. Don't do it again >:/</h1>
+                {% for dates in date %}
+                    <div class="col-sm-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ dates.space_id.space_name }}
+                                    {% if dates.space_open %}
+                                        <span class="badge badge-success">Open</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Closed</span>
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">{{ dates.space_id.space_description }}</p>
+                                Max Capacity
+                                <p class="card-text">{{ dates.space_id.space_max_capacity }}</p>
+                                Wifi Offered?
+                                <p class="card-text">{{ dates.space_id.space_wifi }}</p>
+                                Restrooms Offered?
+                                <p class="card-text">{{ dates.space_id.space_restrooms }}</p>
+                                Food/Drink Offered?
+                                <p class="card-text">{{ dates.space_id.space_food_drink }}</p>
+                                <a href="" class="btn btn-primary">Reserve Space</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
         {% endif %}
     </div>
 </body>
