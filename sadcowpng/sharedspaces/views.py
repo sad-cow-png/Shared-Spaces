@@ -166,7 +166,10 @@ def update_space(request, space_id):
             old_space.space_open = space_form.cleaned_data['space_open']
             tags = space_form.cleaned_data['space_tags']
 
-            # add tags if not existing
+            # clear all tags
+            old_space.space_tags.clear()
+
+            # add tags, takes care of duplicates
             for tag in tags:
                 if tag in old_space.space_tags.get_queryset():
                     pass
