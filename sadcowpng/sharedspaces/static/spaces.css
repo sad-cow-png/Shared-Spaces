@@ -16,10 +16,12 @@
 
   .create_space_table, .update_space_table, .space_date_time_table{
       width: 800px;
+      color: white;
   }
 
   .space_submit_button{
       margin-top: 10px;
+      margin-bottom: 10px;
       width: 400px;
       background-color: #B4DFE5;
       color: black;
@@ -50,4 +52,13 @@
       text-align: center;
       color: white;
   }
+
+  .card-title{
+      color: black;
+  }
+
+  .date-title{
+      color: black;
+  }
+
 

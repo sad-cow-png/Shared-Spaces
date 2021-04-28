@@ -13,6 +13,12 @@
         <!-- Layout may differ depending on user type  -->
         {% if user.is_client and user.is_authenticated %}
             <h1>Welcome, {{ user.get_username }}!</h1>
+            <br>
+            <h3>Reserved Spaces</h3>
+            {% for space in reserved_space %}
+                <p>{{ space.space_name }}</p>
+            {% endfor %}
+
         {% endif %}
 
         {% if user.is_proprietor and user.is_authenticated %}
@@ -21,13 +27,18 @@
             <h3>My Listings</h3>
             <div class="row">
                 {% for spaces in space %}
-                    <div class="col-sm-5">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ spaces.space_name }}</h5>
-                                <p class="card-text">{{ spaces.space_description }}</p>
-                                <a href="{% url 'update_space' spaces.id %}" class="btn btn-primary">Update Space</a>
-                            </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ spaces.space_name }}
+                            {% if spaces.space_open %}
+                                <span class="badge badge-success">Open</span>
+                            {% else %}
+                                <span class="badge badge-danger">Closed</span>
+                            {% endif %}
+                            </h5>
+                            <p class="card-text">{{ spaces.space_description }}</p>
+                            <a href="{% url 'date_time' spaces.id %}" class="btn btn-primary">Edit Time</a>
+                            <a href="{% url 'update_space' spaces.id %}" class="btn btn-primary">Update Space</a>
                         </div>
                     </div>
                 {% endfor %}

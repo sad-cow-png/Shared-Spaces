@@ -1,10 +1,11 @@
-import datetime
-
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from taggit.managers import TaggableManager
 
 # TODO: make a directory to hold static data.
 # This represents the multiple choice options for the noise level multiple choice fields.
+
+
 Noise_Level_Choices = (
     ("1", "None"),
     ("2", "Faint"),
@@ -24,6 +25,12 @@ class Space(models.Model):
     space_name = models.CharField(max_length=500)
     space_description = models.CharField(max_length=1000)
     space_max_capacity = models.IntegerField()
+    space_address1 = models.CharField(max_length=1024)
+    space_address2 = models.CharField(max_length=1024, default="")
+    space_zip_code = models.CharField(max_length=5)
+    space_city = models.CharField(max_length=1024)
+    space_state = models.CharField(max_length=50)
+    space_country = models.CharField(max_length=1024)
     space_noise_level_allowed = models.IntegerField()
     space_noise_level = models.IntegerField()
     space_wifi = models.BooleanField()
@@ -68,6 +75,24 @@ class Space(models.Model):
         else:
             return "This place does not have food and drink."
 
+    def owner_str(self):
+        return self.space_owner.username
+
+    def open_str(self):
+        if self.space_open:
+            return "This location is open"
+        else:
+            return "This location is closed"
+
+    def address_str(self):
+        if self.space_address2:
+            address = "{} {}, {}, {} {}, {}".format(self.space_address1, self.space_address2, self.space_city,
+                                                    self.space_state, self.space_zip_code, self.space_country)
+        else:
+            address = "{}, {}, {} {}, {}".format(self.space_address1, self.space_city,
+                                                 self.space_state, self.space_zip_code, self.space_country)
+        return address
+
 
 class SpaceDateTime(models.Model):
     # Switch to char if this does not work
@@ -110,3 +135,4 @@ class SpaceDateTime(models.Model):
     def s_space_id(self):
         location = self.space_id.space_name
         return "This is an availability time for the following space: {}".format(location)
+

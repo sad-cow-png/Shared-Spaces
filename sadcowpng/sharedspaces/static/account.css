@@ -21,3 +21,11 @@
         width: 1000px;
         height: 800px;
     }
+
+    .badge-success{
+        background-color: darkgreen;
+    }
+
+    .badge-danger{
+        background-color: darkred;
+    }
