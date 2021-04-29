@@ -239,3 +239,20 @@ space tests, and space date and time tests.
 ./manage.py test sharedspaces.tests.SpaceCloseTest
 ```
 
+<br>
+
+####Search Bar Background:
+The search bar is located on the main/home page of the Shared Spaces site. Search functionality works directly with the 
+spaces and space date/time models so that users can directly search for spaces by name, description, and specific dates
+for reservation. Users are able to filter search using a search toggle to the side of the search bar to narrow search.
+Search results conditionally on a separate page based on filter selctions as individual cards with space details and a 
+button that will allow clients to make a reservation. The search results page also includes a home button to return to the home page.
+
+####Search Testing:
+Search testing covers the usage of querysets that extract search results from the space and space date/time models and 
+check that the appropriate object is retrieved based off the search criteria.
+```
+py manage.py test sharedspaces.tests.SearchBarTests
+```
+
+<br>
