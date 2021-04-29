@@ -8,6 +8,7 @@ from django.urls import reverse
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
 from .models import Space, User, SpaceDateTime
 import datetime
+from django.db.models import Q
 
 
 # Testing for the client signup
@@ -247,6 +248,12 @@ class CreateSpaceTests(TestCase):
     TestCase.default_data = {"space_name": 'TestName',
                              "space_description": 'Rand Description',
                              "space_max_capacity": 5,
+                             "space_address1": "1234 teststreet ct",
+                             "space_address2": "",
+                             "space_zip_code": "12345",
+                             "space_city": "testcity",
+                             "space_state": "MD",
+                             "space_country": "United States",
                              "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
                              "space_noise_level": [Noise_Level_Choices[1][0]],
                              "space_wifi": True,
@@ -260,48 +267,79 @@ class CreateSpaceTests(TestCase):
     def test_form_accuracy_name(self):
         # Creating a Test to check if the name is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_name'], 'TestName',
-                         'space name submitted correctly and in accurate location')
+                         'space name is not submitted correctly and in accurate location')
 
     def test_form_accuracy_description(self):
         # Creating a Test to check if the description is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_description'], 'Rand Description',
-                         'space description submitted correctly and in accurate location')
+                         'space description is not submitted correctly and in accurate location')
 
     def test_form_accuracy_capacity(self):
         # Creating a Test to check if the max capacity is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_max_capacity'], 5,
-                         'space max capacity submitted correctly and in accurate location')
+                         'space max capacity is not submitted correctly and in accurate location')
 
     def test_form_accuracy_noise_allowed(self):
         # Creating a Test to check if the allowed noise level is saved same as the input from browser
         self.assertEqual(TestCase.test_form.cleaned_data.get('space_noise_level_allowed'), ['1'],
-                         'space noise level allowed submitted correctly and in accurate location')
+                         'space noise level allowed is not submitted correctly and in accurate location')
 
     def test_form_accuracy_noise_level(self):
         # Creating a Test to check if the noise level is saved same as the input from browser
         self.assertEqual(TestCase.test_form.cleaned_data.get('space_noise_level'), ['2'],
-                         'space noise level submitted correctly and in accurate location')
+                         'space noise level is not submitted correctly and in accurate location')
 
     def test_form_accuracy_wifi(self):
         # Creating a Test to check if the wifi availability is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_wifi'], True,
-                         'space wifi availability submitted correctly and in accurate location')
+                         'space wifi availability is not submitted correctly and in accurate location')
 
     def test_form_accuracy_restroom(self):
         # Creating a Test to check if the restroom availability is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_restrooms'], False,
-                         'space restroom availability submitted correctly and in accurate location')
+                         'space restroom availability is not submitted correctly and in accurate location')
 
     def test_form_accuracy_fd(self):
         # Creating a Test to check if the food and drink availability is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_food_drink'], True,
-                         'space food/drink availability submitted correctly and in accurate location')
+                         'space food/drink availability is not submitted correctly and in accurate location')
 
     # added by Bishal ##################################################################################
     def test_form_accuracy_open(self):
         # Creating a Test to check if the food and drink availability is saved correctly
         self.assertEqual(TestCase.test_form.cleaned_data['space_food_drink'], True,
                          'Space availability submitted correctly and in accurate location')
+
+    # added by Bishal ##################################################################################
+    def test_form_accuracy_address1(self):
+        # Creating a Test to check if the food and drink availability is saved correctly
+        self.assertEqual(TestCase.test_form.cleaned_data['space_address1'], "1234 teststreet ct",
+                         'Space address1 is not submitted correctly and in accurate location')
+
+    def test_form_accuracy_address2(self):
+        # Creating a Test to check if the food and drink availability is saved correctly
+        self.assertEqual(TestCase.test_form.cleaned_data['space_address2'], "",
+                         'Space address2 is not submitted correctly and in accurate location')
+
+    def test_form_accuracy_zipcode(self):
+        # Creating a Test to check if the food and drink availability is saved correctly
+        self.assertEqual(TestCase.test_form.cleaned_data['space_zip_code'], "12345",
+                         'Space zipcode is not submitted correctly and in accurate location')
+
+    def test_form_accuracy_city(self):
+        # Creating a Test to check if the food and drink availability is saved correctly
+        self.assertEqual(TestCase.test_form.cleaned_data['space_city'], "testcity",
+                         'Space city is not submitted correctly and in accurate location')
+
+    def test_form_accuracy_state(self):
+        # Creating a Test to check if the food and drink availability is saved correctly
+        self.assertEqual(TestCase.test_form.cleaned_data['space_state'], "MD",
+                         'Space state is not submitted correctly and in accurate location')
+
+    def test_form_accuracy_country(self):
+        # Creating a Test to check if the food and drink availability is saved correctly
+        self.assertEqual(TestCase.test_form.cleaned_data['space_country'], "United States",
+                         'Space country is not submitted correctly and in accurate location')
 
     # Tests that cover database accuracy once form is submitted
     # The following steps describe the order of steps for the rest of the data base accuracy tests.
@@ -314,6 +352,12 @@ class CreateSpaceTests(TestCase):
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
+        space_address1 = TestCase.test_form.cleaned_data['space_address1']
+        space_address2 = TestCase.test_form.cleaned_data['space_address2']
+        space_zip_code = TestCase.test_form.cleaned_data['space_zip_code']
+        space_city = TestCase.test_form.cleaned_data['space_city']
+        space_state = TestCase.test_form.cleaned_data['space_state']
+        space_country = TestCase.test_form.cleaned_data['space_country']
         noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
         noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
         wifi = TestCase.test_form.cleaned_data['space_wifi']
@@ -321,14 +365,12 @@ class CreateSpaceTests(TestCase):
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
         # put the data into the space mode and create a new space model
-        test_space = Space(space_name=name,
-                           space_description=description,
-                           space_max_capacity=max_capacity,
-                           space_noise_level_allowed=noise_level_allowed,
-                           space_noise_level=noise_level,
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
                            space_wifi=wifi,
-                           space_restrooms=restroom,
-                           space_food_drink=food_drink)
+                           space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
 
         # Submitting test form data to the create space database
         test_space.save()
@@ -348,20 +390,25 @@ class CreateSpaceTests(TestCase):
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
+        space_address1 = TestCase.test_form.cleaned_data['space_address1']
+        space_address2 = TestCase.test_form.cleaned_data['space_address2']
+        space_zip_code = TestCase.test_form.cleaned_data['space_zip_code']
+        space_city = TestCase.test_form.cleaned_data['space_city']
+        space_state = TestCase.test_form.cleaned_data['space_state']
+        space_country = TestCase.test_form.cleaned_data['space_country']
         noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
         noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
         wifi = TestCase.test_form.cleaned_data['space_wifi']
         restroom = TestCase.test_form.cleaned_data['space_restrooms']
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
-        test_space = Space(space_name=name,
-                           space_description=description,
-                           space_max_capacity=max_capacity,
-                           space_noise_level_allowed=noise_level_allowed,
-                           space_noise_level=noise_level,
+        # put the data into the space mode and create a new space model
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
                            space_wifi=wifi,
-                           space_restrooms=restroom,
-                           space_food_drink=food_drink)
+                           space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
 
         # Submitting test form data to the create space database
         test_space.save()
@@ -382,20 +429,25 @@ class CreateSpaceTests(TestCase):
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
+        space_address1 = TestCase.test_form.cleaned_data['space_address1']
+        space_address2 = TestCase.test_form.cleaned_data['space_address2']
+        space_zip_code = TestCase.test_form.cleaned_data['space_zip_code']
+        space_city = TestCase.test_form.cleaned_data['space_city']
+        space_state = TestCase.test_form.cleaned_data['space_state']
+        space_country = TestCase.test_form.cleaned_data['space_country']
         noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
         noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
         wifi = TestCase.test_form.cleaned_data['space_wifi']
         restroom = TestCase.test_form.cleaned_data['space_restrooms']
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
-        test_space = Space(space_name=name,
-                           space_description=description,
-                           space_max_capacity=max_capacity,
-                           space_noise_level_allowed=noise_level_allowed,
-                           space_noise_level=noise_level,
+        # put the data into the space mode and create a new space model
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
                            space_wifi=wifi,
-                           space_restrooms=restroom,
-                           space_food_drink=food_drink)
+                           space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
 
         # Submitting test form data to the create space database
         test_space.save()
@@ -416,20 +468,25 @@ class CreateSpaceTests(TestCase):
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
+        space_address1 = TestCase.test_form.cleaned_data['space_address1']
+        space_address2 = TestCase.test_form.cleaned_data['space_address2']
+        space_zip_code = TestCase.test_form.cleaned_data['space_zip_code']
+        space_city = TestCase.test_form.cleaned_data['space_city']
+        space_state = TestCase.test_form.cleaned_data['space_state']
+        space_country = TestCase.test_form.cleaned_data['space_country']
         noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
         noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
         wifi = TestCase.test_form.cleaned_data['space_wifi']
         restroom = TestCase.test_form.cleaned_data['space_restrooms']
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
-        test_space = Space(space_name=name,
-                           space_description=description,
-                           space_max_capacity=max_capacity,
-                           space_noise_level_allowed=noise_level_allowed,
-                           space_noise_level=noise_level,
+        # put the data into the space mode and create a new space model
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
                            space_wifi=wifi,
-                           space_restrooms=restroom,
-                           space_food_drink=food_drink)
+                           space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
 
         # Submitting test form data to the create space database
         test_space.save()
@@ -453,6 +510,12 @@ class CreateSpaceTests(TestCase):
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
+        space_address1 = TestCase.test_form.cleaned_data['space_address1']
+        space_address2 = TestCase.test_form.cleaned_data['space_address2']
+        space_zip_code = TestCase.test_form.cleaned_data['space_zip_code']
+        space_city = TestCase.test_form.cleaned_data['space_city']
+        space_state = TestCase.test_form.cleaned_data['space_state']
+        space_country = TestCase.test_form.cleaned_data['space_country']
         noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
         noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
         wifi = TestCase.test_form.cleaned_data['space_wifi']
@@ -460,14 +523,12 @@ class CreateSpaceTests(TestCase):
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
         # put the data into the space mode and create a new space model
-        test_space = Space(space_name=name,
-                           space_description=description,
-                           space_max_capacity=max_capacity,
-                           space_noise_level_allowed=noise_level_allowed,
-                           space_noise_level=noise_level,
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
                            space_wifi=wifi,
-                           space_restrooms=restroom,
-                           space_food_drink=food_drink)
+                           space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
 
         # Submitting test form data to the create space database
         test_space.save()
@@ -491,6 +552,12 @@ class CreateSpaceTests(TestCase):
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
+        space_address1 = TestCase.test_form.cleaned_data['space_address1']
+        space_address2 = TestCase.test_form.cleaned_data['space_address2']
+        space_zip_code = TestCase.test_form.cleaned_data['space_zip_code']
+        space_city = TestCase.test_form.cleaned_data['space_city']
+        space_state = TestCase.test_form.cleaned_data['space_state']
+        space_country = TestCase.test_form.cleaned_data['space_country']
         noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
         noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
         wifi = TestCase.test_form.cleaned_data['space_wifi']
@@ -498,14 +565,12 @@ class CreateSpaceTests(TestCase):
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
         # put the data into the space mode and create a new space model
-        test_space = Space(space_name=name,
-                           space_description=description,
-                           space_max_capacity=max_capacity,
-                           space_noise_level_allowed=noise_level_allowed,
-                           space_noise_level=noise_level,
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
                            space_wifi=wifi,
-                           space_restrooms=restroom,
-                           space_food_drink=food_drink)
+                           space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
 
         # Submitting test form data to the create space database
         test_space.save()
@@ -526,20 +591,25 @@ class CreateSpaceTests(TestCase):
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
+        space_address1 = TestCase.test_form.cleaned_data['space_address1']
+        space_address2 = TestCase.test_form.cleaned_data['space_address2']
+        space_zip_code = TestCase.test_form.cleaned_data['space_zip_code']
+        space_city = TestCase.test_form.cleaned_data['space_city']
+        space_state = TestCase.test_form.cleaned_data['space_state']
+        space_country = TestCase.test_form.cleaned_data['space_country']
         noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
         noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
         wifi = TestCase.test_form.cleaned_data['space_wifi']
         restroom = TestCase.test_form.cleaned_data['space_restrooms']
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
-        test_space = Space(space_name=name,
-                           space_description=description,
-                           space_max_capacity=max_capacity,
-                           space_noise_level_allowed=noise_level_allowed,
-                           space_noise_level=noise_level,
+        # put the data into the space mode and create a new space model
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
                            space_wifi=wifi,
-                           space_restrooms=restroom,
-                           space_food_drink=food_drink)
+                           space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
 
         # Submitting test form data to the create space database
         test_space.save()
@@ -560,6 +630,12 @@ class CreateSpaceTests(TestCase):
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
+        space_address1 = TestCase.test_form.cleaned_data['space_address1']
+        space_address2 = TestCase.test_form.cleaned_data['space_address2']
+        space_zip_code = TestCase.test_form.cleaned_data['space_zip_code']
+        space_city = TestCase.test_form.cleaned_data['space_city']
+        space_state = TestCase.test_form.cleaned_data['space_state']
+        space_country = TestCase.test_form.cleaned_data['space_country']
         noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
         noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
         wifi = TestCase.test_form.cleaned_data['space_wifi']
@@ -567,14 +643,12 @@ class CreateSpaceTests(TestCase):
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
 
         # put the data into the space mode and create a new space model
-        test_space = Space(space_name=name,
-                           space_description=description,
-                           space_max_capacity=max_capacity,
-                           space_noise_level_allowed=noise_level_allowed,
-                           space_noise_level=noise_level,
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
                            space_wifi=wifi,
-                           space_restrooms=restroom,
-                           space_food_drink=food_drink)
+                           space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
 
         # Submitting test form data to the create space database
         test_space.save()
@@ -596,23 +670,25 @@ class CreateSpaceTests(TestCase):
         name = TestCase.test_form.cleaned_data['space_name']
         description = TestCase.test_form.cleaned_data['space_description']
         max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
+        space_address1 = TestCase.test_form.cleaned_data['space_address1']
+        space_address2 = TestCase.test_form.cleaned_data['space_address2']
+        space_zip_code = TestCase.test_form.cleaned_data['space_zip_code']
+        space_city = TestCase.test_form.cleaned_data['space_city']
+        space_state = TestCase.test_form.cleaned_data['space_state']
+        space_country = TestCase.test_form.cleaned_data['space_country']
         noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
         noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
         wifi = TestCase.test_form.cleaned_data['space_wifi']
         restroom = TestCase.test_form.cleaned_data['space_restrooms']
         food_drink = TestCase.test_form.cleaned_data['space_food_drink']
-        space_open = TestCase.test_form.cleaned_data['space_open']
 
         # put the data into the space mode and create a new space model
-        test_space = Space(space_name=name,
-                           space_description=description,
-                           space_max_capacity=max_capacity,
-                           space_noise_level_allowed=noise_level_allowed,
-                           space_noise_level=noise_level,
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
                            space_wifi=wifi,
-                           space_restrooms=restroom,
-                           space_food_drink=food_drink,
-                           space_open=space_open)
+                           space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
 
         # Submitting test form data to the create space database
         test_space.save()
@@ -628,7 +704,46 @@ class CreateSpaceTests(TestCase):
         self.assertEqual(test_space.pk, None,
                          'The location was not deleted properly from the database.')
 
-    # Selenium testing will be added later for testing front end to database
+        # Tests that cover database accuracy of food and drink
+
+    def test_form_to_database_accuracy_space_address(self):
+        name = TestCase.test_form.cleaned_data['space_name']
+        description = TestCase.test_form.cleaned_data['space_description']
+        max_capacity = TestCase.test_form.cleaned_data['space_max_capacity']
+        space_address1 = TestCase.test_form.cleaned_data['space_address1']
+        space_address2 = TestCase.test_form.cleaned_data['space_address2']
+        space_zip_code = TestCase.test_form.cleaned_data['space_zip_code']
+        space_city = TestCase.test_form.cleaned_data['space_city']
+        space_state = TestCase.test_form.cleaned_data['space_state']
+        space_country = TestCase.test_form.cleaned_data['space_country']
+        noise_level_allowed = int(TestCase.test_form.cleaned_data["space_noise_level_allowed"][0])
+        noise_level = int(TestCase.test_form.cleaned_data["space_noise_level"][0])
+        wifi = TestCase.test_form.cleaned_data['space_wifi']
+        restroom = TestCase.test_form.cleaned_data['space_restrooms']
+        food_drink = TestCase.test_form.cleaned_data['space_food_drink']
+
+        # put the data into the space mode and create a new space model
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
+                           space_wifi=wifi,
+                           space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
+
+        # Submitting test form data to the create space database
+        test_space.save()
+
+        # testing food and drink string
+        self.assertEqual(test_space.address_str(), "{}, {}, {} {}, {}".format("1234 teststreet ct", "testcity",
+                                                                              "MD", "12345", "United States"),
+                         'The space address was stored in the database incorrectly.')
+
+        # Deleting this entry from the database with it's unique ID number
+        test_space.delete()
+
+        # now check if it was deleted properly
+        self.assertEqual(test_space.pk, None,
+                         'The location was not deleted properly from the database.')
 
 
 # added by Sharlet #################################################################################
@@ -643,17 +758,24 @@ class TestSpaceDateTime(TestCase):
     TestCase.default_space_data = {"space_name": 'TestName',
                                    "space_description": 'Rand Description',
                                    "space_max_capacity": 5,
+                                   "space_address1": "1234 teststreet ct",
+                                   "space_address2": "",
+                                   "space_zip_code": "12345",
+                                   "space_city": "testcity",
+                                   "space_state": "MD",
+                                   "space_country": "United States",
                                    "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
                                    "space_noise_level": [Noise_Level_Choices[1][0]],
                                    "space_wifi": True,
                                    "space_restrooms": False,
-                                   "space_food_drink": True}
+                                   "space_food_drink": True,
+                                   "space_open": True}
     TestCase.test_space_form = CreateSpaceForm(data=TestCase.default_space_data)
     TestCase.test_space_form.is_valid()
 
     # added by Sharlet #################################################################################
     def test_form_accuracy_date(self):
-        self.assertEqual(TestCase.test_form_date.cleaned_data['date'], '09/04/2021',
+        self.assertEqual(TestCase.test_form_date.cleaned_data['date'], datetime.date(2021, 9, 4),
                          'space date was submitted correctly and stored accurately.')
 
     def test_form_accuracy_s_time(self):
@@ -671,6 +793,12 @@ class TestSpaceDateTime(TestCase):
         name = TestCase.test_space_form.cleaned_data['space_name']
         description = TestCase.test_space_form.cleaned_data['space_description']
         max_capacity = TestCase.test_space_form.cleaned_data['space_max_capacity']
+        space_address1 = TestCase.test_space_form.cleaned_data['space_address1']
+        space_address2 = TestCase.test_space_form.cleaned_data['space_address2']
+        space_zip_code = TestCase.test_space_form.cleaned_data['space_zip_code']
+        space_city = TestCase.test_space_form.cleaned_data['space_city']
+        space_state = TestCase.test_space_form.cleaned_data['space_state']
+        space_country = TestCase.test_space_form.cleaned_data['space_country']
         noise_level_allowed = int(TestCase.test_space_form.cleaned_data["space_noise_level_allowed"][0])
         noise_level = int(TestCase.test_space_form.cleaned_data["space_noise_level"][0])
         wifi = TestCase.test_space_form.cleaned_data['space_wifi']
@@ -678,14 +806,12 @@ class TestSpaceDateTime(TestCase):
         food_drink = TestCase.test_space_form.cleaned_data['space_food_drink']
 
         # put the data into the space mode and create a new space model
-        test_space = Space(space_name=name,
-                           space_description=description,
-                           space_max_capacity=max_capacity,
-                           space_noise_level_allowed=noise_level_allowed,
-                           space_noise_level=noise_level,
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
                            space_wifi=wifi,
-                           space_restrooms=restroom,
-                           space_food_drink=food_drink)
+                           space_restrooms=restroom, space_food_drink=food_drink, space_open=True)
 
         # Submitting test form data to the create space database
         test_space.save()
@@ -703,24 +829,25 @@ class TestSpaceDateTime(TestCase):
 
         # now try to access the name of the object
         self.assertEqual(date_time.s_date_str(), datetime.date(2021, 9, 4),
-                         'Date is working properly.')
+                         'Date is not working properly.')
         self.assertEqual(date_time.s_start_str(), datetime.time(4, 15),
-                         'Start time is working properly.')
+                         'Start time is not working properly.')
         self.assertEqual(date_time.s_end_str(), datetime.time(5, 15),
-                         'End time is working properly.')
+                         'End time is not working properly.')
         self.assertEqual(date_time.s_dt_closed_str(),
                          "The listed date/time has not yet passed for this space opening, still open/active in use.",
-                         'Closed flag is working properly.')
+                         'Closed flag is not working properly.')
         self.assertEqual(date_time.s_dt_reserved_str(),
                          "This space has not been reserved yet.",
-                         'Reserved flag is working properly.')
+                         'Reserved flag is not working properly.')
         self.assertEqual(date_time.s_dt_reserved_by_str(), "No User",
-                         'Date reserved by is working properly.')
+                         'Date reserved by is not working properly.')
         self.assertEqual(date_time.s_space_id(), "This is an availability time for the following space: TestName",
-                         'Space foreign key is working properly.')
+                         'Space foreign key is not working properly.')
         # end ##########################################################################################################
 
-
+        
+# added by Binh ############################################################################################
 # Creates client/proprietor users
 # Can be used to create new users, reusable
 # Run this before running decorator tests, if test users in
@@ -1062,6 +1189,430 @@ class PageTemplateTests(TestCase):
 
         response = self.client.get('/logout/')
         self.assertContains(response, 'navbar-brand')
+
+
+# Simple test for testing if client reservation goes through
+class ReserveFormSeleniumTests(TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+
+        self.index_url = "http://127.0.0.1:8000"
+
+        # Can be replaced with users based on your local database
+        self.clientuser = 'spaceplease6'
+        self.clientpw = 'jedwi5hak2'
+
+        self.proprietoruser = 'proprietor5'
+        self.proprietorpw = 'ajkDUI3#f'
+
+        # Space reservation number, change if needed
+        self.rsp = '10'
+
+    def test_proprietor_access_reserve(self):
+        driver = self.driver
+
+        # Access reserve page not logged in
+        driver.get(self.index_url + '/reserve/' + self.rsp)
+        self.assertEqual(self.index_url + '/login/?next=/reserve/' + self.rsp, driver.current_url)
+
+        # Login as proprietor, expected to stay on page
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.proprietoruser)
+        password.send_keys(self.proprietorpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        self.assertEqual(self.index_url + '/login/', driver.current_url)
+
+        # Display error message
+        message = driver.find_element_by_class_name("messages").text
+        self.assertEqual(message, 'Please login as a client to access page.')
+
+    def test_client_access_reserve(self):
+        driver = self.driver
+
+        # Login as client
+        driver.get(self.index_url + '/login/')
+
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.clientuser)
+        password.send_keys(self.clientpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        # Access reserve page
+        driver.get(self.index_url + '/reserve/' + self.rsp)
+        self.assertEqual(self.index_url + '/reserve/' + self.rsp, driver.current_url)
+
+    def test_client_reserve_space(self):
+        """
+        Test currently works for checking one space reserved on account page.
+        Go to admin page to reset reservation if no spaces are left for reservation.
+        """
+
+        driver = self.driver
+
+        # Login as client
+        driver.get(self.index_url + '/login/')
+
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.clientuser)
+        password.send_keys(self.clientpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        driver.get(self.index_url + '/reserve/' + self.rsp)
+        text = driver.find_element_by_tag_name('h2').text
+        text = text.split(' ')
+        text = text[2:5]
+        spaceName = ' '.join(text)
+
+        selectDate = Select(driver.find_element_by_name("reserve_date"))
+        selectDate.select_by_index(1)
+
+        submit = driver.find_element_by_xpath("//input[@type = 'submit']")
+        submit.send_keys(Keys.RETURN)
+
+        spaces = driver.find_element_by_tag_name('p').text
+        self.assertEqual(spaceName, spaces)
+
+#   end ############################################################################################
+
+
+# Test By Bishal
+# These are all the test for listing out spaces
+# This mainly checks to see that given a proprietor their spaces is added to their name
+# Then, we can all their spaces using a name
+class ListSpacesTest(TestCase):
+
+    def test_space_user(self):
+        """
+        As the functionality of getting the space by using user id is required for the
+        listing to work we will mainly just test that
+        """
+        # setting up the user
+        user = {
+            'username': 'testuser2',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**user)
+        proprietor = User.objects.get(username='testuser2')
+        proprietor.is_proprietor = True
+
+        # now we add two identical spaces for the user
+        for i in range(2):
+            default_list_data = {"space_name": 'TestName{}'.format(i),
+                                 "space_description": 'Rand Description',
+                                 "space_max_capacity": 5,
+                                 "space_address1": "1234 teststreet ct",
+                                 "space_address2": "",
+                                 "space_zip_code": "12345",
+                                 "space_city": "testcity",
+                                 "space_state": "MD",
+                                 "space_country": "United States",
+                                 "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
+                                 "space_noise_level": [Noise_Level_Choices[1][0]],
+                                 "space_wifi": True,
+                                 "space_restrooms": False,
+                                 "space_food_drink": True,
+                                 "space_open": True}
+            test_list = CreateSpaceForm(data=default_list_data)
+            test_list.is_valid()
+
+            name = test_list.cleaned_data['space_name']
+            description = test_list.cleaned_data['space_description']
+            max_capacity = test_list.cleaned_data['space_max_capacity']
+            space_address1 = test_list.cleaned_data['space_address1']
+            space_address2 = test_list.cleaned_data['space_address2']
+            space_zip_code = test_list.cleaned_data['space_zip_code']
+            space_city = test_list.cleaned_data['space_city']
+            space_state = test_list.cleaned_data['space_state']
+            space_country = test_list.cleaned_data['space_country']
+            noise_level_allowed = int(test_list.cleaned_data["space_noise_level_allowed"][0])
+            noise_level = int(test_list.cleaned_data["space_noise_level"][0])
+            wifi = test_list.cleaned_data['space_wifi']
+            restroom = test_list.cleaned_data['space_restrooms']
+            food_drink = test_list.cleaned_data['space_food_drink']
+
+            test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                               space_address1=space_address1, space_address2=space_address2,
+                               space_zip_code=space_zip_code,
+                               space_city=space_city, space_state=space_state, space_country=space_country,
+                               space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
+                               space_wifi=wifi,
+                               space_restrooms=restroom, space_food_drink=food_drink, space_owner=proprietor,
+                               space_open=True)
+
+            # Save the save data into the database
+            test_space.save()
+
+        # now the user should have two spaces to their name we we will extract it using their user id
+        spaces = Space.objects.filter(space_owner=proprietor)
+        self.assertEqual(len(spaces), 2, "The owner was not given two spaces.")
+
+        names = [space.space_name for space in spaces]
+
+        for i in range(2):
+            self.assertTrue('TestName{}'.format(i) in names, "A space is missing from the user's list")
+
+
+# Done by Bishal
+# For space reuse one of the main feature that is not already tested is the conenction between spaces
+# and date so that will be tested. A space will be created and a few times will be added for the feature
+# Then the space id will be used to extract date and time from the date/time model to check if the linking
+# is not broken.
+class SpaceReuseTest(TestCase):
+
+    def test_space_date_time(self):
+        """
+        Testing that dates and spaces can be connected properly in the database.
+        """
+        # setting up the user
+        user = {
+            'username': 'testuser2',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**user)
+        proprietor = User.objects.get(username='testuser2')
+        proprietor.is_proprietor = True
+
+        # now we add two identical spaces for the user
+        default_list_data = {"space_name": 'TestName',
+                             "space_description": 'Rand Description',
+                             "space_max_capacity": 5,
+                             "space_address1": "1234 teststreet ct",
+                             "space_address2": "",
+                             "space_zip_code": "12345",
+                             "space_city": "testcity",
+                             "space_state": "MD",
+                             "space_country": "United States",
+                             "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
+                             "space_noise_level": [Noise_Level_Choices[1][0]],
+                             "space_wifi": True,
+                             "space_restrooms": False,
+                             "space_food_drink": True,
+                             "space_open": True}
+        test_list = CreateSpaceForm(data=default_list_data)
+        test_list.is_valid()
+
+        name = test_list.cleaned_data['space_name']
+        description = test_list.cleaned_data['space_description']
+        max_capacity = test_list.cleaned_data['space_max_capacity']
+        space_address1 = test_list.cleaned_data['space_address1']
+        space_address2 = test_list.cleaned_data['space_address2']
+        space_zip_code = test_list.cleaned_data['space_zip_code']
+        space_city = test_list.cleaned_data['space_city']
+        space_state = test_list.cleaned_data['space_state']
+        space_country = test_list.cleaned_data['space_country']
+        noise_level_allowed = int(test_list.cleaned_data["space_noise_level_allowed"][0])
+        noise_level = int(test_list.cleaned_data["space_noise_level"][0])
+        wifi = test_list.cleaned_data['space_wifi']
+        restroom = test_list.cleaned_data['space_restrooms']
+        food_drink = test_list.cleaned_data['space_food_drink']
+
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2,
+                           space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
+                           space_wifi=wifi,
+                           space_restrooms=restroom, space_food_drink=food_drink, space_owner=proprietor,
+                           space_open=True)
+
+        # Save the save data into the database
+        test_space.save()
+
+        # now add a few dates for the space
+        for i in range(3):
+            # setting up the date data
+            default_date_data = {"date": '11/1{}/2021'.format(i),
+                                 "time_start": '10:30',
+                                 "time_end": '12:30',
+                                 "closed": False}
+            test_date = SpaceTimes(data=default_date_data)
+            test_date.is_valid()
+
+            date = test_date.cleaned_data['date']
+            time_start = test_date.cleaned_data['time_start']
+            time_end = test_date.cleaned_data['time_end']
+            closed = test_date.cleaned_data['closed']
+
+            test_date_m = SpaceDateTime(space_date=date,
+                                        space_start_time=time_start,
+                                        space_end_time=time_end,
+                                        space_dt_closed=closed,
+                                        space_dt_reserved=True,
+                                        space_dt_reserved_by=proprietor.username,
+                                        space_id=test_space)
+
+            # Save the save data into the database
+            test_date_m.save()
+
+        # now the space should have three dates and times to their name we will extract it using the space id
+        dates = SpaceDateTime.objects.filter(space_id=test_space)
+        self.assertEqual(len(dates), 3, "The space was not given 3 date and time.")
+
+        date_list = [date.space_date for date in dates]
+
+        for i in range(3):
+            self.assertTrue('2021-11-1{}'.format(i) in date_list, "A date is missing from the space date time list")
+
+
+# Test By Bishal
+# These are all the test for activating and deactivating spaces
+# We main test that once the status of said space has been changed, if we access the said value through the connection
+# between user and space, the data is not affected.
+class SpaceCloseTest(TestCase):
+
+    def test_space_close(self):
+        """
+        We want to create a space with a closed status and then see if that comes through
+        properly when getting the object from the user that owns the spaces.
+        """
+        # setting up the user
+        user = {
+            'username': 'testuser2',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**user)
+        proprietor = User.objects.get(username='testuser2')
+        proprietor.is_proprietor = True
+
+        # now we add two identical spaces for the user but one set to false
+        for i in range(2):
+            default_list_data = {"space_name": 'TestName',
+                                 "space_description": 'Rand Description',
+                                 "space_max_capacity": 5,
+                                 "space_address1": "1234 teststreet ct",
+                                 "space_address2": "",
+                                 "space_zip_code": "12345",
+                                 "space_city": "testcity",
+                                 "space_state": "MD",
+                                 "space_country": "United States",
+                                 "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
+                                 "space_noise_level": [Noise_Level_Choices[1][0]],
+                                 "space_wifi": True,
+                                 "space_restrooms": False,
+                                 "space_food_drink": True,
+                                 "space_open": True}
+
+            if i != 1:
+                default_list_data["space_open"] = False
+
+            test_list = CreateSpaceForm(data=default_list_data)
+            test_list.is_valid()
+
+            name = test_list.cleaned_data['space_name']
+            description = test_list.cleaned_data['space_description']
+            max_capacity = test_list.cleaned_data['space_max_capacity']
+            space_address1 = test_list.cleaned_data['space_address1']
+            space_address2 = test_list.cleaned_data['space_address2']
+            space_zip_code = test_list.cleaned_data['space_zip_code']
+            space_city = test_list.cleaned_data['space_city']
+            space_state = test_list.cleaned_data['space_state']
+            space_country = test_list.cleaned_data['space_country']
+            noise_level_allowed = int(test_list.cleaned_data["space_noise_level_allowed"][0])
+            noise_level = int(test_list.cleaned_data["space_noise_level"][0])
+            wifi = test_list.cleaned_data['space_wifi']
+            restroom = test_list.cleaned_data['space_restrooms']
+            food_drink = test_list.cleaned_data['space_food_drink']
+            space_open = test_list.cleaned_data['space_open']
+
+            test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                               space_address1=space_address1, space_address2=space_address2,
+                               space_zip_code=space_zip_code,
+                               space_city=space_city, space_state=space_state, space_country=space_country,
+                               space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
+                               space_wifi=wifi,
+                               space_restrooms=restroom, space_food_drink=food_drink, space_owner=proprietor,
+                               space_open=space_open)
+
+            # Save the save data into the database
+            test_space.save()
+
+        # now the user should have two spaces to their name we we will extract it using their user id
+        spaces = Space.objects.filter(space_owner=proprietor)
+        self.assertEqual(len(spaces), 2, "The two spaces were properly saved.")
+
+        spaces = Space.objects.filter(space_owner=proprietor, space_open=True)
+        self.assertEqual(len(spaces), 1, "The open flag ia not working.")
+
+        
+# Tester: Sharlet Claros
+# Tests search input validity, filter selections, and search query validity
+# Queries that are able to pull the correct object (only object in this case) are successful
+class SearchBarTests(TestCase):
+    # Have to set up a space and a date/time for it  - Reusing a lot of the set up in tests for date/time
+    TestCase.default_data_date = {'date': '09/04/2021', 'time_start': '04:15', 'time_end': '05:15'}
+
+    # Going through form use first
+    TestCase.test_form_date = SpaceTimes(data=TestCase.default_data_date)
+    TestCase.test_form_date.is_valid()
+
+    TestCase.default_space_data = {"space_name": 'SpaceSearch',
+                                   "space_description": 'Rand Description',
+                                   "space_max_capacity": 5,
+                                   "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
+                                   "space_noise_level": [Noise_Level_Choices[1][0]],
+                                   "space_wifi": True,
+                                   "space_restrooms": False,
+                                   "space_food_drink": True}
+    TestCase.test_space_form = CreateSpaceForm(data=TestCase.default_space_data)
+    TestCase.test_space_form.is_valid()
+    name = TestCase.test_space_form.cleaned_data['space_name']
+    description = TestCase.test_space_form.cleaned_data['space_description']
+    max_capacity = TestCase.test_space_form.cleaned_data['space_max_capacity']
+    noise_level_allowed = int(TestCase.test_space_form.cleaned_data["space_noise_level_allowed"][0])
+    noise_level = int(TestCase.test_space_form.cleaned_data["space_noise_level"][0])
+    wifi = TestCase.test_space_form.cleaned_data['space_wifi']
+    restroom = TestCase.test_space_form.cleaned_data['space_restrooms']
+    food_drink = TestCase.test_space_form.cleaned_data['space_food_drink']
+
+    # pulls data from form and fills out model fields to save space in table
+    test_space = Space(space_name=name,
+                       space_description=description,
+                       space_max_capacity=max_capacity,
+                       space_noise_level_allowed=noise_level_allowed,
+                       space_noise_level=noise_level,
+                       space_wifi=wifi,
+                       space_restrooms=restroom,
+                       space_food_drink=food_drink)
+
+    test_space.save()
+
+    # now create and save the space data model
+    space_date = TestCase.test_form_date.cleaned_data['date']
+    space_start_time = TestCase.test_form_date.cleaned_data['time_start']
+    space_end_time = TestCase.test_form_date.cleaned_data['time_end']
+    space_id = test_space
+    date_time = SpaceDateTime(space_date=space_date,
+                              space_start_time=space_start_time,
+                              space_end_time=space_end_time,
+                              space_id=space_id)
+    date_time.save()
+
+    # Testing that the query method utilized will work on data contained in tables
+    def QueryCheck(self):
+        # Will try to match the space with the search query
+        spacequery = 'Search'
+        datequery = '09'
+
+        space = Space.objects.filter(Q(space_name__contains=spacequery))
+        dt = SpaceDateTime.objects.filter(Q(space_date__contains=datequery))
+
+        TestCase.assertTrue(spacequery in space.space_name)
+        TestCase.assertTrue(datequery in dt.space_date)
+        # Checking to see that the properties/fields for each are available
+        TestCase.assertEqual("SpaceSearch", space.space_name)
+        TestCase.assertEqual("Rand Description", space.space_description)
+        TestCase.assertEqual(5, space.space_max_capacity)
+        TestCase.assertEqual('09/04/2021', dt.space_date)
 
 
 # Added by Binh

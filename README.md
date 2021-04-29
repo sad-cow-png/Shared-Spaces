@@ -158,3 +158,84 @@ all spaces that have the tag.
 python manage.py test sharedspaces.tests.TaggedSpacesTests
 ```
 
+<br>
+
+#### Reserve Space
+Only clients may access page to reserve a time slot for a space. Each space page
+has a reserve page with two selection boxes. Once the date is selected the time slot for
+that date will show up. Since each date and time slot are from the same object, there will be
+duplicate dates showing up in the reserve date box. Using ajax, once the date is selected, it is used to
+determine the SpaceDateTime object pk to display the time slot through ``load_times`` in views.py.
+String formatting for date and time slot displayed in selection boxes is done in forms.py <br><br>
+Once a client clicks on the reserve button, it sends them back to account page where they can see the spaces
+they have reserved.
+
+##### Reserve space testing:
+Created a simple test for making sure the reservation goes through. Will possibly add more later.
+<br>
+```
+python manage.py test sharedspaces.tests.ReserveFormSeleniumTests
+```
+
+<br>
+
+#### List spaces Background:
+List out the spaces in the user account was mostly already complete but what was needed to be added were a few buttons.
+So, a few buttons were added and with that the ability to edit and add time/date for the space. 
+
+##### List spaces Testing:
+The test mainly checks that the functionality required for the card is working correctly. This involves making sure
+that the space connected to the user can be retrieved easily. The testing for actual front end is not added.
+```
+python manage.py test sharedspaces.tests.ListSpacesTest
+```
+
+<br>
+
+#### Space Reuse Background:
+Reuse consisted of making sure that the space had different times that could be signed up for. This consisted of 
+connecting a lot that had already been completed. Fixing up the buttons done for the card set up in account
+to redirect to the list of dates and time was one of them. It also consisted of making sure new dates could be added
+or deactivated and much more. 
+
+##### Space Reuse Testing:
+The testing mainly consists of making sure that the spaces created can have dates linked to them and that nothing goes
+wrong in the database when they are being connected using the foreign key. 
+```
+python manage.py test sharedspaces.tests.SpaceReuseTest
+```
+
+<br>
+
+#### Deactivate Space Background:
+When we deactivate a space, we change the status of the model to not open and there is a text printed on the card that
+lets the user know that the space is not active. This mainly affects the proprietors account.
+
+##### Deactivate Space Testing:
+The main testing here consisted of making sure that when the space is set to in active, and we access it from a user's
+space it still hold the value that it is closed. This is the main process used to change the status of the space.
+```
+python manage.py test sharedspaces.tests.SpaceCloseTest
+```
+
+<br>
+
+#### Space Address Background:
+Given that each location has to be shown on the map. We need to store their addresses. So, this feature focused on
+implementing that into the space model. This required removing all the old migrations as it would require a default.
+But we want there to be no spaces in the database without dates. So we deleted the database, reset the migrations, and
+will do the same for the Heroku Database. Overall, changed up everywhere the space model was used and fixed up all the
+test for the model, and it's uses.
+
+##### Space Address Testing:
+The main test added was to make sure the address was saved correctly into the database and that the forms were working
+correctly. So I mainly added to the create space tests. I also edited the space close tests, space reuse test, list
+space tests, and space date and time tests.
+```
+./manage.py test sharedspaces.tests.CreateSpaceTests
+./manage.py test sharedspaces.tests.TestSpaceDateTime
+./manage.py test sharedspaces.tests.ListSpacesTest
+./manage.py test sharedspaces.tests.SpaceReuseTest
+./manage.py test sharedspaces.tests.SpaceCloseTest
+```
+

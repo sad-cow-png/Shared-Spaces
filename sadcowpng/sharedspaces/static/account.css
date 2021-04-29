@@ -30,3 +30,12 @@
         color: grey;
         font-size: 20px;
     }
+
+    .badge-success{
+        background-color: darkgreen;
+    }
+
+    .badge-danger{
+        background-color: darkred;
+    }
+
