@@ -161,17 +161,22 @@ def create_space(request):
             restroom = space_form.cleaned_data['space_restrooms']
             food_drink = space_form.cleaned_data['space_food_drink']
             user = request.user
-
+            tags = space_form.cleaned_data['space_tags']
+            
             sp = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
                        space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
                        space_city=space_city, space_state=space_state, space_country=space_country,
                        space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level, space_wifi=wifi,
                        space_restrooms=restroom, space_food_drink=food_drink, space_owner=user, space_open=True)
 
-
             sp.save()
 
             primary_key = sp.pk
+
+            # Get created space key to manually add tags
+            space = Space.objects.get(pk=primary_key)
+            for tag in tags:
+                space.space_tags.add(tag)
 
             # redirecting to date and time page once complete to get at least one data and time
             return HttpResponseRedirect(reverse('space_date_time', args=[primary_key]))
@@ -219,6 +224,20 @@ def update_space(request, space_id):
             old_space.space_restrooms = space_form.cleaned_data['space_restrooms']
             old_space.space_food_drink = space_form.cleaned_data['space_food_drink']
             old_space.space_open = space_form.cleaned_data['space_open']
+
+            tags = space_form.cleaned_data['space_tags']
+
+            # clear all tags
+            old_space.space_tags.clear()
+
+            # add tags, takes care of duplicates
+            for tag in tags:
+                if tag in old_space.space_tags.get_queryset():
+                    pass
+                else:
+                    old_space.space_tags.add(tag)
+
+
             # save the updated object in the database
             old_space.save()
 
@@ -233,6 +252,9 @@ def update_space(request, space_id):
         # the data from the multiple choice field is a string that looks l
         old_space_noise_level_allowed = Noise_Level_Choices[old_space.space_noise_level_allowed - 1]
         old_space_noise_level = Noise_Level_Choices[old_space.space_noise_level - 1]
+
+        # get tags
+        tag_list = old_space.space_tags.get_queryset()
 
         # extracting the old data into a dictionary
         old_data = {"space_name": old_space.space_name,
@@ -250,12 +272,13 @@ def update_space(request, space_id):
                     "space_restrooms": old_space.space_restrooms,
                     "space_food_drink": old_space.space_food_drink,
                     "space_open": old_space.space_open,
+                    "space_tags": tag_list,
                     }
 
         # creating a form with the old data
         space_form = CreateSpaceForm(old_data)
 
-        context = {'form': space_form, "space_id": space_id,
+        context = {'form': space_form, "space_id": space_id, "space": old_space,
                    "name": old_space.space_name}
 
     return render(request, 'sharedspaces/update_space.html', context=context)
@@ -406,4 +429,19 @@ def date_time(request, space_id):
         return HttpResponseRedirect(reverse('account'))
 
     return render(request, 'sharedspaces/date_time.html', context=context)
+
+  
+def tag_spaces(request, slug):
+    """
+    Filters space objects by tag and return
+    to tag page based on tag slug
+    """
+    spaces = Space.objects.filter(space_tags__slug=slug)
+
+    context = {
+        'space_list': spaces,
+        'slug': slug,
+    }
+
+    return render(request, 'sharedspaces/tagged_spaces.html', context=context)
 

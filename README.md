@@ -129,6 +129,34 @@ is completed as that is what will connect all the tables together and have a wor
 ```
 python manage.py test sharedspaces.tests.TestSpaceDateTime
 ```
+<br>
+
+#### Tagging Spaces Background:
+Proprietors can tag their spaces by one or however many long words/phrases
+separated by commas on create space and update space forms. Tags can be added and removed in
+any order, thanks to django-taggit. Tags are first cleared, then added back in 
+with duplicate checking in update_space. In create_space, tags are manually added
+after the space has been saved. 
+
+##### Create space tagging tests
+Tested adding tags and not adding tags as it is not required.
+```
+python manage.py test sharedspaces.tests.CreateSpaceTagTests
+```
+##### Update space tagging tests
+Tested adding, removing one tag, removing all tags and making sure
+tags appear on user account page.
+```
+python manage.py test sharedspaces.tests.UpdateSpaceTagTests
+```
+
+##### Tagged Spaces
+Users can click on badges for each tag to go to its page which displays
+all spaces that have the tag. 
+##### Tagged spaces tests
+```
+python manage.py test sharedspaces.tests.TaggedSpacesTests
+```
 
 <br>
 

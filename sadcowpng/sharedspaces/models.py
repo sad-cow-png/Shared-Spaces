@@ -93,7 +93,6 @@ class Space(models.Model):
                                                  self.space_state, self.space_zip_code, self.space_country)
         return address
 
-
 class SpaceDateTime(models.Model):
     # Switch to char if this does not work
     space_date = models.CharField(max_length=100, default='EMPTY')

@@ -1,0 +1,44 @@
+{% extends 'sharedspaces/account_header.html' %}
+{% load static %}
+
+{% block title %}
+<title>Spaces tagged with '{{ slug }}'</title>
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'account.css' %}">
+{% endblock %}
+
+{% block content %}
+    <body>
+
+       <h2>
+           Tag: {{ slug}}
+           {% if space_list.count > 1 %}
+                <span>{{ space_list.count }} listings found</span>
+           {% else %}
+                <span>{{ space_list.count }} listing found</span>
+           {% endif %}
+       </h2>
+
+         <div class="row">
+                {% for space in space_list %}
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ space.space_name }}</h5>
+                                <p class="card-text">{{ space.space_description }}</p>
+                                {% for tag in space.space_tags.all %}
+                                    <button type="button" class="badge rounded-pill"
+                                       onclick="window.location.href='{% url 'tagged_spaces' tag %}'">{{ tag }}</button>
+                                {% endfor %}
+                                <br/><br/>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+    </body>
+
+{% endblock %}
+

@@ -18,4 +18,5 @@ urlpatterns = [
     path('reserve/<space_id>', views.reserve_space, name='reserve_space'),
     path('load_times/', views.load_times, name='load_times'),
     path('date_time/<space_id>', views.date_time, name='date_time'),
+    path('tag/<slug>', views.tag_spaces, name='tagged_spaces'),
 ]
