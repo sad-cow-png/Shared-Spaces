@@ -14,7 +14,11 @@
                 <title>Shared Spaces</title>
             {% endblock %}
             <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-            {% if val = 'all' %}
+            <!-- do this script thing to include the different file (like a library)
+            too lazy to figure out how to properly do it nicely -->
+            <script type = "text/javascript" src= "{% static 'javascript/mapsFunction.js' %}">
+            </script>
+            {% if val == 'all' %}
             {{spaces_data|json_script:"spaces_data"}}
                 <script type = "text/javascript" src= "{% static 'javascript/mapsFunction.js' %}">
                 // remember when jimmy had some nice code here to use the map?
