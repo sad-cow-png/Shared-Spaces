@@ -1,9 +1,8 @@
 // whoa momma, a js file for my stuff!
 
 // create some variables!
-let map;
-let infoWindow1, infoWindow2;
-let my_counter = 0;
+
+
 const umbcLatLng = {lat: 39.254, lng: -76.711};
 const mapOptions = {
     // we can edit this to change map options that
@@ -32,7 +31,7 @@ function initMap() {
         position : umbcLatLng, // use this as default position
         map:map,
     });  // this will be a test window
-
+    //numObjs = 0;
     const moveToCurrentLocation = document.createElement("button");
     moveToCurrentLocation.textContent = "Move to Current Location";
     moveToCurrentLocation.classList.add("custom-map-control-button");
@@ -50,22 +49,25 @@ function initMap() {
                     };
                     infoWindow1.setPosition(pos);
                     infoWindow1.setContent("Location found.");
-                    infoWindow.open(map);
+                    infoWindow1.open(map);
                     map.setCenter(pos);
                 },
                 () => {
-                    handleLocationError(true, infoWindow, map.getCenter());
+                    handleLocationError(true, infoWindow1, map.getCenter());
                 }
             );
         } else {
             // Browser doesn't support Geolocation
-            handleLocationError(false, infoWindow, map.getCenter());
+            handleLocationError(false, infoWindow1, map.getCenter());
         }
     });
 
+    // We have a button that centers you on your location
+    // we should now try to loop through out data
 
 
-
+/* Comment graveyard here, if you want you can let the map's clicks spawn markers
+that don't do anything
     // Enables users to place markers on the map.
     // addListener event just lets us listen for a "click" event
     // we will use addListener to the markers as well
@@ -88,6 +90,8 @@ function initMap() {
             my_counter = my_counter+1;
         })
     });
+
+ */
 
     // TODO: When it is determined how the Space model will contain its location, you
     //       can then loop over those locations in the SQL database and add them as
@@ -128,6 +132,17 @@ function initMap() {
 
 
 
+
+
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+  infoWindow.setPosition(pos);
+  infoWindow.setContent(
+    browserHasGeolocation
+      ? "Error: The Geolocation service failed."
+      : "Error: Your browser doesn't support geolocation."
+  );
+  infoWindow.open(map);
+}
 // If google.maps.InfoWindows are decided to be used to display space information, additional wrapper
 // functions similar to the one above will need to be placed here.
 

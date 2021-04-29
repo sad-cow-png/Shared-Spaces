@@ -16,30 +16,79 @@
             <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
             <!-- do this script thing to include the different file (like a library)
             too lazy to figure out how to properly do it nicely -->
+            <script type = "text/javascript">
+                // declare some global variables (gasp!)
+                // javascript scope is beyond stupid, this is the way it's gotta be
+                var map;
+                var infoWindow1, infoWindow2; // these are useful in the seperate js file
+                var data;
+                var numObjs;
+                data = [];
+                numObjs = 0;
+
+                function space_good(obj) {
+                    if (typeof obj.spc_desc != 'string') {
+                        return false;
+                    }
+                    if (typeof  obj.spc_name != 'string') {
+                        return false;
+                    }
+                    // check validity of address when it gets here
+                    return true;
+                }
+
+            </script>
             <script type = "text/javascript" src= "{% static 'javascript/mapsFunction.js' %}">
-                // couple of global variables is all
-                let data = [];
-                let numObjs = 0;
-                let spc_name, spc_desc, spc_addr1, spc_addr2, spc_zip, spc_city, scp_state, spc_country;
             </script>
             {% if val == 'all' %}
                 {% for allqs in all %}
-                <script type = "text/javascript" src= "{% static 'javascript/mapsFunction.js' %}">
+                <script>
                 // Here, I want to add to the data list
                 // pretty straight forward, we create a couple of strings out of
                 // the information that we have
                 // and we do |escapejs... to prevent some jackass from
                 // running code on our site
-                var myObj = {
+                const myObj = {
                     "spc_desc":"{{allqs.space_description|escapejs|safe}}",
                     "spc_name": "{{allqs.space_name|escapejs|safe}}",
                     // later we will need to add address information, I won't bother rn
+                    // after looking it up, we need to do quite a bit of work (potentially) on
+                    // the address before we send it to google's geolocation
                 };
-                data.push(myObj);
-                // now we jave a json object myObj, let's add it to the data, which we pushed back
+                if (space_good(myObj)) {
+                    data.push(myObj);
+                    numObjs = numObjs + 1;
+                }
+                // now we have a json object myObj, let's add it to the data, which we pushed back
                 </script>
             {% endfor %}
             {% endif %}
+
+            {% if val == 'space' %}
+                {% for spaces in space %}
+                <script>
+                // Here, I want to add to the data list
+                // pretty straight forward, we create a couple of strings out of
+                // the information that we have
+                // and we do |escapejs... to prevent some jackass from
+                // running code on our site
+                const myObj = {
+                    "spc_desc":"{{spaces.space_description|escapejs|safe}}",
+                    "spc_name": "{{spaces.space_name|escapejs|safe}}",
+                    // later we will need to add address information, I won't bother rn
+                    // after looking it up, we need to do quite a bit of work (potentially) on
+                    // the address before we send it to google's geolocation
+                };
+                // check "goodness" of myObj
+                if (space_good(myObj)) {
+                    data.push(myObj);
+                    numObjs = numObjs + 1;
+                }
+                </script>
+            {% endfor %}
+            {% endif %}
+
+
         </head>
         <body>
             <div class = "search_bar">
@@ -65,12 +114,23 @@
                     <input class="space_submit_button" type="reset" value="Clear">
                 </form>
             </div>
-            <div id="counterDebug">
-                hello
-            </div>
-            <script>
-                document.getElementById("counterDebug").innerText = "There were " + numObjs + " spaces found!";
+            <script >
+                function setTxt () {
+                    //document.getElementById("counterDebug").innerHTML = "Paragraph Changed!";
+                    if (typeof numObjs != "number") {
+                        document.getElementById("counterDebug").innerText = "Not a number!";
+                    }
+                    else if (numObjs != 0) {
+                    document.getElementById("counterDebug").innerHTML = 'There were ' + numObjs + ' spaces found!';
+                    } else {
+                    document.getElementById("counterDebug").innerText = 'No objects found';
+                    }
+                }
             </script>
+            <div id="counterDebug" onclick="setTxt()">
+                Click me!
+            </div>
+
             <!-- Google Maps API makes a callback to initMap(). Moving JavaScript to an external file is ideal, but
                  there have been issues with Google Maps being unable to find the initMap() function outside of this
                  file due to weird JavaScript scope and closure fun. -->
