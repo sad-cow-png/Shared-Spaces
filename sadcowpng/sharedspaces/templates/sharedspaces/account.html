@@ -27,7 +27,8 @@
                                 <h5 class="card-title">{{ spaces.space_name }}</h5>
                                 <p class="card-text">{{ spaces.space_description }}</p>
                                 {% for tag in spaces.space_tags.all %}
-                                    <button type="button" class="badge rounded-pill">{{ tag }}</button>
+                                    <button type="button" class="badge rounded-pill"
+                                            onclick="window.location.href='{% url 'tagged_spaces' tag %}'">{{ tag }}</button>
                                 {% endfor %}
                                 <br/><br/>
                                 <a href="{% url 'update_space' spaces.id %}" class="btn btn-primary">Update Space</a>

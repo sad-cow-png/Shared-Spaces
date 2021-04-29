@@ -1268,3 +1268,71 @@ class UpdateSpaceTagTests(TestCase):
         self.assertNotEqual(space.space_tags.get_queryset().count(), old_tags)
         self.assertEqual(space.space_tags.get_queryset().count(), 0)
 
+
+# Added by Binh
+# Tests for correct spaces being displayed when searching by tags
+class TaggedSpacesTests(TestCase):
+    # Taken from CreateSpaceTests
+    TestCase.space_one = {"space_name": 'TestName',
+                          "space_description": 'Rand Description',
+                          "space_max_capacity": 23,
+                          "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
+                          "space_noise_level": [Noise_Level_Choices[1][0]],
+                          "space_wifi": True,
+                          "space_restrooms": False,
+                          "space_food_drink": True,
+                          "space_open": True,
+                          "space_tags": 'cafe,warm,quiet',
+                          }
+
+    TestCase.space_two = {"space_name": 'Test Space',
+                          "space_description": 'Rand Description',
+                          "space_max_capacity": 20,
+                          "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
+                          "space_noise_level": [Noise_Level_Choices[1][0]],
+                          "space_wifi": True,
+                          "space_restrooms": False,
+                          "space_food_drink": True,
+                          "space_open": True,
+                          "space_tags": 'cafe,popup',
+                          }
+
+    def setUp(self):
+        self.user = {
+            'username': 'testuser',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**self.user)
+        self.proprietor = User.objects.get(username='testuser')
+        self.proprietor.is_proprietor = True
+
+        self.client.login(username='testuser', password='#zgsXJLY5jRb35j')
+        response = self.client.post('/create_space/', TestCase.space_one, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post('/create_space/', TestCase.space_two, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_tagged_spaces_template(self):
+        response = self.client.get('/tag/cafe')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'sharedspaces/tagged_spaces.html')
+
+    def test_tagged_spaces_listings(self):
+        # 'cafe' tag should display both space listings
+        response = self.client.get('/tag/cafe')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, TestCase.space_one['space_name'])
+        self.assertContains(response, TestCase.space_two['space_name'])
+
+        # 'warm' tag should display only space one
+        response = self.client.get('/tag/warm')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, TestCase.space_one['space_name'])
+        self.assertNotContains(response, TestCase.space_two['space_name'])
+
+        # 'popup' tag should display only space two
+        response = self.client.get('/tag/popup')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, TestCase.space_two['space_name'])
+        self.assertNotContains(response, TestCase.space_one['space_name'])

@@ -25,3 +25,8 @@
     .badge {
         background-color: #F4976C;
     }
+
+    span {
+        color: grey;
+        font-size: 20px;
+    }

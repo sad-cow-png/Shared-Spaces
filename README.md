@@ -150,3 +150,11 @@ tags appear on user account page.
 python manage.py test sharedspaces.tests.UpdateSpaceTagTests
 ```
 
+##### Tagged Spaces
+Users can click on badges for each tag to go to its page which displays
+all spaces that have the tag. 
+##### Tagged spaces tests
+```
+python manage.py test sharedspaces.tests.TaggedSpacesTests
+```
+

@@ -5,7 +5,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from taggit.models import Tag
 
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
 from .models import Space, User, SpaceDateTime
@@ -285,3 +284,19 @@ def update_space_date_time(request, data_time_id):
                    "id": data_time_id}
 
     return render(request, 'sharedspaces/update_space_date_time.html', context=context)
+
+
+def tag_spaces(request, slug):
+    """
+    Filters space objects by tag and return
+    to tag page based on tag slug
+    """
+    spaces = Space.objects.filter(space_tags__slug=slug)
+
+    context = {
+        'space_list': spaces,
+        'slug': slug,
+    }
+
+    return render(request, 'sharedspaces/tagged_spaces.html', context=context)
+
