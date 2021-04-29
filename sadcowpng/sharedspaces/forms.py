@@ -4,7 +4,6 @@ from django.db.models import Value, F
 from django.db.models.functions import Concat
 from django.forms import RadioSelect
 from taggit.forms import TagField, TagWidget
-from taggit.managers import TaggableManager
 
 from .models import User, SpaceDateTime
 
@@ -36,7 +35,8 @@ class CreateSpaceForm(forms.Form):
     space_restrooms = forms.BooleanField(label='Restroom Availability:', required=False)
     space_food_drink = forms.BooleanField(label='Food or Drink Availability:', required=False)
     space_open = forms.BooleanField(label='Is the Location Open?', required=False)
-    space_tags = TagField(required=False, help_text='Use a comma to separate tags.')
+    space_tags = TagField(help_text='Use a comma to separate tags.', widget=TagWidget(), required=False)
+
 
 
 # Used for proprietor sign up view

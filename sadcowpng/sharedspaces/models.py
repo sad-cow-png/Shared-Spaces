@@ -38,6 +38,7 @@ class Space(models.Model):
     space_food_drink = models.BooleanField()
     space_open = models.BooleanField(default=True)
     space_owner = models.ForeignKey('User', on_delete=models.CASCADE, default=None, null=True)
+    space_tags = TaggableManager(blank=True)
 
     # string methods for each of the different model fields
     def name_str(self):
@@ -92,7 +93,6 @@ class Space(models.Model):
             address = "{}, {}, {} {}, {}".format(self.space_address1, self.space_city,
                                                  self.space_state, self.space_zip_code, self.space_country)
         return address
-
 
 class SpaceDateTime(models.Model):
     # Switch to char if this does not work
