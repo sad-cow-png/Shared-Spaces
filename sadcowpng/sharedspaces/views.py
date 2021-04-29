@@ -28,41 +28,55 @@ def index(request):
         # The all search will comb through each model for a match case for the search query
         # Inter model searches will have chained results
         if ufilter == 'all':
-            context = {
-                'val': ufilter,
-                'all': allq
-            }
             # new stuff here
             if submit_type == 'newPage':
-                # this submit type goes to sharlet (? was it her or someone else)
-                # original new page, with all the fancy details
+                # this submit type goes to original new page, with all the fancy details
+                context = {
+                    'val': ufilter,
+                    'all': allq
+                }
                 return render(request, 'sharedspaces/search_results.html', context=context)
             if submit_type == 'markers':
                 # this submit type goes back to the map page
-                # but now we should have stuff in context
+                # but now we should have cool stuff in context
+                context = {
+                    'val': ufilter,
+                    'all': allq,
+                    'maps_api_key': settings.GOOGLE_MAPS_API_KEY,
+                }
                 return render(request, 'sharedspaces/index.html', context=context)
         if ufilter == 'space':
-            context = {
-                'val': ufilter,
-                'space': space
-            }
             # new stuff here
             if submit_type == 'newPage':
                 # original new page, with all the fancy details
+                context = {
+                    'val': ufilter,
+                    'space': space
+                }
                 return render(request, 'sharedspaces/search_results.html', context=context)
             if submit_type == 'markers':
+                context = {
+                    'val': ufilter,
+                    'space': space,
+                    'maps_api_key': settings.GOOGLE_MAPS_API_KEY,
+                }
                 # this submit type goes back to the map page
                 return render(request, 'sharedspaces/index.html', context=context)
         if ufilter == 'date':
-            context = {
-                'val': ufilter,
-                'date': date
-            }
             # new stuff here
             if submit_type == 'newPage':
+                context = {
+                    'val': ufilter,
+                    'date': date
+                }
                 # original new page, with all the fancy details
                 return render(request, 'sharedspaces/search_results.html', context=context)
             if submit_type == 'markers':
+                context = {
+                    'val': ufilter,
+                    'date': date,
+                    'maps_api_key': settings.GOOGLE_MAPS_API_KEY,
+                }
                 # this submit type goes back to the map page
                 return render(request, 'sharedspaces/index.html', context=context)
     else:
