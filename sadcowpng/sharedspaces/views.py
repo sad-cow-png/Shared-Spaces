@@ -20,6 +20,8 @@ def index(request):
     if request.method == 'POST':
         q = request.POST.get('query')
         ufilter = request.POST.get('filters')
+        # submit type lets us change the redirect
+        submit_type = request.POST.get('submit_style') # new
         space = Space.objects.filter(Q(space_name__contains=q) | Q(space_description__contains=q))
         date = SpaceDateTime.objects.filter(Q(space_date__contains=q))
         allq = chain(space, date)
@@ -30,19 +32,39 @@ def index(request):
                 'val': ufilter,
                 'all': allq
             }
-            return render(request, 'sharedspaces/search_results.html', context=context)
+            # new stuff here
+            if submit_type == 'newPage':
+                # this submit type goes to sharlet (? was it her or someone else)
+                # original new page, with all the fancy details
+                return render(request, 'sharedspaces/search_results.html', context=context)
+            if submit_type == 'markers':
+                # this submit type goes back to the map page
+                # but now we should have stuff in context
+                return render(request, 'sharedspaces/index.html', context=context)
         if ufilter == 'space':
             context = {
                 'val': ufilter,
                 'space': space
             }
-            return render(request, 'sharedspaces/search_results.html', context=context)
+            # new stuff here
+            if submit_type == 'newPage':
+                # original new page, with all the fancy details
+                return render(request, 'sharedspaces/search_results.html', context=context)
+            if submit_type == 'markers':
+                # this submit type goes back to the map page
+                return render(request, 'sharedspaces/index.html', context=context)
         if ufilter == 'date':
             context = {
                 'val': ufilter,
                 'date': date
             }
-            return render(request, 'sharedspaces/search_results.html', context=context)
+            # new stuff here
+            if submit_type == 'newPage':
+                # original new page, with all the fancy details
+                return render(request, 'sharedspaces/search_results.html', context=context)
+            if submit_type == 'markers':
+                # this submit type goes back to the map page
+                return render(request, 'sharedspaces/index.html', context=context)
     else:
         context = {
             'maps_api_key': settings.GOOGLE_MAPS_API_KEY

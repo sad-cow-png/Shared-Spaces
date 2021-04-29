@@ -91,6 +91,12 @@ function initMap() {
     //       Using a google.maps.InfoWindow for each of these markers is likely the
     //       most efficient way to display the Space information when a user clicks
     //       on a space.
+
+    // First, let's define a function that will tell us how many markers we should
+    // expect to place on the map
+    // We grab every object with some given tags
+
+
 }
 
 

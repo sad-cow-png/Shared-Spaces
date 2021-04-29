@@ -14,10 +14,10 @@
                 <title>Shared Spaces</title>
             {% endblock %}
             <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-            <script type = "text/javascript" src= "../../static/mapsFunction.js">
-                // remeber when jimmy had some nice code here to use the map?
+            <script type = "text/javascript" src= "{% static 'javascript/mapsFunction.js' %}">
+                // remember when jimmy had some nice code here to use the map?
                 // moved it to a file called "mapsFunction.js"
-                // over in the static folder (where all the .css)
+                // over in the static/javascript folder
             </script>
         </head>
         <body>
@@ -29,6 +29,16 @@
                         <option value="all">All</option>
                         <option value="space">Space</option>
                         <option value="date">Date</option>
+                    </select>
+                    <!-- I want to hijack the same searchbar you wrote
+                    because I need to do the same thing you did to get
+                    a list of spaces
+                    But I also want a way to let the user decide if
+                    they want the spaces in great detail
+                    or just the map -->
+                    <select name="submit_style" id="submit_style">
+                        <option value="newPage">Show Me Details</option>
+                        <option value="markers">Show Me Markers</option>
                     </select>
                     <input class="space_submit_button" type="submit" value="Search">
                     <input class="space_submit_button" type="reset" value="Clear">
