@@ -17,16 +17,28 @@
             <!-- do this script thing to include the different file (like a library)
             too lazy to figure out how to properly do it nicely -->
             <script type = "text/javascript" src= "{% static 'javascript/mapsFunction.js' %}">
+                // couple of global variables is all
+                let data = [];
+                let numObjs = 0;
+                let spc_name, spc_desc, spc_addr1, spc_addr2, spc_zip, spc_city, scp_state, spc_country;
             </script>
             {% if val == 'all' %}
-            {{spaces_data|json_script:"spaces_data"}}
+                {% for allqs in all %}
                 <script type = "text/javascript" src= "{% static 'javascript/mapsFunction.js' %}">
-                // remember when jimmy had some nice code here to use the map?
-                // moved it to a file called "mapsFunction.js"
-                // over in the static/javascript folder
-                // Here, I want to add to the myQuery list
-                const data = JSON.parse(document.getElementById('spaces_data').textContent);
+                // Here, I want to add to the data list
+                // pretty straight forward, we create a couple of strings out of
+                // the information that we have
+                // and we do |escapejs... to prevent some jackass from
+                // running code on our site
+                var myObj = {
+                    "spc_desc":"{{allqs.space_description|escapejs|safe}}",
+                    "spc_name": "{{allqs.space_name|escapejs|safe}}",
+                    // later we will need to add address information, I won't bother rn
+                };
+                data.push(myObj);
+                // now we jave a json object myObj, let's add it to the data, which we pushed back
                 </script>
+            {% endfor %}
             {% endif %}
         </head>
         <body>
@@ -53,6 +65,11 @@
                     <input class="space_submit_button" type="reset" value="Clear">
                 </form>
             </div>
+            <div id="counterDebug">
+            </div>
+            <script>
+                document.getElementById("counterDebug").innerText = "There were " + numObjs + " spaces found!";
+            </script>
             <!-- Google Maps API makes a callback to initMap(). Moving JavaScript to an external file is ideal, but
                  there have been issues with Google Maps being unable to find the initMap() function outside of this
                  file due to weird JavaScript scope and closure fun. -->

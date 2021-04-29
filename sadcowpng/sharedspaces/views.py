@@ -320,7 +320,7 @@ def update_space(request, space_id):
     return render(request, 'sharedspaces/update_space.html', context=context)
 
 
-@user_is_space_owner
+#@user_is_space_owner
 def space_date_time(request, space_id):
     """
     Used to create the data and time for a specific space
