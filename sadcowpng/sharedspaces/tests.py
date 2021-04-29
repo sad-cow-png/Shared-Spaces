@@ -2,13 +2,12 @@ from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
-from webdriver_manager.chrome import ChromeDriver, ChromeDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
 from django.test import TestCase
 from django.urls import reverse
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes
 from .models import Space, User, SpaceDateTime
 import datetime
-
 
 
 # Testing for the client signup
@@ -107,7 +106,7 @@ class ClientSignUpTest(TestCase):
         self.assertEqual(user.is_proprietor, False)
         self.assertRedirects(response, '/')
 
-      
+
 # Test proprietor signup with invalid and valid users
 class ProprietorSignUpTest(TestCase):
     def setUp(self):
@@ -721,6 +720,7 @@ class TestSpaceDateTime(TestCase):
                          'Space foreign key is working properly.')
         # end ##########################################################################################################
 
+
 # Creates client/proprietor users
 # Can be used to create new users, reusable
 # Run this before running decorator tests, if test users in
@@ -1062,4 +1062,209 @@ class PageTemplateTests(TestCase):
 
         response = self.client.get('/logout/')
         self.assertContains(response, 'navbar-brand')
+
+
+# Added by Binh
+# Tests adding tags in create_space form
+class CreateSpaceTagTests(TestCase):
+    def setUp(self):
+        self.user = {
+            'username': 'testuser',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**self.user)
+        self.proprietor = User.objects.get(username='testuser')
+        self.proprietor.is_proprietor = True
+
+    def test_form_tag_field(self):
+        self.client.login(username='testuser', password='#zgsXJLY5jRb35j')
+        response = self.client.get('/create_space/')
+        self.assertContains(response, 'space_tags')
+
+    def test_tags_not_required(self):
+        # Taken from CreateSpaceTests
+        default_data = {"space_name": 'TestName',
+                        "space_description": 'Rand Description',
+                        "space_max_capacity": 23,
+                        "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
+                        "space_noise_level": [Noise_Level_Choices[1][0]],
+                        "space_wifi": True,
+                        "space_restrooms": False,
+                        "space_food_drink": True,
+                        "space_open": True}
+        test_form = CreateSpaceForm(data=default_data)
+        self.assertTrue(test_form.is_valid())
+
+    def test_create_space_form_with_tags(self):
+        # Taken from CreateSpaceTests
+        default_data = {"space_name": 'TestName',
+                        "space_description": 'Rand Description',
+                        "space_max_capacity": 23,
+                        "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
+                        "space_noise_level": [Noise_Level_Choices[1][0]],
+                        "space_wifi": True,
+                        "space_restrooms": False,
+                        "space_food_drink": True,
+                        "space_open": True,
+                        "space_tags": 'lighting, spacious',
+                        }
+        test_form = CreateSpaceForm(data=default_data)
+        self.assertTrue(test_form.is_valid())
+
+    def test_validate_tags_create_space(self):
+        # Taken from CreateSpaceTests
+        default_data = {"space_name": 'TestName',
+                        "space_description": 'Rand Description',
+                        "space_max_capacity": 23,
+                        "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
+                        "space_noise_level": [Noise_Level_Choices[1][0]],
+                        "space_wifi": True,
+                        "space_restrooms": False,
+                        "space_food_drink": True,
+                        "space_open": True,
+                        "space_tags": 'cafe,warm',
+                        }
+
+        # submit form with tags
+        self.client.login(username='testuser', password='#zgsXJLY5jRb35j')
+        response = self.client.post('/create_space/', default_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(1, Space.objects.count())
+
+        # check if tags were added, !=0
+        space = Space.objects.get(space_name=default_data['space_name'])
+        self.assertNotEqual(space.space_tags.get_queryset().count(), 0)
+
+        # check tags are correct, django-taggit has documents on parsing tags
+        # but checking in case
+        tag_list = space.space_tags.get_queryset()
+        tag_str = 'cafe,warm'
+        tag_names = tag_str.split(',')
+
+        for i in range(tag_list.count()):
+            self.assertEqual(tag_list[i].name, tag_names[i])
+
+
+# Added by Binh
+# Tests updating tags on update_space form, such as removing and adding tags
+class UpdateSpaceTagTests(TestCase):
+    # Taken from CreateSpaceTests
+    TestCase.default_data = {"space_name": 'TestName',
+                             "space_description": 'Rand Description',
+                             "space_max_capacity": 23,
+                             "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
+                             "space_noise_level": [Noise_Level_Choices[1][0]],
+                             "space_wifi": True,
+                             "space_restrooms": False,
+                             "space_food_drink": True,
+                             "space_open": True,
+                             "space_tags": 'cafe,warm,quiet',
+                             }
+
+    def setUp(self):
+        self.user = {
+            'username': 'testuser',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**self.user)
+        self.proprietor = User.objects.get(username='testuser')
+        self.proprietor.is_proprietor = True
+
+        self.client.login(username='testuser', password='#zgsXJLY5jRb35j')
+        response = self.client.post('/create_space/', TestCase.default_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_update_space_tags_appear(self):
+        response = self.client.get('/update_space/1')
+        self.assertEqual(response.status_code, 200)
+
+        # make sure its the correct space page
+        self.assertContains(response, 'TestName')
+
+        # tags appear, comma separated and spaced
+        # Note: tags appear in different order on front end, cannot
+        # string them all in one string for assertContains
+        self.assertContains(response, 'cafe')
+        self.assertContains(response, 'warm')
+        self.assertContains(response, 'quiet')
+
+    def test_add_new_tag(self):
+        default_data = {"space_name": 'TestName',
+                        "space_description": 'Rand Description',
+                        "space_max_capacity": 23,
+                        "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
+                        "space_noise_level": [Noise_Level_Choices[1][0]],
+                        "space_wifi": True,
+                        "space_restrooms": False,
+                        "space_food_drink": True,
+                        "space_open": True,
+                        "space_tags": 'cafe,warm,quiet,bright',
+                        }
+
+        # get number of tags before adding new tags
+        sp = Space.objects.get(space_name=default_data['space_name'])
+        tag_count = sp.space_tags.get_queryset().count()
+
+        response = self.client.post('/update_space/1', default_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        # sum of tags should be tag_count + 1 after adding new tag
+        space = Space.objects.get(space_name=default_data['space_name'])
+        self.assertEqual(space.space_tags.get_queryset().count(), tag_count + 1)
+
+    def test_remove_tag(self):
+        default_data = {"space_name": 'TestName',
+                        "space_description": 'Rand Description',
+                        "space_max_capacity": 23,
+                        "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
+                        "space_noise_level": [Noise_Level_Choices[1][0]],
+                        "space_wifi": True,
+                        "space_restrooms": False,
+                        "space_food_drink": True,
+                        "space_open": True,
+                        "space_tags": 'cafe,warm',
+                        }
+
+        # get number of tags before removing a tag
+        sp = Space.objects.get(space_name=default_data['space_name'])
+        old_tags = sp.space_tags.get_queryset()
+        old_tag_count = old_tags.count()
+
+        response = self.client.post('/update_space/1', default_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        # sum of tags should be tag_count - 1 after removing tag
+        space = Space.objects.get(space_name=default_data['space_name'])
+        self.assertEqual(space.space_tags.get_queryset().count(), old_tag_count - 1)
+        new_tags = space.space_tags.get_queryset()
+
+        # compare tags
+        for i in range(new_tags.count()):
+            self.assertEqual(old_tags[i], new_tags[i])
+
+    def test_remove_all_tags(self):
+        default_data = {"space_name": 'TestName',
+                        "space_description": 'Rand Description',
+                        "space_max_capacity": 23,
+                        "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
+                        "space_noise_level": [Noise_Level_Choices[1][0]],
+                        "space_wifi": True,
+                        "space_restrooms": False,
+                        "space_food_drink": True,
+                        "space_open": True,
+                        "space_tags": '',
+                        }
+
+        # get number of tags before removing all
+        sp = Space.objects.get(space_name=default_data['space_name'])
+        old_tags = sp.space_tags.get_queryset().count()
+
+        response = self.client.post('/update_space/1', default_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        # should be 0
+        space = Space.objects.get(space_name=default_data['space_name'])
+        self.assertNotEqual(space.space_tags.get_queryset().count(), old_tags)
+        self.assertEqual(space.space_tags.get_queryset().count(), 0)
 
