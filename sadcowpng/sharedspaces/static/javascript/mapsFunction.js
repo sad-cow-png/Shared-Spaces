@@ -48,20 +48,21 @@ function initMap() {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude,
                     };
-                    //infoWindow1.setPosition(pos);
-                    //infoWindow1.setContent("Location found.");
-                    //infoWindow.open(map);
+                    infoWindow1.setPosition(pos);
+                    infoWindow1.setContent("Location found.");
+                    infoWindow.open(map);
                     map.setCenter(pos);
                 },
                 () => {
-                    //handleLocationError(true, infoWindow, map.getCenter());
+                    handleLocationError(true, infoWindow, map.getCenter());
                 }
             );
         } else {
             // Browser doesn't support Geolocation
-            //handleLocationError(false, infoWindow, map.getCenter());
+            handleLocationError(false, infoWindow, map.getCenter());
         }
     });
+
 
 
 
