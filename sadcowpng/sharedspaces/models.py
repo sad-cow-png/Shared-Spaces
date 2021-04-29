@@ -38,6 +38,7 @@ class Space(models.Model):
     space_food_drink = models.BooleanField()
     space_open = models.BooleanField(default=True)
     space_owner = models.ForeignKey('User', on_delete=models.CASCADE, default=None, null=True)
+    space_tags = TaggableManager(blank=True)
 
     # string methods for each of the different model fields
     def name_str(self):
