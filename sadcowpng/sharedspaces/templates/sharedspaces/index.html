@@ -14,11 +14,16 @@
                 <title>Shared Spaces</title>
             {% endblock %}
             <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-            <script type = "text/javascript" src= "{% static 'javascript/mapsFunction.js' %}">
+            {% if val = 'all' %}
+            {{spaces_data|json_script:"spaces_data"}}
+                <script type = "text/javascript" src= "{% static 'javascript/mapsFunction.js' %}">
                 // remember when jimmy had some nice code here to use the map?
                 // moved it to a file called "mapsFunction.js"
                 // over in the static/javascript folder
-            </script>
+                // Here, I want to add to the myQuery list
+                const data = JSON.parse(document.getElementById('spaces_data').textContent);
+                </script>
+            {% endif %}
         </head>
         <body>
             <div class = "search_bar">

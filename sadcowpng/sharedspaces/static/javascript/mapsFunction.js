@@ -3,6 +3,7 @@
 // create some variables!
 let map;
 let infoWindow1, infoWindow2;
+let my_counter = 0;
 const umbcLatLng = {lat: 39.254, lng: -76.711};
 const mapOptions = {
     // we can edit this to change map options that
@@ -81,7 +82,9 @@ function initMap() {
             // this function is new, and is only called when
             // the marker we created with a click is clicked again
             // here I want to move the info window to open on the marker
+            temp_marker_listener(my_counter);
             infoWindow2.open(map, marker);
+            my_counter = my_counter+1;
         })
     });
 
@@ -92,10 +95,33 @@ function initMap() {
     //       most efficient way to display the Space information when a user clicks
     //       on a space.
 
-    // First, let's define a function that will tell us how many markers we should
-    // expect to place on the map
-    // We grab every object with some given tags
+    function temp_marker_listener (counter) {
+        if (typeof data != 'object') {
+            infoWindow2.content = "There was a problem with the data";
+        }
+        if (typeof counter == 'number') {
+            // so we have a number, and probably an array
+            // lets print it out
+            if (counter < data.length) {
+                infoWindow2.content = make_html_content_from_array_element([counter])
+            }
+        }
+    }
 
+    function make_html_content_from_array_element (element) {
+        // this takes the element (which should be just a space)
+        // and makes a nice little html to shove in the infoWindow
+        // elements are spaces, so they should have our
+        //space_name and space_description
+        // also, it is ugly, just let it be that way
+        return "<div id=\"content\">" +
+            "<div id=\"siteNotice\"></div>" +
+            "<h1 id=\"firstHeading\" class=\"firstHeading\">"
+        + element.space_name + "</h1>" + "<div id=\"bodyContent\">\n" +
+            "    <p>" + element.space_description + "</p>\n" +
+            "    </div>\n" +
+            "</div>";
+    }
 
 }
 
