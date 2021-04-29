@@ -3,7 +3,7 @@
 // create some variables!
 
 
-const umbcLatLng = {lat: 39.254, lng: -76.711};
+const umbcLatLng = {lat: 39.256, lng: -76.717};
 const mapOptions = {
     // we can edit this to change map options that
     // we pass in to create the map
@@ -20,18 +20,8 @@ function initMap() {
     // The map is embedded in the 'map' div found in index.html.
     map = new google.maps.Map(document.getElementById("map"), mapOptions);
     infoWindow1 = new google.maps.InfoWindow( {
-        content: 'Default text - window1',
-        position : umbcLatLng, // use this as default position
-        map:map,
-    }); // done initializing infoWindow1
-    // below we do the same
-
-    infoWindow2 = new google.maps.InfoWindow( {
-        content: 'Default text - window2',
-        position : umbcLatLng, // use this as default position
-        map:map,
-    });  // this will be a test window
-    //numObjs = 0;
+            content: "nothing",
+    });
     const moveToCurrentLocation = document.createElement("button");
     moveToCurrentLocation.textContent = "Move to Current Location";
     moveToCurrentLocation.classList.add("custom-map-control-button");
@@ -64,6 +54,11 @@ function initMap() {
 
     // We have a button that centers you on your location
     // we should now try to loop through out data
+    for (var i = 0; i < data.length; i++) {
+        create_marker(data[i]);
+    }
+
+
 
 
 /* Comment graveyard here, if you want you can let the map's clicks spawn markers
@@ -99,7 +94,7 @@ that don't do anything
     //       Using a google.maps.InfoWindow for each of these markers is likely the
     //       most efficient way to display the Space information when a user clicks
     //       on a space.
-
+/*
     function temp_marker_listener (counter) {
         if (typeof data != 'object') {
             infoWindow2.content = "There was a problem with the data";
@@ -112,24 +107,41 @@ that don't do anything
             }
         }
     }
-
-    function make_html_content_from_array_element (element) {
-        // this takes the element (which should be just a space)
-        // and makes a nice little html to shove in the infoWindow
-        // elements are spaces, so they should have our
-        //space_name and space_description
-        // also, it is ugly, just let it be that way
-        return "<div id=\"content\">" +
-            "<div id=\"siteNotice\"></div>" +
-            "<h1 id=\"firstHeading\" class=\"firstHeading\">"
-        + element.space_name + "</h1>" + "<div id=\"bodyContent\">\n" +
-            "    <p>" + element.space_description + "</p>\n" +
-            "    </div>\n" +
-            "</div>";
-    }
+*/
 
 }
 
+function make_html_from_obj (obj) {
+    // this takes the element (which should be just a space)
+    // and makes a nice little html to shove in the infoWindow
+    // elements are spaces, so they should have our
+    // space_name and space_description
+    // also, it is ugly, just let it be that way
+    //return "obj.spc_name";
+    return "<div> <h1>" + obj["spc_name"] + "</h1> <div> <p>" + obj["spc_desc"]+ "</p></div> </div>";
+}
+
+function create_marker(obj) {
+    // no error checking here, we raw dogging
+    var pos;
+    // here we take the object and get a pos out of it
+    pos = obj_to_pos(obj);
+    // now we create a marker
+    var marker = new google.maps.Marker({
+        position: {lat: pos.lat, lng: pos.lng},
+        map: map, // default map
+        });
+    marker.addListener('click', (event)=> {
+        infoWindow2 = new google.maps.InfoWindow( {
+            content: make_html_from_obj(obj),
+        });
+        infoWindow2.open(map,marker);
+    });
+}
+
+function obj_to_pos(obj) {
+    return umbcLatLng; // temp value to put markers on the map
+}
 
 
 

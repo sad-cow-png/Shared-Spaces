@@ -27,6 +27,7 @@
                 numObjs = 0;
 
                 function space_good(obj) {
+                    return true;
                     if (typeof obj.spc_desc != 'string') {
                         return false;
                     }
@@ -48,7 +49,7 @@
                 // the information that we have
                 // and we do |escapejs... to prevent some jackass from
                 // running code on our site
-                const myObj = {
+                var myObj = {
                     "spc_desc":"{{allqs.space_description|escapejs|safe}}",
                     "spc_name": "{{allqs.space_name|escapejs|safe}}",
                     // later we will need to add address information, I won't bother rn
@@ -72,7 +73,7 @@
                 // the information that we have
                 // and we do |escapejs... to prevent some jackass from
                 // running code on our site
-                const myObj = {
+                var myObj = {
                     "spc_desc":"{{spaces.space_description|escapejs|safe}}",
                     "spc_name": "{{spaces.space_name|escapejs|safe}}",
                     // later we will need to add address information, I won't bother rn
@@ -127,9 +128,12 @@
                     }
                 }
             </script>
-            <div id="counterDebug" onclick="setTxt()">
-                Click me!
+            <div id="counterDebug">
+
             </div>
+            <script>
+                setTxt();
+            </script>
 
             <!-- Google Maps API makes a callback to initMap(). Moving JavaScript to an external file is ideal, but
                  there have been issues with Google Maps being unable to find the initMap() function outside of this
