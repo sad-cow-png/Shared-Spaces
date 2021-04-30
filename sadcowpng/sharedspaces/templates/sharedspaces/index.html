@@ -41,30 +41,6 @@
             </script>
             <script type = "text/javascript" src= "{% static 'javascript/mapsFunction.js' %}">
             </script>
-            {% if val == 'all' %}
-                {% for allqs in all %}
-                <script>
-                // Here, I want to add to the data list
-                // pretty straight forward, we create a couple of strings out of
-                // the information that we have
-                // and we do |escapejs... to prevent some jackass from
-                // running code on our site
-                var myObj = {
-                    "spc_desc":"{{allqs.space_description|escapejs|safe}}",
-                    "spc_name": "{{allqs.space_name|escapejs|safe}}",
-                    // later we will need to add address information, I won't bother rn
-                    // after looking it up, we need to do quite a bit of work (potentially) on
-                    // the address before we send it to google's geolocation
-                };
-                if (space_good(myObj)) {
-                    data.push(myObj);
-                    numObjs = numObjs + 1;
-                }
-                // now we have a json object myObj, let's add it to the data, which we pushed back
-                </script>
-            {% endfor %}
-            {% endif %}
-
             {% if val == 'space' %}
                 {% for spaces in space %}
                 <script>
@@ -117,9 +93,8 @@
             </div>
             <script >
                 function setTxt () {
-                    //document.getElementById("counterDebug").innerHTML = "Paragraph Changed!";
                     if (typeof numObjs != "number") {
-                        document.getElementById("counterDebug").innerText = "Not a number!";
+                        document.getElementById("counterDebug").innerText += "Not a number!";
                     }
                     else if (numObjs != 0) {
                     document.getElementById("counterDebug").innerHTML = 'There were ' + numObjs + ' spaces found!';
@@ -128,8 +103,18 @@
                     }
                 }
             </script>
-            <div id="counterDebug">
 
+            <div id="counterDebug">
+                {% if val == 'all' %}
+                <script>
+                    document.getElementById("counterDebug").innerHTML = "<h10> You attempted a search by all for markers! </h10>";
+                </script>
+                {% endif %}
+                {% if val == 'date' %}
+                <script>
+                    document.getElementById("counterDebug").innerHTML = "<h10> You attempted a search by date for markers! </h10>";
+                </script>
+                {% endif %}
             </div>
             <script>
                 setTxt();
