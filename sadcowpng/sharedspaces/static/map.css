@@ -13,3 +13,9 @@ body {
     padding: 2px;
     width: 800px;
 }
+
+.search_bar {
+    margin: auto;
+    width: 40%;
+    padding: 1%
+}

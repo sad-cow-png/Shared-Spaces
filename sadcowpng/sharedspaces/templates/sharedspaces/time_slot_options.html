@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Load Time</title>
+</head>
+<body>
+
+    {% for time in sp_times %}
+    <option value="{{ time.pk }}">{{ time.space_start_time }} - {{ time.space_end_time }}</option>
+    {% endfor %}
+
+</body>
+</html>

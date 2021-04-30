@@ -8,6 +8,10 @@
         color: #B4DFE5;
     }
 
+    h3 {
+        color: #FBE8A6;
+    }
+
     body {
         background-color: #D2FDFF;
     }
@@ -17,3 +21,21 @@
         width: 1000px;
         height: 800px;
     }
+
+    .badge {
+        background-color: #F4976C;
+    }
+
+    span {
+        color: grey;
+        font-size: 20px;
+    }
+
+    .badge-success{
+        background-color: darkgreen;
+    }
+
+    .badge-danger{
+        background-color: darkred;
+    }
+

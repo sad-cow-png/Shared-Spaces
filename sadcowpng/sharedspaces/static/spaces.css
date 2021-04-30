@@ -1,43 +1,28 @@
   body {
       text-align: center;
-      overflow: hidden;
-      background-color: #D2FDFF ;
+      height: auto;
+      overflow: scroll;
+      background-color: #D2FDFF;
   }
 
-  .create_space_form{
+  .create_space_form, .update_space_form, .space_date_time_form{
       display: inline-block;
       width: 800px;
       background-color: #303C6C;
       text-align: center;
       margin: auto;
-      height: 600px;
+      height: auto;
 
   }
 
-  .create_space_table{
+  .create_space_table, .update_space_table, .space_date_time_table{
       width: 800px;
+      color: white;
   }
 
   .space_submit_button{
       margin-top: 10px;
-      width: 400px;
-  }
-
-  .update_space_form{
-      display: inline-block;
-      width: 800px;
-      background-color: #303C6C;
-      text-align: center;
-      height: 800px;
-
-  }
-
-  .update_space_table{
-      width: 800px;
-  }
-
-  .space_submit_button{
-      margin-top: 10px;
+      margin-bottom: 10px;
       width: 400px;
       background-color: #B4DFE5;
       color: black;
@@ -52,6 +37,7 @@
       margin: auto;
       border-spacing: 5px;
       border-color: #F4976C;
+
   }
 
   th, td {
@@ -64,8 +50,17 @@
       padding: 5px;
   }
 
-  h3{
+  h3, h5{
       text-align: center;
       color: white;
   }
+
+  .card-title{
+      color: black;
+  }
+
+  .date-title{
+      color: black;
+  }
+
 
