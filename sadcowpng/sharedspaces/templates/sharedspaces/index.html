@@ -14,44 +14,58 @@
                 <title>Shared Spaces</title>
             {% endblock %}
             <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-            <script>
+            <!-- do this script thing to include the different file (like a library)
+            too lazy to figure out how to properly do it nicely -->
+            <script type = "text/javascript">
+                // declare some global variables (gasp!)
+                // javascript scope is beyond stupid, this is the way it's gotta be
+                var map;
+                var infoWindow1, infoWindow2; // these are useful in the seperate js file
+                var data;
+                var numObjs;
+                data = [];
+                numObjs = 0;
 
-                let map;
-                const umbcLatLng = {lat: 39.254, lng: -76.711};
-                const mapOptions = {
-                    center: umbcLatLng,
-                    mapTypeId: 'roadmap',
-                    zoom: 15,
-                };
-
-                // Map initializes centered over UMBC.
-                // Map options fields alter appearance and interactive functionality of the embedded map.
-                function initMap() {
-                    // The map is embedded in the 'map' div found in index.html.
-                    map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-                    // Enables users to place markers on the map.
-                    map.addListener('click', (event) => {
-                        createMarker(event.latLng.lat(), event.latLng.lng());
-                    });
-
-                    // TODO: When it is determined how the Space model will contain its location, you 
-                    //       can then loop over those locations in the SQL database and add them as
-                    //       markers here. 
-                    //       Using a google.maps.InfoWindow for each of these markers is likely the
-                    //       most efficient way to display the Space information when a user clicks
-                    //       on a space.
+                function space_good(obj) {
+                    return true;
+                    if (typeof obj.spc_desc != 'string') {
+                        return false;
+                    }
+                    if (typeof  obj.spc_name != 'string') {
+                        return false;
+                    }
+                    // check validity of address when it gets here
+                    return true;
                 }
-
-                // Wrapper function to add a google.maps.Marker to the embedded map.
-                function createMarker(latitude, longitude) {
-                    const marker = new google.maps.Marker({position: {lat: latitude, lng: longitude}, map: map});
-                }
-
-                // If google.maps.InfoWindows are decided to be used to display space information, additional wrapper
-                // functions similar to the one above will need to be placed here.
 
             </script>
+            <script type = "text/javascript" src= "{% static 'javascript/mapsFunction.js' %}">
+            </script>
+            {% if val == 'space' %}
+                {% for spaces in space %}
+                <script>
+                // Here, I want to add to the data list
+                // pretty straight forward, we create a couple of strings out of
+                // the information that we have
+                // and we do |escapejs... to prevent some jackass from
+                // running code on our site
+                var myObj = {
+                    "spc_desc":"{{spaces.space_description|escapejs|safe}}",
+                    "spc_name": "{{spaces.space_name|escapejs|safe}}",
+                    // later we will need to add address information, I won't bother rn
+                    // after looking it up, we need to do quite a bit of work (potentially) on
+                    // the address before we send it to google's geolocation
+                };
+                // check "goodness" of myObj
+                if (space_good(myObj)) {
+                    data.push(myObj);
+                    numObjs = numObjs + 1;
+                }
+                </script>
+            {% endfor %}
+            {% endif %}
+
+
         </head>
         <body>
             <div class = "search_bar">
@@ -63,10 +77,49 @@
                         <option value="space">Space</option>
                         <option value="date">Date</option>
                     </select>
+                    <!-- I want to hijack the same searchbar you wrote
+                    because I need to do the same thing you did to get
+                    a list of spaces
+                    But I also want a way to let the user decide if
+                    they want the spaces in great detail
+                    or just the map -->
+                    <select name="submit_style" id="submit_style">
+                        <option value="newPage">Show Me Details</option>
+                        <option value="markers">Show Me Markers</option>
+                    </select>
                     <input class="space_submit_button" type="submit" value="Search">
                     <input class="space_submit_button" type="reset" value="Clear">
                 </form>
             </div>
+            <script >
+                function setTxt () {
+                    if (typeof numObjs != "number") {
+                        document.getElementById("counterDebug").innerText += "Not a number!";
+                    }
+                    else if (numObjs != 0) {
+                    document.getElementById("counterDebug").innerHTML = 'There were ' + numObjs + ' spaces found!';
+                    } else {
+                    document.getElementById("counterDebug").innerText = 'No objects found';
+                    }
+                }
+            </script>
+
+            <div id="counterDebug">
+                {% if val == 'all' %}
+                <script>
+                    document.getElementById("counterDebug").innerHTML = "<h10> You attempted a search by all for markers! </h10>";
+                </script>
+                {% endif %}
+                {% if val == 'date' %}
+                <script>
+                    document.getElementById("counterDebug").innerHTML = "<h10> You attempted a search by date for markers! </h10>";
+                </script>
+                {% endif %}
+            </div>
+            <script>
+                setTxt();
+            </script>
+
             <!-- Google Maps API makes a callback to initMap(). Moving JavaScript to an external file is ideal, but
                  there have been issues with Google Maps being unable to find the initMap() function outside of this
                  file due to weird JavaScript scope and closure fun. -->

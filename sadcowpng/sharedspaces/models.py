@@ -26,7 +26,7 @@ class Space(models.Model):
     space_description = models.CharField(max_length=1000)
     space_max_capacity = models.IntegerField()
     space_address1 = models.CharField(max_length=1024)
-    space_address2 = models.CharField(max_length=1024, default="")
+    space_address2 = models.CharField(max_length=1024, default="",blank=True)
     space_zip_code = models.CharField(max_length=5)
     space_city = models.CharField(max_length=1024)
     space_state = models.CharField(max_length=50)
