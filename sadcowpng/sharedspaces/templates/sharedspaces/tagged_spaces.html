@@ -33,6 +33,7 @@
                                        onclick="window.location.href='{% url 'tagged_spaces' tag %}'">{{ tag }}</button>
                                 {% endfor %}
                                 <br/><br/>
+                                <a href="{% url 'reserve_space' space.pk %}" class="btn btn-primary">Reserve Space</a>
                             </div>
                         </div>
                     </div>
