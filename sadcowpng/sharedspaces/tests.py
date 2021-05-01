@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
@@ -9,6 +10,8 @@ from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, C
 from .models import Space, User, SpaceDateTime
 import datetime
 from django.db.models import Q
+from django.test.client import RequestFactory
+from .decorators import user_is_date_owner
 
 
 # Testing for the client signup
@@ -846,7 +849,7 @@ class TestSpaceDateTime(TestCase):
                          'Space foreign key is not working properly.')
         # end ##########################################################################################################
 
-        
+
 # added by Binh ############################################################################################
 # Creates client/proprietor users
 # Can be used to create new users, reusable
@@ -1282,6 +1285,7 @@ class ReserveFormSeleniumTests(TestCase):
         spaces = driver.find_element_by_tag_name('p').text
         self.assertEqual(spaceName, spaces)
 
+
 #   end ############################################################################################
 
 
@@ -1543,7 +1547,7 @@ class SpaceCloseTest(TestCase):
         spaces = Space.objects.filter(space_owner=proprietor, space_open=True)
         self.assertEqual(len(spaces), 1, "The open flag ia not working.")
 
-        
+
 # Tester: Sharlet Claros
 # Tests search input validity, filter selections, and search query validity
 # Queries that are able to pull the correct object (only object in this case) are successful
@@ -1558,6 +1562,12 @@ class SearchBarTests(TestCase):
     TestCase.default_space_data = {"space_name": 'SpaceSearch',
                                    "space_description": 'Rand Description',
                                    "space_max_capacity": 5,
+                                   "space_address1": "1234 teststreet ct",
+                                   "space_address2": "",
+                                   "space_zip_code": "12345",
+                                   "space_city": "testcity",
+                                   "space_state": "MD",
+                                   "space_country": "United States",
                                    "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
                                    "space_noise_level": [Noise_Level_Choices[1][0]],
                                    "space_wifi": True,
@@ -1568,21 +1578,30 @@ class SearchBarTests(TestCase):
     name = TestCase.test_space_form.cleaned_data['space_name']
     description = TestCase.test_space_form.cleaned_data['space_description']
     max_capacity = TestCase.test_space_form.cleaned_data['space_max_capacity']
+    space_address1 = TestCase.test_space_form.cleaned_data['space_address1']
+    space_address2 = TestCase.test_space_form.cleaned_data['space_address2']
+    space_zip_code = TestCase.test_space_form.cleaned_data['space_zip_code']
+    space_city = TestCase.test_space_form.cleaned_data['space_city']
+    space_state = TestCase.test_space_form.cleaned_data['space_state']
+    space_country = TestCase.test_space_form.cleaned_data['space_country']
     noise_level_allowed = int(TestCase.test_space_form.cleaned_data["space_noise_level_allowed"][0])
     noise_level = int(TestCase.test_space_form.cleaned_data["space_noise_level"][0])
     wifi = TestCase.test_space_form.cleaned_data['space_wifi']
     restroom = TestCase.test_space_form.cleaned_data['space_restrooms']
     food_drink = TestCase.test_space_form.cleaned_data['space_food_drink']
+    space_open = TestCase.test_space_form.cleaned_data['space_open']
 
     # pulls data from form and fills out model fields to save space in table
     test_space = Space(space_name=name,
                        space_description=description,
                        space_max_capacity=max_capacity,
-                       space_noise_level_allowed=noise_level_allowed,
-                       space_noise_level=noise_level,
+                       space_address1=space_address1, space_address2=space_address2,
+                       space_zip_code=space_zip_code,
+                       space_city=space_city, space_state=space_state, space_country=space_country,
+                       space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
                        space_wifi=wifi,
-                       space_restrooms=restroom,
-                       space_food_drink=food_drink)
+                       space_restrooms=restroom, space_food_drink=food_drink,
+                       space_open=space_open)
 
     test_space.save()
 
@@ -1637,6 +1656,12 @@ class CreateSpaceTagTests(TestCase):
         default_data = {"space_name": 'TestName',
                         "space_description": 'Rand Description',
                         "space_max_capacity": 23,
+                        "space_address1": "1234 teststreet ct",
+                        "space_address2": "",
+                        "space_zip_code": "12345",
+                        "space_city": "testcity",
+                        "space_state": "MD",
+                        "space_country": "United States",
                         "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
                         "space_noise_level": [Noise_Level_Choices[1][0]],
                         "space_wifi": True,
@@ -1651,6 +1676,12 @@ class CreateSpaceTagTests(TestCase):
         default_data = {"space_name": 'TestName',
                         "space_description": 'Rand Description',
                         "space_max_capacity": 23,
+                        "space_address1": "1234 teststreet ct",
+                        "space_address2": "",
+                        "space_zip_code": "12345",
+                        "space_city": "testcity",
+                        "space_state": "MD",
+                        "space_country": "United States",
                         "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
                         "space_noise_level": [Noise_Level_Choices[1][0]],
                         "space_wifi": True,
@@ -1667,6 +1698,12 @@ class CreateSpaceTagTests(TestCase):
         default_data = {"space_name": 'TestName',
                         "space_description": 'Rand Description',
                         "space_max_capacity": 23,
+                        "space_address1": "1234 teststreet ct",
+                        "space_address2": "",
+                        "space_zip_code": "12345",
+                        "space_city": "testcity",
+                        "space_state": "MD",
+                        "space_country": "United States",
                         "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
                         "space_noise_level": [Noise_Level_Choices[1][0]],
                         "space_wifi": True,
@@ -1704,6 +1741,12 @@ class UpdateSpaceTagTests(TestCase):
     TestCase.default_data = {"space_name": 'TestName',
                              "space_description": 'Rand Description',
                              "space_max_capacity": 23,
+                             "space_address1": "1234 teststreet ct",
+                             "space_address2": "",
+                             "space_zip_code": "12345",
+                             "space_city": "testcity",
+                             "space_state": "MD",
+                             "space_country": "United States",
                              "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
                              "space_noise_level": [Noise_Level_Choices[1][0]],
                              "space_wifi": True,
@@ -1744,6 +1787,12 @@ class UpdateSpaceTagTests(TestCase):
         default_data = {"space_name": 'TestName',
                         "space_description": 'Rand Description',
                         "space_max_capacity": 23,
+                        "space_address1": "1234 teststreet ct",
+                        "space_address2": "",
+                        "space_zip_code": "12345",
+                        "space_city": "testcity",
+                        "space_state": "MD",
+                        "space_country": "United States",
                         "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
                         "space_noise_level": [Noise_Level_Choices[1][0]],
                         "space_wifi": True,
@@ -1768,6 +1817,12 @@ class UpdateSpaceTagTests(TestCase):
         default_data = {"space_name": 'TestName',
                         "space_description": 'Rand Description',
                         "space_max_capacity": 23,
+                        "space_address1": "1234 teststreet ct",
+                        "space_address2": "",
+                        "space_zip_code": "12345",
+                        "space_city": "testcity",
+                        "space_state": "MD",
+                        "space_country": "United States",
                         "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
                         "space_noise_level": [Noise_Level_Choices[1][0]],
                         "space_wifi": True,
@@ -1798,6 +1853,12 @@ class UpdateSpaceTagTests(TestCase):
         default_data = {"space_name": 'TestName',
                         "space_description": 'Rand Description',
                         "space_max_capacity": 23,
+                        "space_address1": "1234 teststreet ct",
+                        "space_address2": "",
+                        "space_zip_code": "12345",
+                        "space_city": "testcity",
+                        "space_state": "MD",
+                        "space_country": "United States",
                         "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
                         "space_noise_level": [Noise_Level_Choices[1][0]],
                         "space_wifi": True,
@@ -1827,6 +1888,12 @@ class TaggedSpacesTests(TestCase):
     TestCase.space_one = {"space_name": 'TestName',
                           "space_description": 'Rand Description',
                           "space_max_capacity": 23,
+                          "space_address1": "1234 teststreet ct",
+                          "space_address2": "",
+                          "space_zip_code": "12345",
+                          "space_city": "testcity",
+                          "space_state": "MD",
+                          "space_country": "United States",
                           "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
                           "space_noise_level": [Noise_Level_Choices[1][0]],
                           "space_wifi": True,
@@ -1839,6 +1906,12 @@ class TaggedSpacesTests(TestCase):
     TestCase.space_two = {"space_name": 'Test Space',
                           "space_description": 'Rand Description',
                           "space_max_capacity": 20,
+                          "space_address1": "1234 teststreet ct",
+                          "space_address2": "",
+                          "space_zip_code": "12345",
+                          "space_city": "testcity",
+                          "space_state": "MD",
+                          "space_country": "United States",
                           "space_noise_level_allowed": [Noise_Level_Choices[2][0]],
                           "space_noise_level": [Noise_Level_Choices[1][0]],
                           "space_wifi": True,
@@ -1887,3 +1960,144 @@ class TaggedSpacesTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, TestCase.space_two['space_name'])
         self.assertNotContains(response, TestCase.space_one['space_name'])
+
+
+# Added by Bishal
+# Tests to make sure that the user_is_date
+class IsDateOwnerDecoratorTest(TestCase):
+    """
+    Tests for the user_is_date_owner decorator
+    """
+
+    def setUp(self):
+        # set up the users
+        self.proper_user = {
+            'username': 'testuser',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**self.proper_user)
+
+        self.prop_wrong = {
+            'username': 'testuser2',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**self.prop_wrong)
+
+        self.client_wrong = {
+            'username': 'testuser3',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**self.client_wrong)
+
+        # set up the user
+        self.proprietor_user = User.objects.get(username='testuser')
+        self.proprietor_user.is_proprietor = True
+
+        self.proprietor_user_2 = User.objects.get(username='testuser2')
+        self.proprietor_user_2.is_proprietor = True
+
+        self.client_user = User.objects.get(username='testuser3')
+        self.client_user.is_client = True
+
+        # set up the space and attach it to proprietor_user
+        default_list_data = {"space_name": 'TestName',
+                             "space_description": 'Rand Description',
+                             "space_max_capacity": 5,
+                             "space_address1": "1234 teststreet ct",
+                             "space_address2": "",
+                             "space_zip_code": "12345",
+                             "space_city": "testcity",
+                             "space_state": "MD",
+                             "space_country": "United States",
+                             "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
+                             "space_noise_level": [Noise_Level_Choices[1][0]],
+                             "space_wifi": True,
+                             "space_restrooms": False,
+                             "space_food_drink": True,
+                             "space_open": True,
+                             "space_tags": 'cafe,popup'}
+        test_list = CreateSpaceForm(data=default_list_data)
+        test_list.is_valid()
+
+        name = test_list.cleaned_data['space_name']
+        description = test_list.cleaned_data['space_description']
+        max_capacity = test_list.cleaned_data['space_max_capacity']
+        space_address1 = test_list.cleaned_data['space_address1']
+        space_address2 = test_list.cleaned_data['space_address2']
+        space_zip_code = test_list.cleaned_data['space_zip_code']
+        space_city = test_list.cleaned_data['space_city']
+        space_state = test_list.cleaned_data['space_state']
+        space_country = test_list.cleaned_data['space_country']
+        noise_level_allowed = int(test_list.cleaned_data["space_noise_level_allowed"][0])
+        noise_level = int(test_list.cleaned_data["space_noise_level"][0])
+        wifi = test_list.cleaned_data['space_wifi']
+        restroom = test_list.cleaned_data['space_restrooms']
+        food_drink = test_list.cleaned_data['space_food_drink']
+        space_tags = test_list.cleaned_data['space_tags']
+
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2,
+                           space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
+                           space_wifi=wifi,
+                           space_restrooms=restroom, space_food_drink=food_drink, space_owner=self.proprietor_user,
+                           space_open=True, space_tags=space_tags)
+
+        test_space.save()
+
+        # now create and save the space date model
+        space_date = TestCase.test_form_date.cleaned_data['date']
+        space_start_time = TestCase.test_form_date.cleaned_data['time_start']
+        space_end_time = TestCase.test_form_date.cleaned_data['time_end']
+        space_id = test_space
+        date_time = SpaceDateTime(space_date=space_date,
+                                  space_start_time=space_start_time,
+                                  space_end_time=space_end_time,
+                                  space_id=space_id)
+        date_time.save()
+
+        self.date_id = date_time.pk
+
+        # set up a request
+        self.factory = RequestFactory()
+
+    def test_proper_access(self):
+        self.made_it_in = False
+
+        @user_is_date_owner
+        def a_view(request, date_time_id):
+            self.made_it_in = True
+            return HttpResponse()
+
+        request_f = self.factory.get('/'.format(self.date_id))
+        request_f.user = self.proprietor_user
+        a_view(request_f, self.date_id)
+        self.assertTrue(self.made_it_in, "The proper space owner was not allowed to edit their space date and time.")
+
+    def test_client_access_denied(self):
+        self.made_it_in = False
+
+        @user_is_date_owner
+        def a_view(request, date_time_id):
+            self.made_it_in = True
+            return HttpResponse()
+
+        request_f = self.factory.get('/'.format(self.date_id))
+        request_f.user = self.client_user
+        a_view(request_f, self.date_id)
+        self.assertFalse(self.made_it_in, "A client was allowed to edit space date and time.")
+
+    def test_proprietor_access_denied(self):
+        self.made_it_in = False
+
+        @user_is_date_owner
+        def a_view(request, date_time_id):
+            self.made_it_in = True
+            return HttpResponse()
+
+        request_f = self.factory.get('/'.format(self.date_id))
+        request_f.user = self.proprietor_user_2
+        a_view(request_f, self.date_id)
+        self.assertFalse(self.made_it_in, "The improper space owner was allowed to edit another space date and time.")
+

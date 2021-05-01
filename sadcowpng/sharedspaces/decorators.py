@@ -1,8 +1,7 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
-
-from .models import Space
+from .models import Space, SpaceDateTime
 
 
 # Protects views only proprietors can access
@@ -40,3 +39,16 @@ def client_required(function):
             return function(request, space_id)
 
     return is_not_client
+
+
+# Only the proprietor that created the space can update date and time for the space
+def user_is_date_owner(function):
+    def is_owner(request, date_time_id):
+        date = SpaceDateTime.objects.get(pk=date_time_id)
+        space = date.space_id
+        if space.space_owner == request.user:
+            return function(request, date_time_id)
+        else:
+            return HttpResponse('Permission Denied.')
+
+    return is_owner
