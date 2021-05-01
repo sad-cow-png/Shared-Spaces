@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect, reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, reverse
+from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
@@ -11,7 +11,6 @@ from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, C
 from .models import Space, User, SpaceDateTime
 from django.db.models import Q
 from itertools import chain
-from django.views.generic import ListView
 from .decorators import proprietor_required, user_is_space_owner, client_required
 
 
@@ -21,7 +20,7 @@ def index(request):
         q = request.POST.get('query')
         ufilter = request.POST.get('filters')
         # submit type lets us change the redirect
-        submit_type = request.POST.get('submit_style') # new
+        submit_type = request.POST.get('submit_style')  # new
         space = Space.objects.filter(Q(space_name__contains=q) | Q(space_description__contains=q))
         date = SpaceDateTime.objects.filter(Q(space_date__contains=q))
         allq = chain(space, date)
@@ -198,7 +197,7 @@ def create_space(request):
             food_drink = space_form.cleaned_data['space_food_drink']
             user = request.user
             tags = space_form.cleaned_data['space_tags']
-            
+
             sp = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
                        space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
                        space_city=space_city, space_state=space_state, space_country=space_country,
@@ -273,7 +272,6 @@ def update_space(request, space_id):
                 else:
                     old_space.space_tags.add(tag)
 
-
             # save the updated object in the database
             old_space.save()
 
@@ -320,7 +318,7 @@ def update_space(request, space_id):
     return render(request, 'sharedspaces/update_space.html', context=context)
 
 
-#@user_is_space_owner
+# @user_is_space_owner
 def space_date_time(request, space_id):
     """
     Used to create the data and time for a specific space
@@ -446,8 +444,8 @@ def load_times(request):
 
     return render(request, 'sharedspaces/time_slot_options.html', {'sp_times': sp_times})
 
-  
-@login_required  
+
+@login_required
 @user_is_space_owner
 def date_time(request, space_id):
     """
@@ -466,13 +464,13 @@ def date_time(request, space_id):
 
     return render(request, 'sharedspaces/date_time.html', context=context)
 
-  
+
 def tag_spaces(request, slug):
     """
     Filters space objects by tag and return
     to tag page based on tag slug
     """
-    spaces = Space.objects.filter(space_tags__slug=slug)
+    spaces = Space.objects.filter(space_tags__name=slug)
 
     context = {
         'space_list': spaces,
@@ -480,4 +478,3 @@ def tag_spaces(request, slug):
     }
 
     return render(request, 'sharedspaces/tagged_spaces.html', context=context)
-
