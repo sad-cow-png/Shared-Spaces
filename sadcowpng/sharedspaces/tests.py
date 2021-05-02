@@ -1584,7 +1584,7 @@ class SearchBarTests(TestCase):
                        space_restrooms=restroom,
                        space_food_drink=food_drink)
 
-    test_space.save()
+    #test_space.save()
 
     # now create and save the space data model
     space_date = TestCase.test_form_date.cleaned_data['date']
@@ -1595,7 +1595,7 @@ class SearchBarTests(TestCase):
                               space_start_time=space_start_time,
                               space_end_time=space_end_time,
                               space_id=space_id)
-    date_time.save()
+    #date_time.save()
 
     # Testing that the query method utilized will work on data contained in tables
     def QueryCheck(self):
@@ -1887,3 +1887,56 @@ class TaggedSpacesTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, TestCase.space_two['space_name'])
         self.assertNotContains(response, TestCase.space_one['space_name'])
+
+
+class SearchResultTagTest(TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+
+        self.index_url = "http://127.0.0.1:8000"
+
+    def test_search_all_space_dates(self):
+        driver = self.driver
+
+        driver.get(self.index_url)
+
+        # Search all spaces and date/time listings
+        searchButton = driver.find_element_by_xpath("//input[@value='Search']")
+        searchButton.send_keys(Keys.RETURN)
+
+        # Check tags
+
+
+
+    def test_search_by_space(self):
+        driver = self.driver
+
+        driver.get(self.index_url)
+
+        # Search by space names
+        selectSearch = Select(driver.find_element_by_name("filters"))
+        selectSearch.select_by_value('space')
+        search = selectSearch.first_selected_option
+
+        self.assertEqual(search.text, 'Space')
+
+        searchButton = driver.find_element_by_xpath("//input[@value='Search']")
+        searchButton.send_keys(Keys.RETURN)
+
+    def test_search_by_date(self):
+        driver = self.driver
+
+        driver.get(self.index_url)
+
+        # Search by date/time listings
+        selectSearch = Select(driver.find_element_by_name("filters"))
+        selectSearch.select_by_value('date')
+        search = selectSearch.first_selected_option
+
+        self.assertEqual(search.text, 'Date')
+
+        searchButton = driver.find_element_by_xpath("//input[@value='Search']")
+        searchButton.send_keys(Keys.RETURN)
+
+    def tearDown(self):
+        self.driver.close()
