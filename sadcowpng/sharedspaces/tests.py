@@ -1286,6 +1286,10 @@ class ReserveFormSeleniumTests(TestCase):
         self.assertEqual(spaceName, spaces)
 
 
+    def tearDown(self):
+        self.driver.close()
+
+
 #   end ############################################################################################
 
 
@@ -1614,6 +1618,7 @@ class SearchBarTests(TestCase):
                               space_start_time=space_start_time,
                               space_end_time=space_end_time,
                               space_id=space_id)
+
     date_time.save()
 
     # Testing that the query method utilized will work on data contained in tables
@@ -1924,8 +1929,9 @@ class TaggedSpacesTests(TestCase):
     def setUp(self):
         self.user = {
             'username': 'testuser',
-            'password': '#zgsXJLY5jRb35j',
+            'password': '#zgsXJ5jRb35j',
         }
+
         User.objects.create_user(**self.user)
         self.proprietor = User.objects.get(username='testuser')
         self.proprietor.is_proprietor = True
@@ -1962,8 +1968,139 @@ class TaggedSpacesTests(TestCase):
         self.assertNotContains(response, TestCase.space_one['space_name'])
 
 
-# Added by Bishal
-# Tests to make sure that the user_is_date
+# Added by Binh
+# Checks client account page has correct listings they reserved
+# Requires manual resetting time slots to run test again
+class ClientReservedListingTests(TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+
+        self.index_url = "http://127.0.0.1:8000"
+
+        # Can be replaced with users based on your local database
+        self.clientuser = 'spaceplease6'
+        self.clientpw = 'jedwi5hak2'
+
+        # Space reservation page number, change if needed
+        self.rsp = '1'
+        self.rsp2 = '3'
+
+    def test_client_reservation_appears(self):
+        driver = self.driver
+
+        # Login as client
+        driver.get(self.index_url + '/login/')
+
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.clientuser)
+        password.send_keys(self.clientpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        # Reserves a time slot from 2 spaces
+
+        spacenames = []  # Add reserved spaces name to list for comparison
+
+        driver.get(self.index_url + '/reserve/' + self.rsp)
+        text = driver.find_element_by_tag_name('h2').text
+        text = text.split(' ')
+        text = text[2:5]
+        spaceName = ' '.join(text)
+
+        spacenames.append(spaceName)
+
+        # Save selected date and time
+        selectDate = Select(driver.find_element_by_name("reserve_date"))
+        selectDate.select_by_index(1)
+        sp1_date = selectDate.first_selected_option
+
+        selectTime = Select(driver.find_element_by_name("reserve_time_slot"))
+        sp1_time = selectTime.first_selected_option
+
+        submit = driver.find_element_by_xpath("//input[@type = 'submit']")
+        submit.send_keys(Keys.RETURN)
+
+        driver.get(self.index_url + '/reserve/' + self.rsp2)
+        text = driver.find_element_by_tag_name('h2').text
+        text = text.split(' ')
+        text = text[2:5]
+        spaceName2 = ' '.join(text)
+
+        spacenames.append(spaceName2)
+
+        # Save selected date and time
+        selectDate = Select(driver.find_element_by_name("reserve_date"))
+        selectDate.select_by_index(1)
+        sp2_date = selectDate.first_selected_option
+
+        selectTime = Select(driver.find_element_by_name("reserve_time_slot"))
+        sp2_time = selectTime.first_selected_option
+
+        submit = driver.find_element_by_xpath("//input[@type = 'submit']")
+        submit.send_keys(Keys.RETURN)
+
+        # Redirected to account page
+        driver.get(self.index_url + '/account/')
+        spaces = driver.find_elements_by_xpath("//h5[@class='card-title']")
+
+        # Compare list of reserved instances to number of cards appearing
+        self.assertEqual(len(spaces), len(spacenames))
+
+        # Split name from open/closed badge text
+        # Check each space is the correctly reserved space
+        sp = []
+
+        for i in range(2):
+            text = spaces[i].text
+            text = text.split(' ')
+            text = text[0:len(text) - 1]
+            text = ' '.join(text)
+            sp.append(text)
+            self.assertTrue(sp[i] in spacenames)
+
+        # Confirm matching date and times appear in page
+        dt = driver.find_elements_by_xpath("//p[@class='card-text' and @id='sp_date']")
+        time = driver.find_elements_by_xpath("//p[@class='card-text' and @id='sp_time']")
+
+        for d in dt:
+            self.assertTrue(sp1_date or sp2_date == d.text)
+            print(d.text)
+
+        for t in time:
+            self.assertTrue(sp1_time or sp2_time == t.text)
+            print(t.text)
+
+    def test_listing_tags_redirect(self):
+        driver = self.driver
+
+        # Login as client
+        driver.get(self.index_url + '/login/')
+
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.clientuser)
+        password.send_keys(self.clientpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        driver.get(self.index_url + '/account/')
+        tags = driver.find_elements_by_xpath("//button[@class='badge rounded-pill']")
+
+        tag_name = tags[1].text
+
+        # Check tags redirect to tag page
+        tags[1].click()
+        self.assertEqual(driver.current_url, self.index_url + '/tag/' + tag_name)
+
+    def tearDown(self):
+        self.driver.close()
+
+        
+# Added by Bishal Tests to make sure that the user trying to update the date and time is actual the user who owns
+# the space that the date and time belongs to.
 class IsDateOwnerDecoratorTest(TestCase):
     """
     Tests for the user_is_date_owner decorator
@@ -2105,6 +2242,7 @@ class IsDateOwnerDecoratorTest(TestCase):
 # Added by Bishal
 # Most of the story was style changes but one functionality that was changed by the redirection once
 # a space is created to the account page rather than the date and time page. So that will be tested here.
+# Also added a few test to check if the navbar is actually used on the pages.
 class FormsStylingTest(TestCase):
     def setUp(self):
         # Setting up a prietor uiser
@@ -2248,3 +2386,4 @@ class FormsStylingTest(TestCase):
         # Test that it is using the right templates
         self.assertTemplateUsed(response, 'sharedspaces/update_space.html')
         self.assertTemplateUsed(response, 'sharedspaces/form_header.html')
+
