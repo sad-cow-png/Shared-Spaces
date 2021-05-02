@@ -5,13 +5,12 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-
-from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes, \
-    ReserveSpaceForm
+from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm,\
+    ClientSignUpForm, SpaceTimes, ReserveSpaceForm
 from .models import Space, User, SpaceDateTime
 from django.db.models import Q
 from itertools import chain
-from .decorators import proprietor_required, user_is_space_owner, client_required
+from .decorators import proprietor_required, user_is_space_owner, client_required, user_is_date_owner
 
 
 # Shared Spaces Home Page
@@ -214,7 +213,9 @@ def create_space(request):
                 space.space_tags.add(tag)
 
             # redirecting to date and time page once complete to get at least one data and time
-            return HttpResponseRedirect(reverse('space_date_time', args=[primary_key]))
+            # return HttpResponseRedirect(reverse('space_date_time', args=[primary_key]))
+            # now redirects to the account page from which the user can add date and time to their heart's content
+            return HttpResponseRedirect(reverse('account'))
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -318,7 +319,8 @@ def update_space(request, space_id):
     return render(request, 'sharedspaces/update_space.html', context=context)
 
 
-# @user_is_space_owner
+@login_required
+@user_is_space_owner
 def space_date_time(request, space_id):
     """
     Used to create the data and time for a specific space
@@ -352,13 +354,14 @@ def space_date_time(request, space_id):
     return render(request, 'sharedspaces/space_date_time.html', context=context)
 
 
-@user_is_space_owner
-def update_space_date_time(request, data_time_id):
+@login_required
+@user_is_date_owner
+def update_space_date_time(request, date_time_id):
     """
     To update the toggle for date and time
     """
     # get the space from the data base with the given space id
-    old_date_time = SpaceDateTime.objects.get(pk=data_time_id)
+    old_date_time = SpaceDateTime.objects.get(pk=date_time_id)
 
     if request.method == 'POST':
         sdt = SpaceTimes(request.POST)
@@ -384,7 +387,7 @@ def update_space_date_time(request, data_time_id):
 
         context = {'form': sdt,
                    "old_date_time": old_date_time,
-                   "id": data_time_id}
+                   "id": date_time_id}
 
     return render(request, 'sharedspaces/update_space_date_time.html', context=context)
 
