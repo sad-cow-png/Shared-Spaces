@@ -1,7 +1,11 @@
+from random import randrange
+
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from django.test import TestCase
 from django.urls import reverse
@@ -846,7 +850,7 @@ class TestSpaceDateTime(TestCase):
                          'Space foreign key is not working properly.')
         # end ##########################################################################################################
 
-        
+
 # added by Binh ############################################################################################
 # Creates client/proprietor users
 # Can be used to create new users, reusable
@@ -1282,6 +1286,7 @@ class ReserveFormSeleniumTests(TestCase):
         spaces = driver.find_element_by_tag_name('p').text
         self.assertEqual(spaceName, spaces)
 
+
 #   end ############################################################################################
 
 
@@ -1543,7 +1548,7 @@ class SpaceCloseTest(TestCase):
         spaces = Space.objects.filter(space_owner=proprietor, space_open=True)
         self.assertEqual(len(spaces), 1, "The open flag ia not working.")
 
-        
+
 # Tester: Sharlet Claros
 # Tests search input validity, filter selections, and search query validity
 # Queries that are able to pull the correct object (only object in this case) are successful
@@ -1584,7 +1589,7 @@ class SearchBarTests(TestCase):
                        space_restrooms=restroom,
                        space_food_drink=food_drink)
 
-    #test_space.save()
+    # test_space.save()
 
     # now create and save the space data model
     space_date = TestCase.test_form_date.cleaned_data['date']
@@ -1595,7 +1600,8 @@ class SearchBarTests(TestCase):
                               space_start_time=space_start_time,
                               space_end_time=space_end_time,
                               space_id=space_id)
-    #date_time.save()
+
+    # date_time.save()
 
     # Testing that the query method utilized will work on data contained in tables
     def QueryCheck(self):
@@ -1889,6 +1895,9 @@ class TaggedSpacesTests(TestCase):
         self.assertNotContains(response, TestCase.space_one['space_name'])
 
 
+# Added by Binh
+# Test checks randomly selected tag on each type of search results page
+# redirects to correct tag name page
 class SearchResultTagTest(TestCase):
     def setUp(self):
         self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
@@ -1904,9 +1913,25 @@ class SearchResultTagTest(TestCase):
         searchButton = driver.find_element_by_xpath("//input[@value='Search']")
         searchButton.send_keys(Keys.RETURN)
 
-        # Check tags
+        # Find tags
+        tags = driver.find_elements_by_xpath("//button[@class='badge rounded-pill']")
 
+        if tags:
+            num = randrange(len(tags))      #Choose random tag
+            tag_name = tags[num].text
 
+            # Reformat tag_name for tag url matching, works for 2 words only
+            if len(tag_name.split()) > 1:
+                tag_name = tag_name.split()
+                tag_name = tag_name[0] + '%20' + tag_name[len(tag_name) - 1]
+
+            # Move to tag and click on tag
+            coordinates = tags[num].location_once_scrolled_into_view
+            driver.execute_script('window.scrollTo({}, {});'.format(coordinates['x'], coordinates['y']))
+            driver.execute_script('arguments[0].click();', tags[num])
+
+            # Check tags redirect to tag page
+            self.assertEqual(driver.current_url, self.index_url + '/tag/' + tag_name)
 
     def test_search_by_space(self):
         driver = self.driver
@@ -1923,6 +1948,26 @@ class SearchResultTagTest(TestCase):
         searchButton = driver.find_element_by_xpath("//input[@value='Search']")
         searchButton.send_keys(Keys.RETURN)
 
+        # Find tags
+        tags = driver.find_elements_by_xpath("//button[@class='badge rounded-pill']")
+
+        if tags:
+            num = randrange(len(tags))      #Choose random tag
+            tag_name = tags[num].text
+
+            # Reformat tag_name for tag url matching, works for 2 words only
+            if len(tag_name.split()) > 1:
+                tag_name = tag_name.split()
+                tag_name = tag_name[0] + '%20' + tag_name[len(tag_name) - 1]
+
+            # Move to tag and click on tag
+            coordinates = tags[num].location_once_scrolled_into_view
+            driver.execute_script('window.scrollTo({}, {});'.format(coordinates['x'], coordinates['y']))
+            driver.execute_script('arguments[0].click();', tags[num])
+
+            # Check tags redirect to tag page
+            self.assertEqual(driver.current_url, self.index_url + '/tag/' + tag_name)
+
     def test_search_by_date(self):
         driver = self.driver
 
@@ -1937,6 +1982,26 @@ class SearchResultTagTest(TestCase):
 
         searchButton = driver.find_element_by_xpath("//input[@value='Search']")
         searchButton.send_keys(Keys.RETURN)
+
+        # Find tags
+        tags = driver.find_elements_by_xpath("//button[@class='badge rounded-pill']")
+
+        if tags:
+            num = randrange(len(tags))       #Choose random tag
+            tag_name = tags[num].text
+
+            # Reformat tag_name for tag url matching, works for 2 words only
+            if len(tag_name.split()) > 1:
+                tag_name = tag_name.split()
+                tag_name = tag_name[0] + '%20' + tag_name[len(tag_name) - 1]
+
+            # Move to tag and click on tag
+            coordinates = tags[num].location_once_scrolled_into_view
+            driver.execute_script('window.scrollTo({}, {});'.format(coordinates['x'], coordinates['y']))
+            driver.execute_script('arguments[0].click();', tags[num])
+
+            # Check tags redirect to tag page
+            self.assertEqual(driver.current_url, self.index_url + '/tag/' + tag_name)
 
     def tearDown(self):
         self.driver.close()
