@@ -30,10 +30,10 @@
                             </div>
                             <p class="card-text">{{ allqs.space_description }}</p>
                             <p class="card-text">{{ allqs.space_id.space_description }}</p>
-                            <ul class="list-group list-group-horizontal ">
+                            <ul class="list-group list-group-horizontal list-group-flush">
                                 <li class="list-group-item list-group-item-info">
                                     Max Capacity
-                                     {% if allqs.space_wifi %}
+                                    {% if allqs.space_wifi %}
                                        <p class="card-text">{{ allqs.space_max_capacity }}</p>
                                     {% elif allqs.space_id.space_wifi %}
                                         <p class="card-text"> {{ allqs.space_id.space_max_capacity }}</p>
@@ -41,7 +41,7 @@
                                 </li>
                                 <li class=" list-group-item list-group-item-info">
                                     Wifi Offered?
-                                     {% if allqs.space_wifi or allqs.space_id.space_wifi %}
+                                    {% if allqs.space_wifi or allqs.space_id.space_wifi %}
                                         <p class="card-text">Yes</p>
                                     {% else %}
                                         <p class="card-text">No</p>
@@ -49,7 +49,7 @@
                                 </li>
                                 <li class="list-group-item list-group-item-info">
                                     Restrooms Offered?
-                                     {% if allqs.space_restooms or allqs.space_id.space_restrooms %}
+                                    {% if allqs.space_restooms or allqs.space_id.space_restrooms %}
                                         <p class="card-text">Yes</p>
                                     {% else %}
                                         <p class="card-text">No</p>
@@ -102,7 +102,7 @@
                                 </h5>
                             </div>
                             <p class="card-text">{{ spaces.space_description }}</p>
-                            <ul class="list-group list-group-horizontal ">
+                            <ul class="list-group list-group-horizontal list-group-flush">
                                 <li class="list-group-item list-group-item-info">
                                     Max Capacity
                                     <p class="card-text">{{ spaces.space_max_capacity }}</p>
@@ -162,7 +162,7 @@
                             </h5>
                             </div>
                             <p class="card-text">{{ dates.space_id.space_description }}</p>
-                            <ul class="list-group list-group-horizontal ">
+                            <ul class="list-group list-group-horizontal list-group-flush">
                                 <li class="list-group-item list-group-item-info">
                                     Max Capacity
                                     <p class="card-text">{{ dates.space_id.space_max_capacity }}</p>
