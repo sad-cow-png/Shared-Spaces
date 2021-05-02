@@ -256,3 +256,16 @@ py manage.py test sharedspaces.tests.SearchBarTests
 ```
 
 <br>
+
+#### Search Results Tag
+The space listings on the search results page for each filter is styled in a uniform format 
+including the tags. 
+
+#### Search Result Tag Testing:
+Selenium test for selecting random tag if tags found on page. Then clicks on tag
+and checks if redirected page is the associated tagged spaces page. Includes three tests 
+for the three types of filters, All, Space, and Date
+```
+python manage.py test sharedspaces.tests.SearchResultTagTest
+```
+<br>
