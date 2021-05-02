@@ -241,14 +241,14 @@ space tests, and space date and time tests.
 
 <br>
 
-####Search Bar Background:
+#### Search Bar Background:
 The search bar is located on the main/home page of the Shared Spaces site. Search functionality works directly with the 
 spaces and space date/time models so that users can directly search for spaces by name, description, and specific dates
 for reservation. Users are able to filter search using a search toggle to the side of the search bar to narrow search.
 Search results conditionally on a separate page based on filter selctions as individual cards with space details and a 
 button that will allow clients to make a reservation. The search results page also includes a home button to return to the home page.
 
-####Search Testing:
+#### Search Testing:
 Search testing covers the usage of querysets that extract search results from the space and space date/time models and 
 check that the appropriate object is retrieved based off the search criteria.
 ```
@@ -268,3 +268,17 @@ after running the test once.
 python manage.py test sharedspaces.tests.ClientReservedListingTests
 ```
 <br>
+
+#### Date/Time Edit Access Decorator Background:
+We were missing a decorator that used the date and time id to determine if the proprietor is allowed to edit the form
+that updates date and time for specific space. So, that was added to allow only owner of the space to edit 
+the status of their date and time.
+
+#### Date/Time Edit Access Decorator Testing:
+The test consists of three unittests that make sure that only the owner of the space whose space id is stored
+in the data and time model can access the view that redirects the user to the edit page. 
+
+```
+./manage.py test sharedspaces.tests.IsDateOwnerDecoratorTest
+```
+
