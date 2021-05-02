@@ -2099,8 +2099,9 @@ class ClientReservedListingTests(TestCase):
         self.driver.close()
 
         
-# Added by Bishal Tests to make sure that the user trying to update the date and time is actual the user who owns
-# the space that the date and time belongs to.
+# Added by Bishal
+# Tests to make sure that the user trying to update the date and time is actuall the user who owns the space that the date
+# and time belongs to.
 class IsDateOwnerDecoratorTest(TestCase):
     """
     Tests for the user_is_date_owner decorator
