@@ -257,6 +257,18 @@ py manage.py test sharedspaces.tests.SearchBarTests
 
 <br>
 
+#### Client Reserved Spaces Listings
+Once a client reserves a time slot from a space reserve page. Each time instance
+appears in their account page as a card.
+
+##### Reserved Spaces Testing (Selenium):
+```test_client_reservation_appears``` requires manual reset of reservation time slots
+after running the test once. 
+```
+python manage.py test sharedspaces.tests.ClientReservedListingTests
+```
+<br>
+
 #### Date/Time Edit Access Decorator Background:
 We were missing a decorator that used the date and time id to determine if the proprietor is allowed to edit the form
 that updates date and time for specific space. So, that was added to allow only owner of the space to edit 
@@ -269,3 +281,4 @@ in the data and time model can access the view that redirects the user to the ed
 ```
 ./manage.py test sharedspaces.tests.IsDateOwnerDecoratorTest
 ```
+

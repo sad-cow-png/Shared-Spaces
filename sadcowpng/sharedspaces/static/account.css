@@ -14,12 +14,13 @@
 
     body {
         background-color: #D2FDFF;
+        overflow: auto;
     }
 
     .container-fluid{
         background-color: #303C6C;
         width: 1000px;
-        height: 800px;
+        height: auto;
     }
 
     .badge {
@@ -39,3 +40,6 @@
         background-color: darkred;
     }
 
+    .list-group{
+        overflow: auto;
+    }
