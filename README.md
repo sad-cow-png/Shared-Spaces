@@ -256,3 +256,15 @@ py manage.py test sharedspaces.tests.SearchBarTests
 ```
 
 <br>
+
+#### Client Reserved Spaces Listings
+Once a client reserves a time slot from a space reserve page. Each time instance
+appears in their account page as a card.
+
+##### Reserved Spaces Testing (Selenium):
+```test_client_reservation_appears``` requires manual reset of reservation time slots
+after running the test once. 
+```
+python manage.py test sharedspaces.tests.ClientReservedListingTests
+```
+<br>

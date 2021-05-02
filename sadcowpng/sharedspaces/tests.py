@@ -846,7 +846,7 @@ class TestSpaceDateTime(TestCase):
                          'Space foreign key is not working properly.')
         # end ##########################################################################################################
 
-        
+
 # added by Binh ############################################################################################
 # Creates client/proprietor users
 # Can be used to create new users, reusable
@@ -1282,6 +1282,9 @@ class ReserveFormSeleniumTests(TestCase):
         spaces = driver.find_element_by_tag_name('p').text
         self.assertEqual(spaceName, spaces)
 
+    def tearDown(self):
+        self.driver.close()
+
 #   end ############################################################################################
 
 
@@ -1543,7 +1546,7 @@ class SpaceCloseTest(TestCase):
         spaces = Space.objects.filter(space_owner=proprietor, space_open=True)
         self.assertEqual(len(spaces), 1, "The open flag ia not working.")
 
-        
+
 # Tester: Sharlet Claros
 # Tests search input validity, filter selections, and search query validity
 # Queries that are able to pull the correct object (only object in this case) are successful
@@ -1574,6 +1577,7 @@ class SearchBarTests(TestCase):
     restroom = TestCase.test_space_form.cleaned_data['space_restrooms']
     food_drink = TestCase.test_space_form.cleaned_data['space_food_drink']
 
+
     # pulls data from form and fills out model fields to save space in table
     test_space = Space(space_name=name,
                        space_description=description,
@@ -1584,7 +1588,7 @@ class SearchBarTests(TestCase):
                        space_restrooms=restroom,
                        space_food_drink=food_drink)
 
-    test_space.save()
+####    test_space.save()
 
     # now create and save the space data model
     space_date = TestCase.test_form_date.cleaned_data['date']
@@ -1595,7 +1599,7 @@ class SearchBarTests(TestCase):
                               space_start_time=space_start_time,
                               space_end_time=space_end_time,
                               space_id=space_id)
-    date_time.save()
+ ####   date_time.save()
 
     # Testing that the query method utilized will work on data contained in tables
     def QueryCheck(self):
@@ -1851,8 +1855,9 @@ class TaggedSpacesTests(TestCase):
     def setUp(self):
         self.user = {
             'username': 'testuser',
-            'password': '#zgsXJLY5jRb35j',
+            'password': '#zgsXJ5jRb35j',
         }
+
         User.objects.create_user(**self.user)
         self.proprietor = User.objects.get(username='testuser')
         self.proprietor.is_proprietor = True
@@ -1887,3 +1892,113 @@ class TaggedSpacesTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, TestCase.space_two['space_name'])
         self.assertNotContains(response, TestCase.space_one['space_name'])
+
+
+# Added by Binh
+# Checks client account page has correct listings they reserved
+# Requires manual resetting time slots to run test again
+class ClientReservedListingTests(TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+
+        self.index_url = "http://127.0.0.1:8000"
+
+        # Can be replaced with users based on your local database
+        self.clientuser = 'spaceplease6'
+        self.clientpw = 'jedwi5hak2'
+
+        # Space reservation page number, change if needed
+        self.rsp = '1'
+        self.rsp2 = '3'
+
+    def test_client_reservation_appears(self):
+        driver = self.driver
+
+        # Login as client
+        driver.get(self.index_url + '/login/')
+
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.clientuser)
+        password.send_keys(self.clientpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        # Reserves a time slot from 2 spaces
+
+        spacenames = []  # Add reserved spaces name to list for comparison
+
+        driver.get(self.index_url + '/reserve/' + self.rsp)
+        text = driver.find_element_by_tag_name('h2').text
+        text = text.split(' ')
+        text = text[2:5]
+        spaceName = ' '.join(text)
+
+        spacenames.append(spaceName)
+
+        selectDate = Select(driver.find_element_by_name("reserve_date"))
+        selectDate.select_by_index(1)
+
+        submit = driver.find_element_by_xpath("//input[@type = 'submit']")
+        submit.send_keys(Keys.RETURN)
+
+        driver.get(self.index_url + '/reserve/' + self.rsp2)
+        text = driver.find_element_by_tag_name('h2').text
+        text = text.split(' ')
+        text = text[2:5]
+        spaceName2 = ' '.join(text)
+
+        spacenames.append(spaceName2)
+
+        selectDate = Select(driver.find_element_by_name("reserve_date"))
+        selectDate.select_by_index(1)
+
+        submit = driver.find_element_by_xpath("//input[@type = 'submit']")
+        submit.send_keys(Keys.RETURN)
+
+        # Redirected to account page
+        driver.get(self.index_url + '/account/')
+        spaces = driver.find_elements_by_xpath("//h5[@class='card-title']")
+
+        # Compare list of reserved instances to number of cards appearing
+        self.assertEqual(len(spaces), len(spacenames))
+
+        # Split name from open/closed badge text
+        # Check each space is the correctly reserved space
+        sp = []
+
+        for i in range(2):
+            text = spaces[i].text
+            text = text.split(' ')
+            text = text[0:len(text)-1]
+            text = ' '.join(text)
+            sp.append(text)
+            self.assertTrue(sp[i] in spacenames)
+
+    def test_listing_tags_redirect(self):
+        driver = self.driver
+
+        # Login as client
+        driver.get(self.index_url + '/login/')
+
+        name = driver.find_element_by_name("username")
+        password = driver.find_element_by_name("password")
+        loginbutton = driver.find_element_by_xpath("//*[contains(@class, 'btn')]")
+
+        name.send_keys(self.clientuser)
+        password.send_keys(self.clientpw)
+        loginbutton.send_keys(Keys.RETURN)
+
+        driver.get(self.index_url + '/account/')
+        tags = driver.find_elements_by_xpath("//button[@class='badge rounded-pill']")
+
+        tag_name = tags[1].text
+
+        # Check tags redirect to tag page
+        tags[1].click()
+        self.assertEqual(driver.current_url, self.index_url+'/tag/'+tag_name)
+
+    def tearDown(self):
+        self.driver.close()
+
