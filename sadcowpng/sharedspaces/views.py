@@ -213,7 +213,9 @@ def create_space(request):
                 space.space_tags.add(tag)
 
             # redirecting to date and time page once complete to get at least one data and time
-            return HttpResponseRedirect(reverse('space_date_time', args=[primary_key]))
+            # return HttpResponseRedirect(reverse('space_date_time', args=[primary_key]))
+            # now redirects to the account page from which the user can add date and time to their heart's content
+            return HttpResponseRedirect(reverse('account'))
 
     # if a GET (or any other method) we'll create a blank form
     else:

@@ -2101,3 +2101,150 @@ class IsDateOwnerDecoratorTest(TestCase):
         a_view(request_f, self.date_id)
         self.assertFalse(self.made_it_in, "The improper space owner was allowed to edit another space date and time.")
 
+
+# Added by Bishal
+# Most of the story was style changes but one functionality that was changed by the redirection once
+# a space is created to the account page rather than the date and time page. So that will be tested here.
+class FormsStylingTest(TestCase):
+    def setUp(self):
+        # Setting up a prietor uiser
+        self.user = {
+            'username': 'testuser',
+            'password': '#zgsXJLY5jRb35j',
+        }
+        User.objects.create_user(**self.user)
+        self.proprietor = User.objects.get(username='testuser')
+        self.proprietor.is_proprietor = True
+
+        self.proprietor.save()
+
+        # have prop logon
+        self.response = self.client.post('/login/', self.user, follow=True)
+
+        # setting up the space data
+        self.space_save = {"space_name": 'SpaceSearch',
+                           "space_description": 'Rand Description',
+                           "space_max_capacity": 5,
+                           "space_address1": "1234 teststreet ct",
+                           "space_address2": "",
+                           "space_zip_code": "12345",
+                           "space_city": "testcity",
+                           "space_state": "MD",
+                           "space_country": "United States"}
+
+        # set up the space and attach it to proprietor_user
+        self.default_list_data = {"space_name": 'TestName',
+                                  "space_description": 'Rand Description',
+                                  "space_max_capacity": 5,
+                                  "space_address1": "1234 teststreet ct",
+                                  "space_address2": "",
+                                  "space_zip_code": "12345",
+                                  "space_city": "testcity",
+                                  "space_state": "MD",
+                                  "space_country": "United States",
+                                  "space_noise_level_allowed": [Noise_Level_Choices[0][0]],
+                                  "space_noise_level": [Noise_Level_Choices[1][0]],
+                                  "space_wifi": True,
+                                  "space_restrooms": False,
+                                  "space_food_drink": True,
+                                  "space_open": True,
+                                  "space_tags": 'cafe,popup'}
+        test_list = CreateSpaceForm(data=self.default_list_data)
+        test_list.is_valid()
+
+        name = test_list.cleaned_data['space_name']
+        description = test_list.cleaned_data['space_description']
+        max_capacity = test_list.cleaned_data['space_max_capacity']
+        space_address1 = test_list.cleaned_data['space_address1']
+        space_address2 = test_list.cleaned_data['space_address2']
+        space_zip_code = test_list.cleaned_data['space_zip_code']
+        space_city = test_list.cleaned_data['space_city']
+        space_state = test_list.cleaned_data['space_state']
+        space_country = test_list.cleaned_data['space_country']
+        noise_level_allowed = int(test_list.cleaned_data["space_noise_level_allowed"][0])
+        noise_level = int(test_list.cleaned_data["space_noise_level"][0])
+        wifi = test_list.cleaned_data['space_wifi']
+        restroom = test_list.cleaned_data['space_restrooms']
+        food_drink = test_list.cleaned_data['space_food_drink']
+        space_tags = test_list.cleaned_data['space_tags']
+
+        test_space = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
+                           space_address1=space_address1, space_address2=space_address2,
+                           space_zip_code=space_zip_code,
+                           space_city=space_city, space_state=space_state, space_country=space_country,
+                           space_noise_level_allowed=noise_level_allowed, space_noise_level=noise_level,
+                           space_wifi=wifi,
+                           space_restrooms=restroom, space_food_drink=food_drink, space_owner=self.proprietor,
+                           space_open=True, space_tags=space_tags)
+
+        test_space.save()
+
+        self.space_id = test_space.pk
+
+        # setting up date and time for the space
+        data_date = {'date': '09/04/2021', 'time_start': '04:15', 'time_end': '05:15'}
+
+        # Going through form use first
+        test_form_date = SpaceTimes(data=data_date)
+        test_form_date.is_valid()
+
+        # now create and save the space date model
+        space_date = test_form_date.cleaned_data['date']
+        space_start_time = test_form_date.cleaned_data['time_start']
+        space_end_time = test_form_date.cleaned_data['time_end']
+        space_id = test_space
+
+        date_time = SpaceDateTime(space_date=space_date,
+                                  space_start_time=space_start_time,
+                                  space_end_time=space_end_time,
+                                  space_id=space_id)
+        date_time.save()
+
+        self.date_id = date_time.pk
+
+    def test_redirection_space_to_account(self):
+        response = self.client.post('/create_space/', self.default_list_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        # Test if it is at the account page
+        self.assertTemplateUsed(response, 'sharedspaces/account.html')
+
+    def test_date_time_page(self):
+        response = self.client.get('/date_time/' + str(self.space_id))
+        self.assertEqual(response.status_code, 200)
+
+        # Test that it is using the right templates
+        self.assertTemplateUsed(response, 'sharedspaces/date_time.html')
+        self.assertTemplateUsed(response, 'sharedspaces/form_header.html')
+
+    def test_create_date_time_page(self):
+        response = self.client.get('/space_times/' + str(self.space_id))
+        self.assertEqual(response.status_code, 200)
+
+        # Test that it is using the right templates
+        self.assertTemplateUsed(response, 'sharedspaces/space_date_time.html')
+        self.assertTemplateUsed(response, 'sharedspaces/form_header.html')
+
+    def test_update_date_time_page(self):
+        response = self.client.get('/space_update_times/' + str(self.date_id))
+        self.assertEqual(response.status_code, 200)
+
+        # Test that it is using the right templates
+        self.assertTemplateUsed(response, 'sharedspaces/update_space_date_time.html')
+        self.assertTemplateUsed(response, 'sharedspaces/form_header.html')
+
+    def test_create_space_page(self):
+        response = self.client.get('/create_space/')
+        self.assertEqual(response.status_code, 200)
+
+        # Test that it is using the right templates
+        self.assertTemplateUsed(response, 'sharedspaces/create_space.html')
+        self.assertTemplateUsed(response, 'sharedspaces/form_header.html')
+
+    def test_update_space_page(self):
+        response = self.client.get('/update_space/' + str(self.space_id))
+        self.assertEqual(response.status_code, 200)
+
+        # Test that it is using the right templates
+        self.assertTemplateUsed(response, 'sharedspaces/update_space.html')
+        self.assertTemplateUsed(response, 'sharedspaces/form_header.html')

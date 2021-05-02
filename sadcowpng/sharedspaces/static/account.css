@@ -3,7 +3,7 @@
         margin-left: 20px;
     }
 
-    a, h1{
+    h1{
         margin-left: 20px;
         color: #B4DFE5;
     }
@@ -14,12 +14,13 @@
 
     body {
         background-color: #D2FDFF;
+        overflow: auto;
     }
 
     .container-fluid{
         background-color: #303C6C;
-        width: 1000px;
-        height: 800px;
+        width: auto;
+        height: auto;
     }
 
     .badge {
@@ -37,5 +38,17 @@
 
     .badge-danger{
         background-color: darkred;
+    }
+
+    .list-group{
+        overflow: auto;
+        display: flex;
+        justify-content: space-evenly;
+        background: #CFF4FC;
+    }
+
+    .space-button{
+        display: flex;
+        justify-content: space-around;
     }
 

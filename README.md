@@ -269,3 +269,20 @@ in the data and time model can access the view that redirects the user to the ed
 ```
 ./manage.py test sharedspaces.tests.IsDateOwnerDecoratorTest
 ```
+
+<br>
+
+#### Proprietor Form Styling Background:
+The main purpose behind this feature was to make the user interface much more appealing when it comes to all the forms
+used by the proprietor. So, a nav bar was added to all the pages with only a few links that made sense available on 
+the nav bar. Also, fixed up styling for the spaces that show up on the account page. Also, revamped the date and time 
+page to look more appealing and fixed up the date and time cards.
+
+#### Proprietor Form Styling Testing:
+The main test done was the redirection changes. When a space is created the user is redirected to the account rather 
+than to the page to create new date and time. All the other stuff was styling changes that just added or made the 
+interface more appealing so nothing could be tested automatically. We did end up testing if the nav bar was being used
+in when the specific pages were called.
+
+```
+./manage.py test sharedspaces.tests.FormsStylingTest
