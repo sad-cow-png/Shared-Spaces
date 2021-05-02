@@ -17,27 +17,19 @@
 
   .create_space_table, .update_space_table, .space_date_time_table{
       width: 800px;
-      color: white;
+      color: #B4DFE5;
   }
 
   .space_submit_button{
-      margin-top: 10px;
-      margin-bottom: 10px;
+      margin-top: 5px;
       width: 400px;
-      background-color: #B4DFE5;
-      color: black;
-  }
-
-  .space_submit_button:hover {
-      background-color: #D2FDFF;
   }
 
   table{
       color: #F4976C;
       margin: auto;
       border-spacing: 5px;
-      border-color: #F4976C;
-
+      border: none;
   }
 
   th, td {
@@ -52,15 +44,28 @@
 
   h3, h5{
       text-align: center;
-      color: white;
+      color: #B4DFE5;
+  }
+
+  .btn {
+      margin-bottom: 10px;
+  }
+
+  .btn:hover {
+      color: #B4DFE5;
   }
 
   .card-title{
       color: black;
   }
 
-  .date-title{
-      color: black;
+  .container-fluid{
+      background-color: #303C6C;
+      width: auto;
+      height: auto;
   }
 
+  .list-group{
+      overflow: auto;
+  }
 
