@@ -1285,6 +1285,7 @@ class ReserveFormSeleniumTests(TestCase):
     def tearDown(self):
         self.driver.close()
 
+
 #   end ############################################################################################
 
 
@@ -1577,7 +1578,6 @@ class SearchBarTests(TestCase):
     restroom = TestCase.test_space_form.cleaned_data['space_restrooms']
     food_drink = TestCase.test_space_form.cleaned_data['space_food_drink']
 
-
     # pulls data from form and fills out model fields to save space in table
     test_space = Space(space_name=name,
                        space_description=description,
@@ -1588,7 +1588,7 @@ class SearchBarTests(TestCase):
                        space_restrooms=restroom,
                        space_food_drink=food_drink)
 
-####    test_space.save()
+    ####    test_space.save()
 
     # now create and save the space data model
     space_date = TestCase.test_form_date.cleaned_data['date']
@@ -1599,7 +1599,8 @@ class SearchBarTests(TestCase):
                               space_start_time=space_start_time,
                               space_end_time=space_end_time,
                               space_id=space_id)
- ####   date_time.save()
+
+    ####   date_time.save()
 
     # Testing that the query method utilized will work on data contained in tables
     def QueryCheck(self):
@@ -1937,8 +1938,13 @@ class ClientReservedListingTests(TestCase):
 
         spacenames.append(spaceName)
 
+        # Save selected date and time
         selectDate = Select(driver.find_element_by_name("reserve_date"))
         selectDate.select_by_index(1)
+        sp1_date = selectDate.first_selected_option
+
+        selectTime = Select(driver.find_element_by_name("reserve_time_slot"))
+        sp1_time = selectTime.first_selected_option
 
         submit = driver.find_element_by_xpath("//input[@type = 'submit']")
         submit.send_keys(Keys.RETURN)
@@ -1951,8 +1957,13 @@ class ClientReservedListingTests(TestCase):
 
         spacenames.append(spaceName2)
 
+        # Save selected date and time
         selectDate = Select(driver.find_element_by_name("reserve_date"))
         selectDate.select_by_index(1)
+        sp2_date = selectDate.first_selected_option
+
+        selectTime = Select(driver.find_element_by_name("reserve_time_slot"))
+        sp2_time = selectTime.first_selected_option
 
         submit = driver.find_element_by_xpath("//input[@type = 'submit']")
         submit.send_keys(Keys.RETURN)
@@ -1971,10 +1982,22 @@ class ClientReservedListingTests(TestCase):
         for i in range(2):
             text = spaces[i].text
             text = text.split(' ')
-            text = text[0:len(text)-1]
+            text = text[0:len(text) - 1]
             text = ' '.join(text)
             sp.append(text)
             self.assertTrue(sp[i] in spacenames)
+
+        # Confirm matching date and times appear in page
+        dt = driver.find_elements_by_xpath("//p[@class='card-text' and @id='sp_date']")
+        time = driver.find_elements_by_xpath("//p[@class='card-text' and @id='sp_time']")
+
+        for d in dt:
+            self.assertTrue(sp1_date or sp2_date == d.text)
+            print(d.text)
+
+        for t in time:
+            self.assertTrue(sp1_time or sp2_time == t.text)
+            print(t.text)
 
     def test_listing_tags_redirect(self):
         driver = self.driver
@@ -1997,8 +2020,9 @@ class ClientReservedListingTests(TestCase):
 
         # Check tags redirect to tag page
         tags[1].click()
-        self.assertEqual(driver.current_url, self.index_url+'/tag/'+tag_name)
+        self.assertEqual(driver.current_url, self.index_url + '/tag/' + tag_name)
 
     def tearDown(self):
         self.driver.close()
+
 
