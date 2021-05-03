@@ -1,8 +1,10 @@
+from random import randrange
 from django.http import HttpResponse
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from django.test import TestCase
 from django.urls import reverse
@@ -1285,7 +1287,6 @@ class ReserveFormSeleniumTests(TestCase):
         spaces = driver.find_element_by_tag_name('p').text
         self.assertEqual(spaceName, spaces)
 
-
     def tearDown(self):
         self.driver.close()
 
@@ -1619,7 +1620,9 @@ class SearchBarTests(TestCase):
                               space_end_time=space_end_time,
                               space_id=space_id)
 
+
     date_time.save()
+
 
     # Testing that the query method utilized will work on data contained in tables
     def QueryCheck(self):
@@ -2387,4 +2390,117 @@ class FormsStylingTest(TestCase):
         # Test that it is using the right templates
         self.assertTemplateUsed(response, 'sharedspaces/update_space.html')
         self.assertTemplateUsed(response, 'sharedspaces/form_header.html')
+
+        
+# Added by Binh
+# Test checks randomly selected tag on each type of search results page
+# redirects to correct tag name page
+# Assumes there are spaces saved on the database
+class SearchResultTagTest(TestCase):
+    def setUp(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())  # opens a webpage
+
+        self.index_url = "http://127.0.0.1:8000"
+        
+    def test_search_all_space_dates(self):
+        driver = self.driver
+
+        driver.get(self.index_url)
+
+        # Search all spaces and date/time listings
+        searchButton = driver.find_element_by_xpath("//input[@value='Search']")
+        searchButton.send_keys(Keys.RETURN)
+
+        # Find tags
+        tags = driver.find_elements_by_xpath("//button[@class='badge rounded-pill']")
+
+        if tags:
+            num = randrange(len(tags))      #Choose random tag
+            tag_name = tags[num].text
+
+            # Reformat tag_name for tag url matching, works for 2 words only
+            if len(tag_name.split()) > 1:
+                tag_name = tag_name.split()
+                tag_name = tag_name[0] + '%20' + tag_name[len(tag_name) - 1]
+
+            # Move to tag and click on tag
+            coordinates = tags[num].location_once_scrolled_into_view
+            driver.execute_script('window.scrollTo({}, {});'.format(coordinates['x'], coordinates['y']))
+            driver.execute_script('arguments[0].click();', tags[num])
+
+            # Check tags redirect to tag page
+            self.assertEqual(driver.current_url, self.index_url + '/tag/' + tag_name)
+
+    def test_search_by_space(self):
+        driver = self.driver
+
+        driver.get(self.index_url)
+
+        # Search by space names
+        selectSearch = Select(driver.find_element_by_name("filters"))
+        selectSearch.select_by_value('space')
+        search = selectSearch.first_selected_option
+
+        self.assertEqual(search.text, 'Space')
+
+        searchButton = driver.find_element_by_xpath("//input[@value='Search']")
+        searchButton.send_keys(Keys.RETURN)
+
+        # Find tags
+        tags = driver.find_elements_by_xpath("//button[@class='badge rounded-pill']")
+
+        if tags:
+            num = randrange(len(tags))      #Choose random tag
+            tag_name = tags[num].text
+
+            # Reformat tag_name for tag url matching, works for 2 words only
+            if len(tag_name.split()) > 1:
+                tag_name = tag_name.split()
+                tag_name = tag_name[0] + '%20' + tag_name[len(tag_name) - 1]
+
+            # Move to tag and click on tag
+            coordinates = tags[num].location_once_scrolled_into_view
+            driver.execute_script('window.scrollTo({}, {});'.format(coordinates['x'], coordinates['y']))
+            driver.execute_script('arguments[0].click();', tags[num])
+
+            # Check tags redirect to tag page
+            self.assertEqual(driver.current_url, self.index_url + '/tag/' + tag_name)
+
+    def test_search_by_date(self):
+        driver = self.driver
+
+        driver.get(self.index_url)
+
+        # Search by date/time listings
+        selectSearch = Select(driver.find_element_by_name("filters"))
+        selectSearch.select_by_value('date')
+        search = selectSearch.first_selected_option
+
+        self.assertEqual(search.text, 'Date')
+
+        searchButton = driver.find_element_by_xpath("//input[@value='Search']")
+        searchButton.send_keys(Keys.RETURN)
+
+        # Find tags
+        tags = driver.find_elements_by_xpath("//button[@class='badge rounded-pill']")
+
+        if tags:
+            num = randrange(len(tags))       #Choose random tag
+            tag_name = tags[num].text
+
+            # Reformat tag_name for tag url matching, works for 2 words only
+            if len(tag_name.split()) > 1:
+                tag_name = tag_name.split()
+                tag_name = tag_name[0] + '%20' + tag_name[len(tag_name) - 1]
+
+            # Move to tag and click on tag
+            coordinates = tags[num].location_once_scrolled_into_view
+            driver.execute_script('window.scrollTo({}, {});'.format(coordinates['x'], coordinates['y']))
+            driver.execute_script('arguments[0].click();', tags[num])
+
+            # Check tags redirect to tag page
+            self.assertEqual(driver.current_url, self.index_url + '/tag/' + tag_name)
+
+    def tearDown(self):
+        self.driver.close()
 
