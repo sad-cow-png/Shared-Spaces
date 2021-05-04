@@ -15,12 +15,15 @@
     body {
         background-color: #D2FDFF;
         overflow: auto;
+        height: auto;
+        width: auto;
     }
 
     .container-fluid{
         background-color: #303C6C;
         width: auto;
         height: auto;
+        word-wrap: break-word;
     }
 
     .badge {
