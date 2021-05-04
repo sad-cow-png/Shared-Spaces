@@ -136,3 +136,11 @@ class SpaceDateTime(models.Model):
     def s_space_id(self):
         location = self.space_id.space_name
         return "This is an availability time for the following space: {}".format(location)
+
+class SpaceFeedback(models.Model):
+    space_feedback = models.CharField(max_length=1000)
+
+    # Leaving this for further development as needed
+    space_dt_reserved_by = models.CharField(max_length=1000, default='No User')
+    space_id = models.ForeignKey('Space', on_delete=models.CASCADE, default=None, null=True)
+
