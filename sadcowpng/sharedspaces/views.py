@@ -6,8 +6,8 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm,\
-    ClientSignUpForm, SpaceTimes, ReserveSpaceForm
-from .models import Space, User, SpaceDateTime
+    ClientSignUpForm, SpaceTimes, ReserveSpaceForm, SpaceFeedbackForm
+from .models import Space, User, SpaceDateTime, SpaceFeedback
 from django.db.models import Q
 from itertools import chain
 from .decorators import proprietor_required, user_is_space_owner, client_required, user_is_date_owner
@@ -481,3 +481,24 @@ def tag_spaces(request, slug):
     }
 
     return render(request, 'sharedspaces/tagged_spaces.html', context=context)
+
+
+def write_feedback(request, space_id):
+    # Does not restrict user feedback to logged in users - can be changed
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        space_form = SpaceFeedbackForm(request.POST)
+        # check whether it's valid:
+        if space_form.is_valid():
+            # User writes feedback and it is saved with an association to the selected space
+            # This is so when the feedback gets a page for viewing feedback it can load appropriately
+            space_fb = space_form.cleaned_data['space_feedback']
+            sp = SpaceFeedback(space_feedback = space_fb, space_id=Space.objects.get(pk=space_id))
+            sp.save()
+
+            return HttpResponseRedirect(reverse('index'))
+    else:
+        space_form= SpaceFeedbackForm()
+        context = {'form': space_form,
+                   "space_id": space_id}
+        return render(request, 'sharedspaces/write_feedback.html', context)

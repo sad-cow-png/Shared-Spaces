@@ -85,3 +85,7 @@ class ReserveSpaceForm(forms.Form):
     reserve_date = ReserveDateChoiceField(label='Available date(s):', queryset=None, required=True)
     reserve_time_slot = ReserveTimeChoiceField(label='Available time slot:', queryset=None, required=True,
                                                empty_label=None)
+
+
+class SpaceFeedbackForm(forms.Form):
+    space_feedback = forms.CharField(label='', max_length=1000, strip=True)
