@@ -23,6 +23,7 @@
         background-color: #303C6C;
         width: auto;
         height: auto;
+        word-wrap: break-word;
     }
 
     .badge {

@@ -2,14 +2,30 @@
         margin-right: 20px;
       }
 
-      #user{
-          margin-left: 20px;
-          margin-right: 20px;
-          color: #FBE8A6;
-      }
+    #user{
+        margin-left: 20px;
+        margin-right: 20px;
+        color: #FBE8A6;
+        white-space: pre;
+        overflow: auto;
+    }
 
-      nav{
-          background-color: #F4976C;
-          width: auto;
-      }
+    nav{
+        background-color: #F4976C;
+    }
+
+    .navbar-nav{
+        width: auto;
+    }
+
+    @media only screen and (max-width: 768px){
+        .navbar-text{
+            margin-right: 10%;
+        }
+
+        .navbar-nav{
+            width: auto;
+        }
+
+    }
 

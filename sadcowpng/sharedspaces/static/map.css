@@ -19,3 +19,14 @@ body {
     width: 40%;
     padding: 1%
 }
+
+ @media only screen and (max-width: 768px){
+     #map{
+        width: 95vw;
+        height: 80vh;
+     }
+
+     .search_bar{
+        width: 80%;
+     }
+ }

@@ -51,7 +51,7 @@
                         <a class="nav-link" href="{% url 'create_space' %}">Add Listing</a>
                     </li>
                 </ul>
-                <span id="user" class="navbar-brand">Hi,  {{ user.get_username }}</span>
+                <span id="user" class="navbar-text">Hi,  {{ user.get_username }}</span>
 
             {% elif user.is_authenticated and user.is_client %}
                 <nav class="navbar-text">
@@ -69,14 +69,14 @@
                         <a class="nav-link" href="#">Saved Spaces</a>
                     </li>
                 </ul>
-                <span id="user" class="navbar-brand">Hi,  {{ user.get_username }}</span>
+                <span id="user" class="navbar-text">Hi,  {{ user.get_username }}</span>
 
 
                 <!-- header can be used in homepage, whether logged in or not -->
             {% else %}
                  <nav class="navbar-text">
                     Reserve your spaces now!
-                </nav>
+                 </nav>
 
                 <ul class="navbar-nav ms-auto my-2">
                     <li class="nav-item active">
