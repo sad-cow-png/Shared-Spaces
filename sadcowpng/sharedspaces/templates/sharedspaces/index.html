@@ -52,17 +52,15 @@
                 var myObj = {
                     "spc_desc":"{{spaces.space_description|escapejs|safe}}",
                     "spc_name": "{{spaces.space_name|escapejs|safe}}",
-                    "spc_addr": "{{spaces.space_address1}}",
-                    "spc_zip": "{{spaces.space_zip_code}}",
+                    "spc_addr": "{{spaces.space_address1|safe}}",
+                    "spc_zip": "{{spaces.space_zip_code|safe}}"
                     // later we will need to add address information, I won't bother rn
                     // after looking it up, we need to do quite a bit of work (potentially) on
                     // the address before we send it to google's geolocation
                 };
                 // check "goodness" of myObj
-                if (space_good(myObj)) {
-                    data.push(myObj);
-                    numObjs = numObjs + 1;
-                }
+                data.push(myObj);
+                numObjs = numObjs + 1;
                 </script>
             {% endfor %}
             {% endif %}
