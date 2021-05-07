@@ -2,6 +2,7 @@
 
 // create some variables!
 
+var geocoder;
 
 const umbcLatLng = {lat: 39.256, lng: -76.717};
 const mapOptions = {
@@ -22,6 +23,7 @@ function initMap() {
     infoWindow1 = new google.maps.InfoWindow( {
             content: "nothing",
     });
+    geocoder = new google.maps.Geocoder();
     const moveToCurrentLocation = document.createElement("button");
     moveToCurrentLocation.textContent = "Move to Current Location";
     moveToCurrentLocation.classList.add("custom-map-control-button");
@@ -125,21 +127,37 @@ function create_marker(obj) {
     // no error checking here, we raw dogging
     var pos;
     // here we take the object and get a pos out of it
-    pos = obj_to_pos(obj);
-    // now we create a marker
-    var marker = new google.maps.Marker({
-        position: {lat: pos.lat, lng: pos.lng},
-        map: map, // default map
+    //pos = obj_to_pos(obj);
+    // before we create a marker, we want to do a geocoding call
+    // on the address
+    geocoder.geocode(
+        {
+            address: obj["spc_addr"],
+            componentRestrictions: {
+                country: 'US',
+                postalCode: obj["spc_zip"],
+            }
+        }, (results, status) => {
+      if (status === "OK") {
+        // do work
+          var marker = new google.maps.Marker({
+            position: results[0].geometry.location,
+            map: map, // default map
+            });
+        marker.addListener('click', (event)=> {
+            infoWindow2 = new google.maps.InfoWindow( {
+                content: make_html_from_obj(obj),
+            });
+            infoWindow2.open(map,marker);
         });
-    marker.addListener('click', (event)=> {
-        infoWindow2 = new google.maps.InfoWindow( {
-            content: make_html_from_obj(obj),
-        });
-        infoWindow2.open(map,marker);
+      }
     });
+
+
 }
 
 function obj_to_pos(obj) {
+    // turns out we do not need to do anything super special with the address
     return umbcLatLng; // temp value to put markers on the map
 }
 
