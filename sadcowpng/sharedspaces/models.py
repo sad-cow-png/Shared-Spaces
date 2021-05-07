@@ -26,7 +26,7 @@ class Space(models.Model):
     space_description = models.CharField(max_length=1000)
     space_max_capacity = models.IntegerField()
     space_address1 = models.CharField(max_length=1024)
-    space_address2 = models.CharField(max_length=1024, default="",blank=True)
+    space_address2 = models.CharField(max_length=1024, default="", blank=True)
     space_zip_code = models.CharField(max_length=5)
     space_city = models.CharField(max_length=1024)
     space_state = models.CharField(max_length=50)
@@ -94,6 +94,7 @@ class Space(models.Model):
                                                  self.space_state, self.space_zip_code, self.space_country)
         return address
 
+
 class SpaceDateTime(models.Model):
     # Switch to char if this does not work
     space_date = models.CharField(max_length=100, default='EMPTY')
@@ -135,4 +136,11 @@ class SpaceDateTime(models.Model):
     def s_space_id(self):
         location = self.space_id.space_name
         return "This is an availability time for the following space: {}".format(location)
+
+class SpaceFeedback(models.Model):
+    space_feedback = models.CharField(max_length=1000)
+
+    # Leaving this for further development as needed
+    space_dt_reserved_by = models.CharField(max_length=1000, default='No User')
+    space_id = models.ForeignKey('Space', on_delete=models.CASCADE, default=None, null=True)
 

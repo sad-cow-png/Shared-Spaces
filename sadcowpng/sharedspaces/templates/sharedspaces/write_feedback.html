@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-    <title>Create Space</title>
+    <title>Write Feedback</title>
 {% endblock %}
 
 {% block css %}
@@ -12,11 +12,11 @@
 {% block content %}
     <body>
         <div class="container-fluid">
-            <div class = "create_space_form">
-                <h3>Enter Your Space Information</h3>
-                <form  action="/create_space/" method="post">
+            <div class = "write_feedback_form">
+                <h3>Enter your feedback on this space!</h3>
+                <form  action="/write_feedback/{{space_id}}" method="post">
                     {% csrf_token %}
-                    <table class="create_space_table" border="1">
+                    <table class="write_feedback_t" border="1">
                         {{ form.as_table }}
                     </table>
                     <input class="btn btn-primary space_submit_button" type="submit" value="Submit">
@@ -26,5 +26,3 @@
         </div>
     </body>
 {% endblock %}
-
-

@@ -38,13 +38,12 @@ class CreateSpaceForm(forms.Form):
     space_tags = TagField(help_text='Use a comma to separate tags.', widget=TagWidget(), required=False)
 
 
-
 # Used for proprietor sign up view
 class ProprietorSignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
-        
-        
+
+
 # Saves user as a proprietor
 # Right now the client/props seem similar, but later
 # we may want different forms for different types of users
@@ -88,3 +87,5 @@ class ReserveSpaceForm(forms.Form):
                                                empty_label=None)
 
 
+class SpaceFeedbackForm(forms.Form):
+    space_feedback = forms.CharField(label='', max_length=1000, strip=True)

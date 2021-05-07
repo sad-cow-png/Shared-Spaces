@@ -5,8 +5,10 @@
     <head>
         <meta charset="UTF-8">
         {% block title %}
-        <title>Search Results</title>
+        <title>Form Title</title>
         {% endblock %}
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <!-- Bootstrap CSS -->
         <link crossorigin="anonymous"
@@ -26,7 +28,7 @@
 
     <body>
 
-        <!-- account navbar -->
+        <!-- Forms navbar -->
         <nav class="navbar navbar-expand-sm navbar-dark">
             <a class="navbar-brand" href="{% url 'index' %}">
                 Shared Spaces
@@ -45,49 +47,8 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'account' %}">My Listings</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'create_space' %}">Add Listing</a>
-                    </li>
                 </ul>
                 <span id="user" class="navbar-brand">Hi,  {{ user.get_username }}</span>
-
-            {% elif user.is_authenticated and user.is_client %}
-                <nav class="navbar-text">
-                    Client Account
-                </nav>
-
-                <ul class="navbar-nav ms-auto my-2">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">My Spaces</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Saved Spaces</a>
-                    </li>
-                </ul>
-                <span id="user" class="navbar-brand">Hi,  {{ user.get_username }}</span>
-
-
-                <!-- header can be used in homepage, whether logged in or not -->
-            {% else %}
-                 <nav class="navbar-text">
-                    Reserve your spaces now!
-                </nav>
-
-                <ul class="navbar-nav ms-auto my-2">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'login' %}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'sign_up' %}">Create Account</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"></a>
-                    </li>
-                </ul>
-
             {% endif %}
         </nav>
 

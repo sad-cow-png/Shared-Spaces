@@ -1,35 +1,29 @@
+{% extends 'sharedspaces/form_header.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Update A Space</title>
+{% block title %}
+    <title>Update Space</title>
+{% endblock %}
 
-        <!-- Bootstrap CSS -->
-        <link crossorigin="anonymous"
-              href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
-              integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
-              rel="stylesheet">
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'spaces.css' %}">
+{% endblock %}
 
-        <link rel="stylesheet" type="text/css" href="{% static 'spaces.css' %}">
-
-          <!-- favicon -->
-        <link rel="shortcut icon" type="image/png" href="{% static 'logo2-dark.png' %}"/>
-
-    </head>
+{% block content %}
     <body>
-        <div class = "update_space_form">
-            <h3>Update the Information for {{name}}</h3>
-            <form  action="/update_space/{{space_id}}" method="post">
-                {% csrf_token %}
-                <table class="update_space_table" border="1">
-                    {{ form }}
-                </table>
-                <input class="space_submit_button" type="submit" value="Update">
-                <input class="space_submit_button" type="reset" value="Back to Previous Values">
-            </form>
+        <div class="container-fluid">
+            <div class = "update_space_form">
+                <h3>Update the Information for {{name}}</h3>
+                <form  action="/update_space/{{space_id}}" method="post">
+                    {% csrf_token %}
+                    <table class="update_space_table" border="1">
+                        {{ form }}
+                    </table>
+                    <input class="btn btn-primary space_submit_button" type="submit" value="Update">
+                    <input class="btn btn-primary space_submit_button" type="reset" value="Back to Previous Values">
+                </form>
+            </div>
         </div>
     </body>
-</html>
+{% endblock %}
 

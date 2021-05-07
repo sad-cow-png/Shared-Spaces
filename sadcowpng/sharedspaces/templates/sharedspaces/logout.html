@@ -5,6 +5,7 @@
         <meta charset="UTF-8">
         <title>Logout</title>
 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <!-- Bootstrap CSS -->
         <link crossorigin="anonymous"
@@ -30,8 +31,10 @@
             <div id="logout_box" class="shadow d-flex align-items-center justify-content-center p-2 rounded">
                 <ul>
                     <li id="logout_text">You have successfully logged out!</li>
-                    <a type="button" class="btn" id="login_btn" href="{% url 'login' %}">Click here to login again</a>
-                    <a type="button" class="btn" id="home_btn" href="{% url 'index' %}">Home</a>
+                    <input class="btn" id="login_btn" onclick="window.location='{% url 'login' %}'"
+                           value="Click here to login again">
+                    <input class="btn" id="home_btn" onclick="window.location='{% url 'index' %}'"
+                           value="Home">
                 </ul>
             </div>
         </div>

@@ -1,52 +1,105 @@
-{% extends 'sharedspaces/search_header.html' %}
+{% extends 'sharedspaces/account_header.html' %}
 {% load static %}
 
 {% block css %}
     <link rel="stylesheet" type="text/css" href="{% static 'account.css' %}">
 {% endblock %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+
+{% block title %}
     <title>Search Results!</title>
-</head>
+{% endblock %}
+
 {% block content %}
 
 <body>
     <div>
         {% if val == 'all' %}
             <h1>Displaying Search Results for an ALL search.</h1>
-                {% for allqs in all %}
-                    <div class="col-sm-5">
-                        <div class="card">
-                            <div class="card-body">
+            <div class="row g-4">
+                  {% for allqs in all %}
+                      <div class="col-sm-5">
+                            <div class="card border-info mb-3">
+                            <div class="card-header bg-primary text-white">
                                 <h5 class="card-title">{{ allqs.space_name }}</h5>
                                 <h5 class="card-title">{{ allqs.space_id.space_name }}</h5>
-                                <p class="card-text">{{ allqs.space_description }}</p>
-                                <p class="card-text">{{ allqs.space_id.space_description }}</p>
-                                Max Capacity:
-                                <p class="card-text">{{ allqs.space_max_capacity }}</p>
-                                <p class="card-text">{{ allqs.space_id.space_max_capacity }}</p>
-                                Wifi Offered?
-                                <p class="card-text">{{ allqs.space_wifi }}</p>
-                                <p class="card-text">{{ allqs.space_id.space_wifi }}</p>
-                                Restrooms Offered?
-                                <p class="card-text">{{ allqs.space_restrooms }}</p>
-                                <p class="card-text">{{ allqs.space_id.space_restrooms }}</p>
-                                Food/Drink Offered?
-                                <p class="card-text">{{ allqs.space_food_drink }}</p>
-                                <p class="card-text">{{ allqs.space_id.space_food_drink }}</p>
-                                <a href="" class="btn btn-primary">Reserve Space</a>
+                                {% if allqs.space_open or allqs.space_id.space_open %}
+                                    <span class="badge badge-success">Open</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Closed</span>
+                                {% endif %}
+                            </div>
+                            <p class="card-text">{{ allqs.space_description }}</p>
+                            <p class="card-text">{{ allqs.space_id.space_description }}</p>
+                            <ul class="list-group list-group-horizontal list-group-flush">
+                                <li class="list-group-item list-group-item-info">
+                                    Max Capacity
+                                    {% if allqs.space_wifi %}
+                                       <p class="card-text">{{ allqs.space_max_capacity }}</p>
+                                    {% elif allqs.space_id.space_wifi %}
+                                        <p class="card-text"> {{ allqs.space_id.space_max_capacity }}</p>
+                                    {% endif %}
+                                </li>
+                                <li class=" list-group-item list-group-item-info">
+                                    Wifi Offered?
+                                    {% if allqs.space_wifi or allqs.space_id.space_wifi %}
+                                        <p class="card-text">Yes</p>
+                                    {% else %}
+                                        <p class="card-text">No</p>
+                                    {% endif %}
+                                </li>
+                                <li class="list-group-item list-group-item-info">
+                                    Restrooms Offered?
+                                    {% if allqs.space_restooms or allqs.space_id.space_restrooms %}
+                                        <p class="card-text">Yes</p>
+                                    {% else %}
+                                        <p class="card-text">No</p>
+                                    {% endif %}
+                                </li>
+                                <li class="list-group-item list-group-item-info">
+                                    Food/Drink Offered?
+                                    {% if allqs.space_food_drink or allqs.space_id.space_food_drink %}
+                                        <p class="card-text">Yes</p>
+                                    {% else %}
+                                        <p class="card-text">No</p>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                            <div class="card-body">
+                                {% for tag in allqs.space_tags.all %}
+                                    <button type="button" class="badge rounded-pill"
+                                            onclick="window.location.href='{% url 'tagged_spaces' tag %}'">
+                                        {{ tag }}</button>
+                                {% endfor %}
+                                {% for tag in allqs.space_id.space_tags.all %}
+                                    <button type="button" class="badge rounded-pill"
+                                            onclick="window.location.href='{% url 'tagged_spaces' tag %}'">{{ tag }}</button>
+                                {% endfor %}
+                            </div>
+                            <div class="card-body">
+                                {% if allqs.pk %}
+                                    <a href="{% url 'reserve_space' allqs.pk %}" class="btn btn-primary">Reserve Space</a>
+                                {% elif allqs.space_id.pk %}
+                                    <a href="{% url 'reserve_space' allqs.space_id.pk %}" class="btn btn-primary">Reserve Space</a>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                {% if allqs.pk %}
+                                    <a href="{% url 'write_feedback' allqs.pk%}" class="btn btn-primary">Write Feedback</a>
+                                {% elif allqs.space_id.pk %}
+                                    <a href="{% url 'write_feedback' allqs.space_id.pk%}" class="btn btn-primary">Write Feedback</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 {% endfor %}
+            </div>
         {% elif val == 'space' %}
+            <div class="row g-4">
             <h1>Displaying Search Results for a SPACE search.</h1>
-            {% for spaces in space %}
+                {% for spaces in space %}
                     <div class="col-sm-5">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="card border-info mb-3">
+                            <div class="card-header bg-primary text-white">
                                 <h5 class="card-title">{{ spaces.space_name }}
                                     {% if spaces.space_open %}
                                         <span class="badge badge-success">Open</span>
@@ -54,47 +107,118 @@
                                         <span class="badge badge-danger">Closed</span>
                                     {% endif %}
                                 </h5>
-                                <p class="card-text">{{ spaces.space_description }}</p>
-                                Max Capacity
-                                <p class="card-text">{{ spaces.space_max_capacity }}</p>
-                                Wifi Offered?
-                                <p class="card-text">{{ spaces.space_wifi }}</p>
-                                Restrooms Offered?
-                                <p class="card-text">{{ spaces.space_restrooms }}</p>
-                                Food/Drink Offered?
-                                <p class="card-text">{{ spaces.space_food_drink }}</p>
-                                <a href="" class="btn btn-primary">Reserve Space</a>
+                            </div>
+                            <p class="card-text">{{ spaces.space_description }}</p>
+                            <ul class="list-group list-group-horizontal list-group-flush">
+                                <li class="list-group-item list-group-item-info">
+                                    Max Capacity
+                                    <p class="card-text">{{ spaces.space_max_capacity }}</p>
+                                </li>
+                                <li class="list-group-item list-group-item-info">
+                                    Wifi Offered?
+                                    {% if spaces.space_wifi %}
+                                        <p class="card-text">Yes</p>
+                                    {% else %}
+                                        <p class="card-text">No</p>
+                                    {% endif %}
+                                </li>
+                                <li class="list-group-item list-group-item-info">
+                                    Restrooms Offered?
+                                    {% if spaces.space_restrooms %}
+                                        <p class="card-text">Yes</p>
+                                    {% else %}
+                                        <p class="card-text">No</p>
+                                    {% endif %}
+                                </li>
+                                <li class="list-group-item list-group-item-info">
+                                    Food/Drink Offered?
+                                    {% if spaces.space_food_drink %}
+                                        <p class="card-text">Yes</p>
+                                    {% else %}
+                                        <p class="card-text">No</p>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                            <div class="card-body">
+                                {% for tag in spaces.space_tags.all %}
+                                    <button type="button" class="badge rounded-pill"
+                                            onclick="window.location.href='{% url 'tagged_spaces' tag %}'">{{ tag }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+                            <div class="card-body">
+                                <a href="{% url 'reserve_space' spaces.pk %}" class="btn btn-primary">Reserve Space</a>
+                            </div>
+                            <div class="card-body">
+                                <a href="{% url 'write_feedback' spaces.pk %}" class="btn btn-primary">Write Feedback</a>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
+            </div>
         {% elif val == 'date' %}
+            <div class="row g-4">
             <h1>Displaying Search Results for a DATE search.</h1>
                 {% for dates in date %}
                     <div class="col-sm-5">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ dates.space_id.space_name }}
-                                    {% if dates.space_open %}
-                                        <span class="badge badge-success">Open</span>
+                        <div class="card border-info mb-3">
+                            <div class="card-header bg-primary text-white">
+                            <h5 class="card-title">{{ dates.space_id.space_name }}
+                                {% if dates.space_id.space_open %}
+                                    <span class="badge badge-success">Open</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Closed</span>
+                                {% endif %}
+                            </h5>
+                            </div>
+                            <p class="card-text">{{ dates.space_id.space_description }}</p>
+                            <ul class="list-group list-group-horizontal list-group-flush">
+                                <li class="list-group-item list-group-item-info">
+                                    Max Capacity
+                                    <p class="card-text">{{ dates.space_id.space_max_capacity }}</p>
+                                </li>
+                                <li class="list-group-item list-group-item-info">
+                                    Wifi Offered?
+                                    {% if dates.space_id.space_wifi %}
+                                        <p class="card-text">Yes</p>
                                     {% else %}
-                                        <span class="badge badge-danger">Closed</span>
+                                        <p class="card-text">No</p>
                                     {% endif %}
-                                </h5>
-                                <p class="card-text">{{ dates.space_id.space_description }}</p>
-                                Max Capacity
-                                <p class="card-text">{{ dates.space_id.space_max_capacity }}</p>
-                                Wifi Offered?
-                                <p class="card-text">{{ dates.space_id.space_wifi }}</p>
-                                Restrooms Offered?
-                                <p class="card-text">{{ dates.space_id.space_restrooms }}</p>
-                                Food/Drink Offered?
-                                <p class="card-text">{{ dates.space_id.space_food_drink }}</p>
-                                <a href="" class="btn btn-primary">Reserve Space</a>
+                                </li>
+                                <li class="list-group-item list-group-item-info">
+                                    Restrooms Offered?
+                                    {% if dates.space_id.space_restrooms %}
+                                        <p class="card-text">Yes</p>
+                                    {% else %}
+                                        <p class="card-text">No</p>
+                                    {% endif %}
+                                </li>
+                                <li class="list-group-item list-group-item-info">
+                                    Food/Drink Offered?
+                                    {% if dates.space_id.space_food_drink %}
+                                        <p class="card-text">Yes</p>
+                                    {% else %}
+                                        <p class="card-text">No</p>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                            <div class="card-body">
+                                {% for tag in dates.space_id.space_tags.all %}
+                                    <button type="button" class="badge rounded-pill"
+                                            onclick="window.location.href='{% url 'tagged_spaces' tag %}'">
+                                            {{ tag }}</button>
+                                {% endfor %}
+                            </div>
+                            <div class="card-body">
+                                <a href="{% url 'reserve_space' dates.space_id.pk %}" class="btn btn-primary">Reserve Space</a>
+                            </div>
+                            <div class="card-body">
+                                <a href="{% url 'write_feedback' dates.space_id.pk%}" class="btn btn-primary">Write Feedback</a>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
+            </div>
         {% endif %}
     </div>
     <a type="button" class="btn" id="home_btn" href="{% url 'index' %}">Home</a>
@@ -102,4 +226,4 @@
 
 {% endblock %}
 
-</html>
+

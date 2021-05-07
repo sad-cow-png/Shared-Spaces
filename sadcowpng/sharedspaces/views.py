@@ -1,18 +1,16 @@
-from django.shortcuts import render, redirect, reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, reverse
+from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-
-from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm, ClientSignUpForm, SpaceTimes, \
-    ReserveSpaceForm
-from .models import Space, User, SpaceDateTime
+from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm,\
+    ClientSignUpForm, SpaceTimes, ReserveSpaceForm, SpaceFeedbackForm
+from .models import Space, User, SpaceDateTime, SpaceFeedback
 from django.db.models import Q
 from itertools import chain
-from django.views.generic import ListView
-from .decorators import proprietor_required, user_is_space_owner, client_required
+from .decorators import proprietor_required, user_is_space_owner, client_required, user_is_date_owner
 
 
 # Shared Spaces Home Page
@@ -21,64 +19,42 @@ def index(request):
         q = request.POST.get('query')
         ufilter = request.POST.get('filters')
         # submit type lets us change the redirect
-        submit_type = request.POST.get('submit_style') # new
+        submit_type = request.POST.get('submit_style')  # new
         space = Space.objects.filter(Q(space_name__contains=q) | Q(space_description__contains=q))
         date = SpaceDateTime.objects.filter(Q(space_date__contains=q))
         allq = chain(space, date)
+        # first I check if the submit type is NOT none, meaning we want markers!
+        if submit_type is not None:
+            context = {
+                'val': 'space',
+                'space': space,
+                'maps_api_key': settings.GOOGLE_MAPS_API_KEY
+            }
+            return render(request, 'sharedspaces/index.html', context=context)
         # The all search will comb through each model for a match case for the search query
         # Inter model searches will have chained results
-        if ufilter == 'all':
+        if ufilter == 'all' and submit_type is None:
+
+            # this submit type goes to original new page, with all the fancy details
+            context = {
+                'val': ufilter,
+                'all': allq
+            }
+            return render(request, 'sharedspaces/search_results.html', context=context)
+        if ufilter == 'space' and submit_type is None:
             # new stuff here
-            if submit_type == 'newPage':
-                # this submit type goes to original new page, with all the fancy details
-                context = {
-                    'val': ufilter,
-                    'all': allq
-                }
-                return render(request, 'sharedspaces/search_results.html', context=context)
-            if submit_type == 'markers':
-                # this submit type goes back to the map page
-                # but now we should have cool stuff in context
-                context = {
-                    'val': ufilter,
-                    'all': allq,
-                    'maps_api_key': settings.GOOGLE_MAPS_API_KEY,
-                }
-                return render(request, 'sharedspaces/index.html', context=context)
-        if ufilter == 'space':
+            context = {
+                'val': ufilter,
+                'space': space
+            }
+            return render(request, 'sharedspaces/search_results.html', context=context)
+        if ufilter == 'date' and submit_type == None:
             # new stuff here
-            if submit_type == 'newPage':
-                # original new page, with all the fancy details
-                context = {
-                    'val': ufilter,
-                    'space': space
-                }
-                return render(request, 'sharedspaces/search_results.html', context=context)
-            if submit_type == 'markers':
-                context = {
-                    'val': ufilter,
-                    'space': space,
-                    'maps_api_key': settings.GOOGLE_MAPS_API_KEY,
-                }
-                # this submit type goes back to the map page
-                return render(request, 'sharedspaces/index.html', context=context)
-        if ufilter == 'date':
-            # new stuff here
-            if submit_type == 'newPage':
-                context = {
-                    'val': ufilter,
-                    'date': date
-                }
-                # original new page, with all the fancy details
-                return render(request, 'sharedspaces/search_results.html', context=context)
-            if submit_type == 'markers':
-                context = {
-                    'val': ufilter,
-                    'date': date,
-                    'maps_api_key': settings.GOOGLE_MAPS_API_KEY,
-                }
-                # this submit type goes back to the map page
-                return render(request, 'sharedspaces/index.html', context=context)
+            context = {
+                'val': ufilter,
+                'date': date
+            }
+            return render(request, 'sharedspaces/search_results.html', context=context)
     else:
         context = {
             'maps_api_key': settings.GOOGLE_MAPS_API_KEY
@@ -198,7 +174,7 @@ def create_space(request):
             food_drink = space_form.cleaned_data['space_food_drink']
             user = request.user
             tags = space_form.cleaned_data['space_tags']
-            
+
             sp = Space(space_name=name, space_description=description, space_max_capacity=max_capacity,
                        space_address1=space_address1, space_address2=space_address2, space_zip_code=space_zip_code,
                        space_city=space_city, space_state=space_state, space_country=space_country,
@@ -215,7 +191,9 @@ def create_space(request):
                 space.space_tags.add(tag)
 
             # redirecting to date and time page once complete to get at least one data and time
-            return HttpResponseRedirect(reverse('space_date_time', args=[primary_key]))
+            # return HttpResponseRedirect(reverse('space_date_time', args=[primary_key]))
+            # now redirects to the account page from which the user can add date and time to their heart's content
+            return HttpResponseRedirect(reverse('account'))
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -273,7 +251,6 @@ def update_space(request, space_id):
                 else:
                     old_space.space_tags.add(tag)
 
-
             # save the updated object in the database
             old_space.save()
 
@@ -320,7 +297,8 @@ def update_space(request, space_id):
     return render(request, 'sharedspaces/update_space.html', context=context)
 
 
-#@user_is_space_owner
+@login_required
+@user_is_space_owner
 def space_date_time(request, space_id):
     """
     Used to create the data and time for a specific space
@@ -354,13 +332,14 @@ def space_date_time(request, space_id):
     return render(request, 'sharedspaces/space_date_time.html', context=context)
 
 
-@user_is_space_owner
-def update_space_date_time(request, data_time_id):
+@login_required
+@user_is_date_owner
+def update_space_date_time(request, date_time_id):
     """
     To update the toggle for date and time
     """
     # get the space from the data base with the given space id
-    old_date_time = SpaceDateTime.objects.get(pk=data_time_id)
+    old_date_time = SpaceDateTime.objects.get(pk=date_time_id)
 
     if request.method == 'POST':
         sdt = SpaceTimes(request.POST)
@@ -386,7 +365,7 @@ def update_space_date_time(request, data_time_id):
 
         context = {'form': sdt,
                    "old_date_time": old_date_time,
-                   "id": data_time_id}
+                   "id": date_time_id}
 
     return render(request, 'sharedspaces/update_space_date_time.html', context=context)
 
@@ -446,8 +425,8 @@ def load_times(request):
 
     return render(request, 'sharedspaces/time_slot_options.html', {'sp_times': sp_times})
 
-  
-@login_required  
+
+@login_required
 @user_is_space_owner
 def date_time(request, space_id):
     """
@@ -466,13 +445,13 @@ def date_time(request, space_id):
 
     return render(request, 'sharedspaces/date_time.html', context=context)
 
-  
+
 def tag_spaces(request, slug):
     """
     Filters space objects by tag and return
     to tag page based on tag slug
     """
-    spaces = Space.objects.filter(space_tags__slug=slug)
+    spaces = Space.objects.filter(space_tags__name=slug)
 
     context = {
         'space_list': spaces,
@@ -481,3 +460,23 @@ def tag_spaces(request, slug):
 
     return render(request, 'sharedspaces/tagged_spaces.html', context=context)
 
+
+def write_feedback(request, space_id):
+    # Does not restrict user feedback to logged in users - can be changed
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        space_form = SpaceFeedbackForm(request.POST)
+        # check whether it's valid:
+        if space_form.is_valid():
+            # User writes feedback and it is saved with an association to the selected space
+            # This is so when the feedback gets a page for viewing feedback it can load appropriately
+            space_fb = space_form.cleaned_data['space_feedback']
+            sp = SpaceFeedback(space_feedback = space_fb, space_id=Space.objects.get(pk=space_id))
+            sp.save()
+
+            return HttpResponseRedirect(reverse('index'))
+    else:
+        space_form= SpaceFeedbackForm()
+        context = {'form': space_form,
+                   "space_id": space_id}
+        return render(request, 'sharedspaces/write_feedback.html', context)
