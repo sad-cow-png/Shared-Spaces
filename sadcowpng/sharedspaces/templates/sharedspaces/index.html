@@ -52,15 +52,15 @@
                 var myObj = {
                     "spc_desc":"{{spaces.space_description|escapejs|safe}}",
                     "spc_name": "{{spaces.space_name|escapejs|safe}}",
+                    "spc_addr": "{{spaces.space_address1|safe}}",
+                    "spc_zip": "{{spaces.space_zip_code|safe}}"
                     // later we will need to add address information, I won't bother rn
                     // after looking it up, we need to do quite a bit of work (potentially) on
                     // the address before we send it to google's geolocation
                 };
                 // check "goodness" of myObj
-                if (space_good(myObj)) {
-                    data.push(myObj);
-                    numObjs = numObjs + 1;
-                }
+                data.push(myObj);
+                numObjs = numObjs + 1;
                 </script>
             {% endfor %}
             {% endif %}
@@ -83,12 +83,9 @@
                     But I also want a way to let the user decide if
                     they want the spaces in great detail
                     or just the map -->
-                    <select name="submit_style" id="submit_style">
-                        <option value="newPage">Show Me Details</option>
-                        <option value="markers">Show Me Markers</option>
-                    </select>
-                    <input class="space_submit_button" type="submit" value="Search">
+                    <input class="space_submit_button" type="submit" value="Search for Details!">
                     <input class="space_submit_button" type="reset" value="Clear">
+                    <input class="space_submit_button" type="submit" name="submit_style" id="submit_style" value="Show Me Markers!">
                 </form>
             </div>
             <script >
