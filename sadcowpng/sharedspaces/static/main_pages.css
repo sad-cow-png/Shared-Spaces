@@ -1,3 +1,8 @@
+    ::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
+    }
+
     .shadow {
         background-color: #303C6C;
         text-align: center;
@@ -183,6 +188,7 @@
             margin-top: 5%;
             width: 90%;
             overflow: scroll;
+
         }
 
         #client_box, #proprietor_box{

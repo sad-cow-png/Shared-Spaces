@@ -8,7 +8,7 @@
 {% block content %}
 
     <body>
-      <div class="container-fluid">
+        <div class="container-fluid">
 
         <!-- Layout may differ depending on user type  -->
         {% if user.is_client and user.is_authenticated %}
@@ -36,7 +36,7 @@
                                 </li>
                                 <li class="list-group-item list-group-item-info">
                                     Wifi Offered?
-                                    {% if spaces.space_id.space_wifi %}
+                                    {% if space.space_id.space_wifi %}
                                         <p class="card-text">Yes</p>
                                     {% else %}
                                         <p class="card-text">No</p>
@@ -76,14 +76,13 @@
                     </div>
                 {% endfor %}
             </div>
-
         {% endif %}
 
         {% if user.is_proprietor and user.is_authenticated %}
             <h1>Welcome, {{ user.get_username }}!</h1>
             <br>
             <h3>My Listings</h3>
-            <div class="row g-4">
+            <div class="row">
                 {% for spaces in space %}
                     <div class="col-sm-4">
                         <div class="card border-info mb-3">
@@ -147,7 +146,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-      </div>
+        </div>
     </body>
 {% endblock %}
 
