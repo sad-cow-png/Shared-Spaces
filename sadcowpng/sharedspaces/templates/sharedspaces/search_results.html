@@ -83,6 +83,12 @@
                                 {% endif %}
                             </div>
                             <div class="card-body">
+                                <form  action="/saved_spaces/" method="post">
+                                    {% csrf_token %}
+                                    <input class="btn btn-primary space_submit_button" type="submit" value="Save Space">
+                                </form>
+                            </div>
+                            <div class="card-body">
                                 {% if allqs.pk %}
                                     <a href="{% url 'write_feedback' allqs.pk%}" class="btn btn-primary">Write Feedback</a>
                                 {% elif allqs.space_id.pk %}
@@ -150,6 +156,12 @@
                                 <a href="{% url 'reserve_space' spaces.pk %}" class="btn btn-primary">Reserve Space</a>
                             </div>
                             <div class="card-body">
+                                <form  action="/saved_spaces/" method="post">
+                                    {% csrf_token %}
+                                    <input class="btn btn-primary space_submit_button" type="submit" value="Save Space">
+                                </form>
+                            </div>
+                            <div class="card-body">
                                 <a href="{% url 'write_feedback' spaces.pk %}" class="btn btn-primary">Write Feedback</a>
                             </div>
                         </div>
@@ -211,6 +223,12 @@
                             </div>
                             <div class="card-body">
                                 <a href="{% url 'reserve_space' dates.space_id.pk %}" class="btn btn-primary">Reserve Space</a>
+                            </div>
+                            <div class="card-body">
+                                <form  action="/saved_spaces/" method="post">
+                                    {% csrf_token %}
+                                    <input class="btn btn-primary space_submit_button" type="submit" value="Save Space">
+                                </form>
                             </div>
                             <div class="card-body">
                                 <a href="{% url 'write_feedback' dates.space_id.pk%}" class="btn btn-primary">Write Feedback</a>
