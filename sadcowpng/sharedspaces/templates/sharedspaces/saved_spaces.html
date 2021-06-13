@@ -1,0 +1,26 @@
+{% extends 'sharedspaces/account_header.html' %}
+{% load static %}
+
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'account.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <body>
+        <div class="container-fluid">
+
+        <!-- Layout may differ depending on user type  -->
+        {% if user.is_client and user.is_authenticated %}
+            <h1>Welcome, {{ user.get_username }}!</h1>
+            <br>
+            <!-- acount.html as reference-->
+            <h3>Saved Spaces</h3>
+            <div class="row">
+                <!-- logic for listing saved spaces here-->
+            </div>
+        {% endif %}
+        </div>
+    </body>
+{% endblock %}

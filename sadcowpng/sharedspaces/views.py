@@ -2,7 +2,7 @@ from django.shortcuts import render, reverse
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm,\
@@ -480,3 +480,16 @@ def write_feedback(request, space_id):
         context = {'form': space_form,
                    "space_id": space_id}
         return render(request, 'sharedspaces/write_feedback.html', context)
+
+
+# @login_required
+# @client_required
+# TODO: Ask ProfJ about why requirements aren't working
+def saved_spaces(request):
+    user = request.user
+
+    context = {
+        'user': user,
+    }
+
+    return render(request, 'sharedspaces/saved_spaces.html', context=context)
