@@ -481,15 +481,17 @@ def write_feedback(request, space_id):
                    "space_id": space_id}
         return render(request, 'sharedspaces/write_feedback.html', context)
 
-# @login_required
-# @client_required
-def save_space(request, space_id):
 
+def save_space(request, space_id):
+    """
+    POST: Updates User model saved_spaces field with a new saved space.
+    GET : Renders a save confirmation page for the desired space.
+    """
     user = request.user
     space = Space.objects.get(pk=space_id)
 
     if request.method == 'POST':
-        print('hi')
+        # Record the space to the user's saved_spaces field
         user.saved_spaces.add(space)
         user.save()
 
@@ -501,14 +503,13 @@ def save_space(request, space_id):
         'space_id': space_id,
     }
 
-    return render(request, 'sharedspaces/save_space.html', context)
+    return render(request, 'sharedspaces/save_space.html', context) 
 
 
-
-# @login_required
-# @client_required
 def saved_spaces(request):
-
+    """
+    Renders the spaces that the user has saved to view later on one page.
+    """
     user = request.user
     saved_spaces = []
 
