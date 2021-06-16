@@ -481,15 +481,45 @@ def write_feedback(request, space_id):
                    "space_id": space_id}
         return render(request, 'sharedspaces/write_feedback.html', context)
 
-
 # @login_required
 # @client_required
-# TODO: Ask ProfJ about why requirements aren't working
-def saved_spaces(request):
+def save_space(request, space_id):
+
     user = request.user
+    space = Space.objects.get(pk=space_id)
+
+    if request.method == 'POST':
+        print('hi')
+        user.saved_spaces.add(space)
+        user.save()
+
+        return HttpResponseRedirect(reverse('saved_spaces'))
 
     context = {
         'user': user,
+        'space': space,
+        'space_id': space_id,
+    }
+
+    return render(request, 'sharedspaces/save_space.html', context)
+
+
+
+# @login_required
+# @client_required
+def saved_spaces(request):
+
+    user = request.user
+    saved_spaces = []
+
+    for saved_space in user.saved_spaces.all():
+        print(saved_space.space_name)
+        saved_spaces.append(saved_space)
+
+    context = {
+        'user': user,
+        'saved_spaces': saved_spaces,
     }
 
     return render(request, 'sharedspaces/saved_spaces.html', context=context)
+
