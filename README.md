@@ -62,6 +62,21 @@ python manage.py test sharedspaces.tests.LoginTest
 ```
 <br>
 
+#### Save Space Background:
+Spaces returned from a search query have a button providing the user with the
+option to save the space and view it later. Clicking this button will take them
+to a confirmation page for the intended space. If the user confirms that they
+would like to save the space, then the space will be added to the saved_spaces
+field in the User model. The user can view their saved spaces under the Saved
+Spaces tab located in the account header.
+
+<br>
+
+URLs: <br>
+http://127.0.0.1:8000/save_space/<space_id> <br>
+http://127.0.0.1:8000/saved_spaces/ <br>
+
+#### Testing Save Space
 
 #### Interactive Map Background:
 The Google Maps JavaScript API embeds an interactive map centered over UMBC within a

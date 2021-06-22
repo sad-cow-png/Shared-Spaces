@@ -20,4 +20,6 @@ urlpatterns = [
     path('date_time/<space_id>', views.date_time, name='date_time'),
     path('tag/<slug>', views.tag_spaces, name='tagged_spaces'),
     path('write_feedback/<space_id>', views.write_feedback, name='write_feedback'),
+    path('save_space/<space_id>', views.save_space, name='save_space'),
+    path('saved_spaces/', views.saved_spaces, name='saved_spaces'),
 ]

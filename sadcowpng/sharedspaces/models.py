@@ -15,12 +15,6 @@ Noise_Level_Choices = (
 )
 
 
-# Create user as a client or proprietor
-class User(AbstractUser):
-    is_client = models.BooleanField(default=False)
-    is_proprietor = models.BooleanField(default=False)
-
-
 class Space(models.Model):
     space_name = models.CharField(max_length=500)
     space_description = models.CharField(max_length=1000)
@@ -95,6 +89,13 @@ class Space(models.Model):
         return address
 
 
+# Create user as a client or proprietor
+class User(AbstractUser):
+    is_client = models.BooleanField(default=False)
+    is_proprietor = models.BooleanField(default=False)
+    saved_spaces = models.ManyToManyField(Space)
+
+    
 class SpaceDateTime(models.Model):
     # Switch to char if this does not work
     space_date = models.CharField(max_length=100, default='EMPTY')

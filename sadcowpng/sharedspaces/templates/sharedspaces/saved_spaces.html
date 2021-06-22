@@ -1,0 +1,81 @@
+{% extends 'sharedspaces/account_header.html' %}
+{% load static %}
+
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'account.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <body>
+        <div class="container-fluid">
+
+        <!-- Layout may differ depending on user type  -->
+        {% if user.is_client and user.is_authenticated %}
+            <h1>Welcome, {{ user.get_username }}!</h1>
+            <br>
+            <!-- acount.html as reference-->
+            <h3>Saved Spaces</h3>
+            <div class="row">
+                <!-- logic for listing saved spaces here-->
+            </div>
+            <div class="row">
+                {% for space in saved_spaces %}
+                    <div class="col-sm-4">
+                        <div class="card border-info mb-3">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title">{{ space.space_name }}
+                                    {% if space.space_open %}
+                                        <span class="badge badge-success">Open</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Closed</span>
+                                    {% endif %}
+                                </h5>
+                            </div>
+                            <p class="card-text">{{ space.space_description }}</p>
+                            <ul class="list-group list-group-horizontal list-group-flush">
+                                <li class="list-group-item list-group-item-info">
+                                    Max Capacity
+                                    <p class="card-text">{{ space.space_max_capacity }}</p>
+                                </li>
+                                <li class="list-group-item list-group-item-info">
+                                    Wifi Offered?
+                                    {% if space.space_wifi %}
+                                        <p class="card-text">Yes</p>
+                                    {% else %}
+                                        <p class="card-text">No</p>
+                                    {% endif %}
+                                </li>
+                                <li class="list-group-item list-group-item-info">
+                                    Restrooms Offered?
+                                    {% if space.space_restrooms %}
+                                        <p class="card-text">Yes</p>
+                                    {% else %}
+                                        <p class="card-text">No</p>
+                                    {% endif %}
+                                </li>
+                                <li class="list-group-item list-group-item-info">
+                                    Food/Drink Offered?
+                                    {% if space.space_food_drink %}
+                                        <p class="card-text">Yes</p>
+                                    {% else %}
+                                        <p class="card-text">No</p>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                            <div class="card-body">
+                                {% for tag in space.space_tags.all %}
+                                    <button type="button" class="badge rounded-pill"
+                                            onclick="window.location.href='{% url 'tagged_spaces' tag %}'">{{ tag }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        </div>
+    </body>
+{% endblock %}

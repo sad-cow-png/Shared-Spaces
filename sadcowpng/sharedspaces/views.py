@@ -2,7 +2,7 @@ from django.shortcuts import render, reverse
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from .forms import CreateSpaceForm, Noise_Level_Choices, ProprietorSignUpForm,\
@@ -480,3 +480,47 @@ def write_feedback(request, space_id):
         context = {'form': space_form,
                    "space_id": space_id}
         return render(request, 'sharedspaces/write_feedback.html', context)
+
+
+def save_space(request, space_id):
+    """
+    POST: Updates User model saved_spaces field with a new saved space.
+    GET : Renders a save confirmation page for the desired space.
+    """
+    user = request.user
+    space = Space.objects.get(pk=space_id)
+
+    if request.method == 'POST':
+        # Record the space to the user's saved_spaces field
+        user.saved_spaces.add(space)
+        user.save()
+
+        return HttpResponseRedirect(reverse('saved_spaces'))
+
+    context = {
+        'user': user,
+        'space': space,
+        'space_id': space_id,
+    }
+
+    return render(request, 'sharedspaces/save_space.html', context) 
+
+
+def saved_spaces(request):
+    """
+    Renders the spaces that the user has saved to view later on one page.
+    """
+    user = request.user
+    saved_spaces = []
+
+    for saved_space in user.saved_spaces.all():
+        print(saved_space.space_name)
+        saved_spaces.append(saved_space)
+
+    context = {
+        'user': user,
+        'saved_spaces': saved_spaces,
+    }
+
+    return render(request, 'sharedspaces/saved_spaces.html', context=context)
+
